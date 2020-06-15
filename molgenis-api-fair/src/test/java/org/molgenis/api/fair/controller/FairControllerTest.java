@@ -6,7 +6,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.net.URI;
+<<<<<<< HEAD
 import java.util.Optional;
+=======
+import java.util.stream.Stream;
+>>>>>>> 388014de9d... Modifies fair api to get namespaces to add namespaces dinamycally from a model
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -56,10 +60,11 @@ class FairControllerTest extends AbstractMockitoSpringContextTests {
   @Test
   void getCatalogTest() throws Exception {
     Entity answer = mock(Entity.class);
-
     when(metaDataService.getEntityType("fdp_Catalog")).thenReturn(Optional.of(catalogMeta));
     when(entityModelWriter.isADcatResource(catalogMeta)).thenReturn(true);
     when(dataService.findOneById("fdp_Catalog", "catalogID")).thenReturn(answer);
+    Stream<Entity> namespaces = Stream.empty();
+    when(dataService.findAll("fdp_Namespace")).thenReturn(namespaces);
 
     this.mockMvc
         .perform(
@@ -68,7 +73,7 @@ class FairControllerTest extends AbstractMockitoSpringContextTests {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED))
         .andExpect(status().isOk());
 
-    Mockito.verify(entityModelWriter).createRdfModel(answer);
+    Mockito.verify(entityModelWriter).createRdfModel(answer, namespaces);
   }
 
   @Test

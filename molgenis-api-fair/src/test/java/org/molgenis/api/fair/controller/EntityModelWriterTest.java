@@ -29,8 +29,11 @@ import com.google.common.collect.Multimap;
 import java.io.StringWriter;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
+import javax.xml.datatype.DatatypeConfigurationException;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
@@ -58,9 +61,13 @@ class EntityModelWriterTest extends AbstractMockitoTest {
   @Mock private TagService<LabeledResource, LabeledResource> tagService;
   @Mock private Entity objectEntity;
   @Mock private Entity refEntity;
+  @Mock private Entity namespaceEntity;
   @Mock private EntityType entityType;
   @Mock private EntityType refEntityType;
   @Mock private Attribute attribute;
+  @Mock private Attribute attr1;
+  @Mock private Attribute attr2;
+  @Mock private Attribute attr3;
   @Mock private SemanticTag<EntityType, LabeledResource, LabeledResource> entityTag;
   @Mock private SemanticTag<EntityType, LabeledResource, LabeledResource> entityTag2;
   @Mock private LabeledResource labeledResource;
@@ -80,6 +87,14 @@ class EntityModelWriterTest extends AbstractMockitoTest {
         };
   }
 
+  private Stream<Entity> getStreamEntity() {
+    when(namespaceEntity.getString("prefix")).thenReturn("icd");
+    when(namespaceEntity.getString("IRI"))
+        .thenReturn("http://purl.bioontology.org/ontology/ICD9CM/");
+    List<Entity> namespaceCollection = singletonList(namespaceEntity);
+    return namespaceCollection.stream();
+  }
+
   @Test
   void testCreateRfdModelForEntity() {
     List<Attribute> attributeList = singletonList(attribute);
@@ -92,23 +107,16 @@ class EntityModelWriterTest extends AbstractMockitoTest {
 
     when(entityType.getAtomicAttributes()).thenReturn(attributeList);
 
-    when(attribute.getName()).thenReturn("attributeName1");
-    when(attribute.getDataType()).thenReturn(STRING);
-
-    when(tagService.getTagsForEntity(entityType)).thenReturn(List.of(entityTag, entityTag2));
-    when(entityTag.getRelation()).thenReturn(isAssociatedWith);
-    when(entityTag.getObject()).thenReturn(labeledResource);
-    when(labeledResource.getIri()).thenReturn(DCAT_RESOURCE);
-
-    when(entityTag2.getRelation()).thenReturn(isAssociatedWith);
-    when(entityTag2.getObject()).thenReturn(labeledResource2);
-    when(labeledResource2.getIri()).thenReturn(R3D_REPOSITORY);
+    when(attr1.getName()).thenReturn("attributeName1");
+    when(attr1.getDataType()).thenReturn(AttributeType.STRING);
 
     LabeledResource tag1 = new LabeledResource("http://IRI1.nl", "tag1Label");
-    Multimap<Relation, LabeledResource> tags = ImmutableMultimap.of(isAssociatedWith, tag1);
-    when(tagService.getTagsForAttribute(entityType, attribute)).thenReturn(tags);
+    Multimap<Relation, LabeledResource> tags =
+        ImmutableMultimap.of(Relation.isAssociatedWith, tag1);
+    when(tagService.getTagsForAttribute(entityType, attr1)).thenReturn(tags);
 
-    Model result = writer.createRdfModel(objectEntity);
+    Model result =
+        writer.createRdfModel(objectEntity, getStreamEntity());
 
     assertEquals(9, result.size());
     StringWriter writer = new StringWriter();
@@ -205,11 +213,12 @@ class EntityModelWriterTest extends AbstractMockitoTest {
     when(attribute.getDataType()).thenReturn(attributeType);
 
     Multimap<Relation, LabeledResource> tags =
-        ImmutableMultimap.of(isAssociatedWith, labeledResource);
+        ImmutableMultimap.of(Relation.isAssociatedWith, labeledResource);
     when(labeledResource.getIri()).thenReturn("http://example.org/iri");
     when(tagService.getTagsForAttribute(entityType, attribute)).thenReturn(tags);
 
-    Model result = writer.createRdfModel(objectEntity);
+    Model result =
+        writer.createRdfModel(objectEntity, getStreamEntity());
 
     StringWriter writer = new StringWriter();
     Rio.write(result, writer, TURTLE, new WriterConfig().set(INLINE_BLANK_NODES, true));
@@ -236,7 +245,7 @@ class EntityModelWriterTest extends AbstractMockitoTest {
         .thenReturn(ImmutableMultimap.of(isAssociatedWith, labeledResource));
     when(labeledResource.getIri()).thenReturn("http://example.org/relation");
 
-    Model result = writer.createRdfModel(objectEntity);
+    Model result = writer.createRdfModel(objectEntity, getStreamEntity());
 
     assertEquals(1, result.size());
     StringWriter writer = new StringWriter();
@@ -265,7 +274,7 @@ class EntityModelWriterTest extends AbstractMockitoTest {
         .thenReturn(ImmutableMultimap.of(isAssociatedWith, labeledResource));
     when(labeledResource.getIri()).thenReturn("http://example.org/relation");
 
-    Model result = writer.createRdfModel(objectEntity);
+    Model result = writer.createRdfModel(objectEntity, getStreamEntity());
 
     assertEquals(1, result.size());
     StringWriter writer = new StringWriter();
@@ -296,7 +305,8 @@ class EntityModelWriterTest extends AbstractMockitoTest {
     Multimap<Relation, LabeledResource> tags = ImmutableMultimap.of(isAssociatedWith, tag);
     when(tagService.getTagsForAttribute(entityType, attribute)).thenReturn(tags);
 
-    Model result = writer.createRdfModel(objectEntity);
+    Model result =
+        writer.createRdfModel(objectEntity, getStreamEntity());
 
     assertEquals(3, result.size());
     StringWriter writer = new StringWriter();
@@ -312,7 +322,8 @@ class EntityModelWriterTest extends AbstractMockitoTest {
     when(objectEntity.get("attributeName1")).thenReturn(null);
     when(attribute.getName()).thenReturn("attributeName1");
 
-    Model result = writer.createRdfModel(objectEntity);
+    Model result =
+        writer.createRdfModel(objectEntity, getStreamEntity());
 
     assertTrue(result.isEmpty());
   }

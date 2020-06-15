@@ -6,6 +6,8 @@ import static java.util.Objects.requireNonNull;
 import static org.molgenis.api.fair.controller.FairController.BASE_URI;
 
 import com.google.common.collect.Streams;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -71,7 +73,7 @@ public class EntityModelWriter {
     fdpMetadataIdentifier = valueFactory.createIRI(NS_FDP, "metadataIdentifier");
   }
 
-  private void setNamespacePrefixes(Model model) {
+  private void setNamespacePrefixes(Model model, Stream<Entity> namespaces) {
     model.setNamespace("rdf", NS_RDF);
     model.setNamespace("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
     model.setNamespace("dcat", NS_DCAT);
@@ -88,16 +90,21 @@ public class EntityModelWriter {
     model.setNamespace("datacite", NS_DATACITE);
   }
 
-  public Model createRdfModel(Entity objectEntity) {
-    Model model = createEmptyModel();
+  public Model createRdfModel(Entity objectEntity, Stream<Entity> namespaces) {
+    Model model = createEmptyModel(namespaces);
     Resource subject = createResource(objectEntity);
     addEntityToModel(subject, objectEntity, model);
+    Consumer<Entity> namespacesConsumer =
+        entity -> {
+          model.setNamespace(entity.getString("prefix"), entity.getString("IRI"));
+        };
+    namespaces.forEach(namespacesConsumer);
     return model;
   }
 
-  public Model createEmptyModel() {
+  public Model createEmptyModel(Stream<Entity> namespaces) {
     Model model = new LinkedHashModel();
-    setNamespacePrefixes(model);
+    setNamespacePrefixes(model, namespaces);
     return model;
   }
 

@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static org.molgenis.core.ui.converter.RDFMediaType.TEXT_TURTLE_VALUE;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
+import java.util.stream.Stream;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.molgenis.api.ApiNamespace;
@@ -49,7 +50,8 @@ public class FairController {
   @RunAsSystem
   public Model getMetadata() {
     Entity subjectEntity = dataService.findOne("fdp_Metadata", new QueryImpl<>());
-    return entityModelWriter.createRdfModel(subjectEntity);
+    Stream<Entity> namespaces = dataService.findAll("fdp_Namespace");
+    return entityModelWriter.createRdfModel(subjectEntity, namespaces);
   }
 
   @GetMapping(produces = TEXT_TURTLE_VALUE, value = "/{entityType}/{entity}")
@@ -62,10 +64,12 @@ public class FairController {
       throw new IllegalArgumentException("Entitytype is not a resource");
     }
     Entity subjectEntity = dataService.findOneById(entityType, entity);
+
     if (subjectEntity == null) {
       throw new UnknownEntityException(entityType, entity);
     }
-    return entityModelWriter.createRdfModel(subjectEntity);
+    Stream<Entity> namespaces = dataService.findAll("fdp_Namespace");
+    return entityModelWriter.createRdfModel(subjectEntity, namespaces);
   }
 
   @ExceptionHandler(UnknownEntityException.class)

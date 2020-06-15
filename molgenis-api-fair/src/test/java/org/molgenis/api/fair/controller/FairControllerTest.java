@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.net.URI;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -55,8 +56,9 @@ class FairControllerTest extends AbstractMockitoSpringContextTests {
     reset(dataService);
 
     Entity answer = mock(Entity.class);
-
+    Stream<Entity> namespaces = Stream.empty();
     when(dataService.findOneById("fdp_Catalog", "catalogID")).thenReturn(answer);
+    when(dataService.findAll("fdp_Namespace")).thenReturn(namespaces);
 
     this.mockMvc
         .perform(
@@ -65,7 +67,7 @@ class FairControllerTest extends AbstractMockitoSpringContextTests {
         .andExpect(status().isOk());
 
     Mockito.verify(entityModelWriter)
-        .createRdfModel("http://molgenis01.gcc.rug.nl:8080/api/fdp/catalogID", answer);
+        .createRdfModel("http://molgenis01.gcc.rug.nl:8080/api/fdp/catalogID", answer, namespaces);
   }
 
   @Test

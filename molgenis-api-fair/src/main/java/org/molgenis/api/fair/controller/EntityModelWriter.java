@@ -4,6 +4,8 @@ import static com.google.common.collect.Iterables.contains;
 import static java.util.Arrays.stream;
 import static java.util.Objects.requireNonNull;
 
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -48,7 +50,7 @@ public class EntityModelWriter {
         valueFactory.createIRI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
   }
 
-  private void setNamespacePrefixes(Model model) {
+  private void setNamespacePrefixes(Model model, Stream<Entity> namespaces) {
     model.setNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
     model.setNamespace("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
     model.setNamespace("dcat", "http://www.w3.org/ns/dcat#");
@@ -62,17 +64,22 @@ public class EntityModelWriter {
     model.setNamespace("orcid", "http://orcid.org/");
     model.setNamespace("r3d", "http://www.re3data.org/schema/3-0#");
     model.setNamespace("sio", "http://semanticscience.org/resource/");
+    Consumer<Entity> namespacesConsumer =
+        entity -> {
+          model.setNamespace(entity.getString("prefix"), entity.getString("IRI"));
+        };
+    namespaces.forEach(namespacesConsumer);
   }
 
-  public Model createRdfModel(String subjectIRI, Entity objectEntity) {
-    Model model = createEmptyModel();
+  public Model createRdfModel(String subjectIRI, Entity objectEntity, Stream<Entity> namespaces) {
+    Model model = createEmptyModel(namespaces);
     addEntityToModel(subjectIRI, objectEntity, model);
     return model;
   }
 
-  public Model createEmptyModel() {
+  public Model createEmptyModel(Stream<Entity> namespaces) {
     Model model = new LinkedHashModel();
-    setNamespacePrefixes(model);
+    setNamespacePrefixes(model, namespaces);
     return model;
   }
 

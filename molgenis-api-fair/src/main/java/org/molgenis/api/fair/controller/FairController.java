@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static org.molgenis.core.ui.converter.RDFMediaType.TEXT_TURTLE_VALUE;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
+import java.util.stream.Stream;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.molgenis.api.ApiNamespace;
@@ -50,7 +51,8 @@ public class FairController {
   public Model getMetadata() {
     String subjectIRI = getBaseUri().toUriString();
     Entity subjectEntity = dataService.findOne("fdp_Metadata", new QueryImpl<>());
-    return entityModelWriter.createRdfModel(subjectIRI, subjectEntity);
+    Stream<Entity> namespaces = dataService.findAll("fdp_Namespace");
+    return entityModelWriter.createRdfModel(subjectIRI, subjectEntity, namespaces);
   }
 
   @GetMapping(produces = TEXT_TURTLE_VALUE, value = "/{catalogID}")
@@ -59,10 +61,12 @@ public class FairController {
   public Model getCatalog(@PathVariable("catalogID") String catalogID) {
     String subjectIRI = getBaseUri().pathSegment(catalogID).toUriString();
     Entity subjectEntity = dataService.findOneById("fdp_Catalog", catalogID);
+    Stream<Entity> namespaces = dataService.findAll("fdp_Namespace");
+
     if (subjectEntity == null) {
       throw new UnknownEntityException("fdp_Catalog", catalogID);
     }
-    return entityModelWriter.createRdfModel(subjectIRI, subjectEntity);
+    return entityModelWriter.createRdfModel(subjectIRI, subjectEntity, namespaces);
   }
 
   @GetMapping(produces = TEXT_TURTLE_VALUE, value = "/{catalogID}/{datasetID}")
@@ -75,7 +79,8 @@ public class FairController {
     if (subjectEntity == null) {
       throw new UnknownEntityException("fdp_Dataset", datasetID);
     }
-    return entityModelWriter.createRdfModel(subjectIRI, subjectEntity);
+    Stream<Entity> namespaces = dataService.findAll("fdp_Namespace");
+    return entityModelWriter.createRdfModel(subjectIRI, subjectEntity, namespaces);
   }
 
   @GetMapping(produces = TEXT_TURTLE_VALUE, value = "/{catalogID}/{datasetID}/{distributionID}")
@@ -88,7 +93,8 @@ public class FairController {
     String subjectIRI =
         getBaseUri().pathSegment(catalogID, datasetID, distributionID).toUriString();
     Entity subjectEntity = dataService.findOneById("fdp_Distribution", distributionID);
-    return entityModelWriter.createRdfModel(subjectIRI, subjectEntity);
+    Stream<Entity> namespaces = dataService.findAll("fdp_Namespace");
+    return entityModelWriter.createRdfModel(subjectIRI, subjectEntity, namespaces);
   }
 
   @ExceptionHandler(UnknownEntityException.class)

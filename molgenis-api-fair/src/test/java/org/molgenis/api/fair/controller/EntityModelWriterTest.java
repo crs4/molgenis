@@ -18,6 +18,7 @@ import java.time.Month;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 import javax.xml.datatype.DatatypeConfigurationException;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Resource;
@@ -41,6 +42,7 @@ class EntityModelWriterTest extends AbstractMockitoTest {
   @Mock private TagService<LabeledResource, LabeledResource> tagService;
   @Mock private Entity objectEntity;
   @Mock private Entity refEntity;
+  @Mock private Entity namespaceEntity;
   @Mock private EntityType entityType;
   @Mock private EntityType refEntityType;
   @Mock private Attribute attribute;
@@ -54,6 +56,14 @@ class EntityModelWriterTest extends AbstractMockitoTest {
   @BeforeEach
   void beforeMethod() throws DatatypeConfigurationException {
     writer = new EntityModelWriter(tagService, valueFactory);
+  }
+
+  private Stream<Entity> getStreamEntity() {
+    when(namespaceEntity.getString("prefix")).thenReturn("icd");
+    when(namespaceEntity.getString("IRI"))
+        .thenReturn("http://purl.bioontology.org/ontology/ICD9CM/");
+    List<Entity> namespaceCollection = singletonList(namespaceEntity);
+    return namespaceCollection.stream();
   }
 
   @Test
@@ -75,7 +85,8 @@ class EntityModelWriterTest extends AbstractMockitoTest {
     when(tagService.getTagsForAttribute(entityType, attr1)).thenReturn(tags);
 
     Model result =
-        writer.createRdfModel("http://molgenis01.gcc.rug.nl/fdp/catolog/test/this", objectEntity);
+        writer.createRdfModel(
+            "http://molgenis01.gcc.rug.nl/fdp/catolog/test/this", objectEntity, getStreamEntity());
 
     assertEquals(1, result.size());
     Iterator results = result.iterator();
@@ -103,7 +114,8 @@ class EntityModelWriterTest extends AbstractMockitoTest {
     when(tagService.getTagsForAttribute(entityType, attr2)).thenReturn(tags2);
 
     Model result =
-        writer.createRdfModel("http://molgenis01.gcc.rug.nl/fdp/catolog/test/this", objectEntity);
+        writer.createRdfModel(
+            "http://molgenis01.gcc.rug.nl/fdp/catolog/test/this", objectEntity, getStreamEntity());
 
     assertEquals(1, result.size());
     Iterator results = result.iterator();
@@ -136,7 +148,8 @@ class EntityModelWriterTest extends AbstractMockitoTest {
     when(tagService.getTagsForAttribute(entityType, attr3)).thenReturn(tags3);
 
     Model result =
-        writer.createRdfModel("http://molgenis01.gcc.rug.nl/fdp/catolog/test/this", objectEntity);
+        writer.createRdfModel(
+            "http://molgenis01.gcc.rug.nl/fdp/catolog/test/this", objectEntity, getStreamEntity());
 
     assertEquals(1, result.size());
     Iterator results = result.iterator();
@@ -165,7 +178,8 @@ class EntityModelWriterTest extends AbstractMockitoTest {
     when(tagService.getTagsForAttribute(entityType, attribute)).thenReturn(tags);
 
     Model result =
-        writer.createRdfModel("http://molgenis01.gcc.rug.nl/fdp/catolog/test/this", objectEntity);
+        writer.createRdfModel(
+            "http://molgenis01.gcc.rug.nl/fdp/catolog/test/this", objectEntity, getStreamEntity());
 
     assertEquals(1, result.size());
     Iterator results = result.iterator();
@@ -196,7 +210,8 @@ class EntityModelWriterTest extends AbstractMockitoTest {
     when(tagService.getTagsForAttribute(entityType, attribute)).thenReturn(tags);
 
     Model result =
-        writer.createRdfModel("http://molgenis01.gcc.rug.nl/fdp/catolog/test/this", objectEntity);
+        writer.createRdfModel(
+            "http://molgenis01.gcc.rug.nl/fdp/catolog/test/this", objectEntity, getStreamEntity());
 
     assertEquals(1, result.size());
     Iterator results = result.iterator();
@@ -229,7 +244,8 @@ class EntityModelWriterTest extends AbstractMockitoTest {
     when(tagService.getTagsForAttribute(entityType, attribute)).thenReturn(tags);
 
     Model result =
-        writer.createRdfModel("http://molgenis01.gcc.rug.nl/fdp/catolog/test/this", objectEntity);
+        writer.createRdfModel(
+            "http://molgenis01.gcc.rug.nl/fdp/catolog/test/this", objectEntity, getStreamEntity());
 
     assertEquals(1, result.size());
     Iterator results = result.iterator();
@@ -262,7 +278,8 @@ class EntityModelWriterTest extends AbstractMockitoTest {
     when(tagService.getTagsForAttribute(entityType, attribute)).thenReturn(tags);
 
     Model result =
-        writer.createRdfModel("http://molgenis01.gcc.rug.nl/fdp/catolog/test/this", objectEntity);
+        writer.createRdfModel(
+            "http://molgenis01.gcc.rug.nl/fdp/catolog/test/this", objectEntity, getStreamEntity());
 
     assertEquals(1, result.size());
     Iterator results = result.iterator();
@@ -295,7 +312,8 @@ class EntityModelWriterTest extends AbstractMockitoTest {
     when(tagService.getTagsForAttribute(entityType, attribute)).thenReturn(tags);
 
     Model result =
-        writer.createRdfModel("http://molgenis01.gcc.rug.nl/fdp/catolog/test/this", objectEntity);
+        writer.createRdfModel(
+            "http://molgenis01.gcc.rug.nl/fdp/catolog/test/this", objectEntity, getStreamEntity());
 
     assertEquals(1, result.size());
     Iterator results = result.iterator();
@@ -328,7 +346,8 @@ class EntityModelWriterTest extends AbstractMockitoTest {
     when(tagService.getTagsForAttribute(entityType, attribute)).thenReturn(tags);
 
     Model result =
-        writer.createRdfModel("http://molgenis01.gcc.rug.nl/fdp/catolog/test/this", objectEntity);
+        writer.createRdfModel(
+            "http://molgenis01.gcc.rug.nl/fdp/catolog/test/this", objectEntity, getStreamEntity());
 
     assertEquals(1, result.size());
     Iterator results = result.iterator();
@@ -360,7 +379,8 @@ class EntityModelWriterTest extends AbstractMockitoTest {
     when(tagService.getTagsForAttribute(entityType, attribute)).thenReturn(tags);
 
     Model result =
-        writer.createRdfModel("http://molgenis01.gcc.rug.nl/fdp/catolog/test/this", objectEntity);
+        writer.createRdfModel(
+            "http://molgenis01.gcc.rug.nl/fdp/catolog/test/this", objectEntity, getStreamEntity());
 
     assertEquals(3, result.size());
     List<String> statements = result.stream().map(Statement::toString).collect(toList());
@@ -402,7 +422,8 @@ class EntityModelWriterTest extends AbstractMockitoTest {
     doReturn(tags2).when(tagService).getTagsForAttribute(entityType, attribute2);
 
     Model result =
-        writer.createRdfModel("http://molgenis01.gcc.rug.nl/fdp/catolog/test/this", objectEntity);
+        writer.createRdfModel(
+            "http://molgenis01.gcc.rug.nl/fdp/catolog/test/this", objectEntity, getStreamEntity());
 
     assertEquals(1, result.size());
     Iterator results = result.iterator();

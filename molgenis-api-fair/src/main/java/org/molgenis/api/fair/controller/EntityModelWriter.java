@@ -23,10 +23,14 @@ import org.molgenis.data.semantic.LabeledResource;
 import org.molgenis.data.semantic.Relation;
 import org.molgenis.data.semantic.SemanticTag;
 import org.molgenis.semanticsearch.service.TagService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class EntityModelWriter {
+  private static final Logger LOG = LoggerFactory.getLogger(FairController.class);
+
   private static final String KEYWORD = "http://www.w3.org/ns/dcat#keyword";
   private final IRI rdfTypePredicate;
 
@@ -200,10 +204,7 @@ public class EntityModelWriter {
   private void addRelationForMrefTypeAttribute(
       Model model, Resource subject, IRI predicate, Iterable<Entity> objectEntities) {
     for (Entity objectEntity : objectEntities) {
-      model.add(
-          subject,
-          predicate,
-          valueFactory.createIRI(subject.stringValue() + '/' + objectEntity.getIdValue()));
+      addRelationForXrefTypeAttribute(model, subject, predicate, objectEntity);
     }
   }
 }

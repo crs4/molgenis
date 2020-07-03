@@ -161,11 +161,14 @@ class EntityModelWriterTest extends AbstractMockitoTest {
   @Test
   void testCreateRfdModelMREF() {
     List<Attribute> attributeList = singletonList(attribute);
+    List<String> refAttributeList = singletonList("refAttr");
 
     when(objectEntity.getEntityType()).thenReturn(entityType);
     when(objectEntity.get("attributeName")).thenReturn(refEntity);
     when(objectEntity.getEntities("attributeName")).thenReturn(singletonList(refEntity));
 
+    when(refEntity.getEntityType()).thenReturn(refEntityType);
+    when(refEntityType.getAttributeNames()).thenReturn(refAttributeList);
     when(refEntity.getIdValue()).thenReturn("refID");
 
     when(entityType.getAtomicAttributes()).thenReturn(attributeList);

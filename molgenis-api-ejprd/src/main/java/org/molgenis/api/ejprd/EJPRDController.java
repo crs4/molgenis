@@ -9,6 +9,8 @@ import java.util.stream.Stream;
 import org.molgenis.api.ApiNamespace;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
+import org.molgenis.data.Query;
+import org.molgenis.data.support.QueryImpl;
 import org.molgenis.security.core.runas.RunAsSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +42,15 @@ public class EJPRDController {
   @ResponseBody
   @RunAsSystem
   public List<CollectionResponse> getCollections() {
+    Query<Entity> q = new QueryImpl<>();
+    // q=((diagnosis_available.code==R55);(diagnosis_available.ontology==ICD-10))
+    q.nest();
+    q.eq("diagnosis_available.code", "R55");
+    q.and();
+    q.eq("diagnosis_available.ontology", "ICD-10");
+    q.unnest();
 
-    Stream<Entity> collections = dataService.findAll("eu_bbmri_eric_collections");
+    Stream<Entity> collections = dataService.findAll("eu_bbmri_eric_collections", q);
 
     List<CollectionResponse> collectionsResponse = new ArrayList<>();
 

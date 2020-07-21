@@ -41,40 +41,24 @@ public class EJPRDController {
   @GetMapping("/collection/")
   @ResponseBody
   @RunAsSystem
-  public List<CollectionResponse> getCollections() {
-    Query<Entity> q = new QueryImpl<>();
-    // q=((diagnosis_available.code==R55);(diagnosis_available.ontology==ICD-10))
-    q.nest();
-    q.eq("diagnosis_available.code", "R55");
-    q.and();
-    q.eq("diagnosis_available.ontology", "ICD-10");
-    q.unnest();
+  public List<Resource> getResource() {
+    // TODO: it should get the builder dinamically
+    QueryBuilder queryBuilder = new BBMRIEricQueryBuilder();
+    Query<Entity> q = queryBuilder.getQuery();
 
-    Stream<Entity> collections = dataService.findAll("eu_bbmri_eric_collections", q);
+    Stream<Entity> entities = dataService.findAll(queryBuilder.getEntityType(), q);
 
-    List<CollectionResponse> collectionsResponse = new ArrayList<>();
-
-    Consumer<Entity> collectionsConsumer =
+    List<Resource> resources = new ArrayList<>();
+    Consumer<Entity> entityConsumer =
         collection -> {
-          collectionsResponse.add(createCollection(collection));
+          resources.add(createResource(collection));
         };
-    collections.forEach(collectionsConsumer);
-    return collectionsResponse;
+    entities.forEach(entityConsumer);
+    return resources;
   }
 
-  private CollectionResponse createCollection(Entity collection) {
-    String subjectIRI = getBaseUri().toUriString();
-
-    String url =
-        String.format(
-            "%s/menu/main/app-molgenis-app-biobank-explorer/collection/%s",
-            subjectIRI, collection.getString("id"));
-
-    String uuid = collection.getString("id");
-    Entity biobank = (Entity) collection.get("biobank");
-    String name = String.format("%s - %s", biobank.getString("name"), collection.getString("name"));
-    String description = collection.getString("description");
-
-    return new CollectionResponse(url, uuid, name, description);
+  private Resource createResource(Entity entity) {
+    ResourceAdapter mapper = new BBMRIEricResourceAdapter(entity);
+    return mapper.createResource();
   }
 }

@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.molgenis.api.ApiNamespace;
+import org.molgenis.api.ejprd.model.CatalogResponse;
+import org.molgenis.api.ejprd.model.CatalogsResponse;
+import org.molgenis.api.ejprd.model.ResourceResponse;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
 import org.molgenis.data.Query;
@@ -37,17 +40,17 @@ public class EJPRDController {
     return ServletUriComponentsBuilder.fromCurrentContextPath().path(BASE_URI);
   }
 
-  @GetMapping("/collection/")
+  @GetMapping("/query")
   @ResponseBody
   @RunAsSystem
-  public List<Resource> getResource() {
+  public List<ResourceResponse> getResource() {
     // TODO: it should get the builder dinamically
     QueryBuilder queryBuilder = new BBMRIEricQueryBuilder();
     Query<Entity> q = queryBuilder.getQuery();
 
     Stream<Entity> entities = dataService.findAll(queryBuilder.getEntityType(), q);
 
-    List<Resource> resources = new ArrayList<>();
+    List<ResourceResponse> resources = new ArrayList<>();
     Consumer<Entity> entityConsumer =
         collection -> {
           resources.add(createResource(collection));
@@ -56,7 +59,29 @@ public class EJPRDController {
     return resources;
   }
 
-  private Resource createResource(Entity entity) {
+  @GetMapping("/external_resource/")
+  @ResponseBody
+  @RunAsSystem
+  public CatalogsResponse getExternalResource() {
+    List<ResourceResponse> resources = new ArrayList<>();
+    String catalogName = "ERDRI";
+    String catalogUrl = "https://eu-rd-platform.jrc.ec.europa.eu/erdridor/";
+    ResourceResponse register =
+        ResourceResponse.create(
+            "Registry",
+            "Banque Nationale de Données Maladies Rares",
+            "https://eu-rd-platform.jrc.ec.europa.eu/erdridor/register/2444",
+            "2444",
+            "The French National Registry for Rare Diseases is a national tool for epidemiology and public health purposes in the field of rare diseases (RD). The data collection is mandatory for all the Rare Disease expert centers at the national level. A minimum data set (MDS) of about 60 items is collected for all the rare disease expert centers patients. This MDS strongly inspired the Common Data Elements (CDE) promoted by the EUCERD, and later by the JRC, which will greatly facilitate interoperability.");
+
+    resources.add(register);
+    CatalogResponse erdri = CatalogResponse.create(catalogName, catalogUrl, resources);
+    List<CatalogResponse> catalogs = new ArrayList<>();
+    catalogs.add(erdri);
+    return CatalogsResponse.create(catalogs);
+  }
+
+  private ResourceResponse createResource(Entity entity) {
     ResourceAdapter mapper = new BBMRIEricResourceAdapter(entity);
     return mapper.createResource();
   }

@@ -3,6 +3,7 @@ package org.molgenis.api.ejprd;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -63,21 +64,44 @@ public class EJPRDController {
   @ResponseBody
   @RunAsSystem
   public CatalogsResponse getExternalResource() {
-    List<ResourceResponse> resources = new ArrayList<>();
-    String catalogName = "ERDRI";
-    String catalogUrl = "https://eu-rd-platform.jrc.ec.europa.eu/erdridor/";
-    ResourceResponse register =
+    List<ResourceResponse> erdriResources = new ArrayList<>();
+
+    String erdriCatalog = "ERDRI";
+    String erdriUrl = "https://eu-rd-platform.jrc.ec.europa.eu/erdridor/";
+
+    ResourceResponse register1 =
         ResourceResponse.create(
             "Registry",
             "Banque Nationale de Données Maladies Rares",
             "https://eu-rd-platform.jrc.ec.europa.eu/erdridor/register/2444",
             "2444",
             "The French National Registry for Rare Diseases is a national tool for epidemiology and public health purposes in the field of rare diseases (RD). The data collection is mandatory for all the Rare Disease expert centers at the national level. A minimum data set (MDS) of about 60 items is collected for all the rare disease expert centers patients. This MDS strongly inspired the Common Data Elements (CDE) promoted by the EUCERD, and later by the JRC, which will greatly facilitate interoperability.");
+    ResourceResponse register2 =
+        ResourceResponse.create(
+            "Registry",
+            "Degos Disease Registry (Registry for Malignant Atrophic Papulosis)",
+            "https://eu-rd-platform.jrc.ec.europa.eu/erdridor/register/4607",
+            "Degos-Disease",
+            "Purpose of the registry is the support of research on demographics, epidemiology, prognosis, etiology and treatment of the disease Malignant Atrophic Papulosis (Köhlmeier-Degos disease, Degos disease)");
+    erdriResources.add(register1);
+    erdriResources.add(register2);
+    CatalogResponse erdri = CatalogResponse.create(erdriCatalog, erdriUrl, erdriResources);
 
-    resources.add(register);
-    CatalogResponse erdri = CatalogResponse.create(catalogName, catalogUrl, resources);
+    String orphanetName = "Orphanet";
+    String orphanetUrl = "https://www.orpha.net/";
+    ResourceResponse register3 =
+        ResourceResponse.create(
+            "Biobank",
+            "Cell line and DNA Biobank from patients affected by genetic diseases",
+            "https://www.orpha.net/consor/cgi-bin/ResearchTrials_RegistriesMaterials.php?lng=EN&data_id=46305&RegistryMaterialName=Biobanca-di-linee-cellulari-e-di-DNA-da-pazienti-affetti-da-malattie-genetiche&title=Biobanca%20di%20linee%20cellulari%20e%20di%20DNA%20da%20pazienti%20affetti%20da%20malattie%20genetiche&search=ResearchTrials_RegistriesMaterials_Simple",
+            "46305",
+            null);
+    CatalogResponse orphanet =
+        CatalogResponse.create(orphanetName, orphanetUrl, Collections.singletonList(register3));
+
     List<CatalogResponse> catalogs = new ArrayList<>();
     catalogs.add(erdri);
+    catalogs.add(orphanet);
     return CatalogsResponse.create(catalogs);
   }
 

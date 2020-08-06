@@ -1,6 +1,8 @@
 package org.molgenis.api.ejprd;
 
+import org.molgenis.api.ejprd.model.ResourceResponse;
+
 public interface ResourceAdapter {
 
-  Resource createResource();
+  ResourceResponse createResource();
 }

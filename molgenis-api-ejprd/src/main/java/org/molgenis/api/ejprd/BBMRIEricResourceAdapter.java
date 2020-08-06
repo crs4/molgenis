@@ -2,6 +2,7 @@ package org.molgenis.api.ejprd;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.molgenis.api.ejprd.model.ResourceResponse;
 import org.molgenis.data.Entity;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -21,7 +22,7 @@ public class BBMRIEricResourceAdapter implements ResourceAdapter {
     return ServletUriComponentsBuilder.fromCurrentContextPath();
   }
 
-  public Resource createResource() {
+  public ResourceResponse createResource() {
     String baseURL = getBaseUri().toUriString();
 
     String url =
@@ -42,7 +43,6 @@ public class BBMRIEricResourceAdapter implements ResourceAdapter {
               String.format("%s:%s", diagnosis.getString("ontology"), diagnosis.getString("code")));
         });
 
-    return new Resource(
-        catalogueName, baseURL, url, uuid, name, description, resourceType, diagnoses);
+    return ResourceResponse.create(resourceType, name, url, uuid, description);
   }
 }

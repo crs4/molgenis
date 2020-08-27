@@ -53,7 +53,7 @@ public class ResourceApiController implements ResourceApi {
       @ApiParam(value = "The orphacode of the disease.")
           @Valid
           @RequestParam(value = "orphaCode", required = false)
-          Integer orphaCode,
+          String orphaCode,
       @ApiParam(
               value =
                   "The medical areas of the desired resource. If this field is null/not specified, all ressources should be queried.")
@@ -63,7 +63,8 @@ public class ResourceApiController implements ResourceApi {
 
     // TODO: it should get the builder dynamically
     QueryBuilder queryBuilder = new BBMRIEricQueryBuilder();
-    Query<Entity> q = queryBuilder.getQuery();
+    Query<Entity> q =
+        queryBuilder.getQuery(orphaCode, BBMRIEricQueryBuilder.ORPHANET_ONTOLOGY, name);
 
     Stream<Entity> entities = dataService.findAll(queryBuilder.getEntityType(), q);
 

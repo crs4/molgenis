@@ -5,7 +5,7 @@ import org.molgenis.data.Query;
 
 public interface QueryBuilder {
 
-  Query<Entity> getQuery();
+  Query<Entity> getQuery(String diseaseCode, String diseaseOntology, String diseaseName);
 
   String getEntityType();
 }

@@ -2,7 +2,6 @@ package org.molgenis.api.ejprd;
 
 import static java.util.Objects.requireNonNull;
 
-import io.swagger.annotations.ApiParam;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -10,6 +9,7 @@ import java.util.stream.Stream;
 import javax.validation.Valid;
 import org.molgenis.api.ApiNamespace;
 import org.molgenis.api.ejprd.model.DataResponse;
+import org.molgenis.api.ejprd.model.ResourceRequest;
 import org.molgenis.api.ejprd.model.ResourceResponse;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
@@ -42,29 +41,15 @@ public class ResourceApiController implements ResourceApi {
   @GetMapping("/resource")
   @ResponseBody
   @RunAsSystem
-  public DataResponse getResourceRequest(
-      @ApiParam(
-              value =
-                  "Reference name of the disease.  Accepting strings on a certain naming convention basis.",
-              required = true)
-          @Valid
-          @RequestParam(value = "name", required = false)
-          String name,
-      @ApiParam(value = "The orphacode of the disease.")
-          @Valid
-          @RequestParam(value = "orphaCode", required = false)
-          String orphaCode,
-      @ApiParam(
-              value =
-                  "The medical areas of the desired resource. If this field is null/not specified, all ressources should be queried.")
-          @Valid
-          @RequestParam(value = "medAreas", required = false)
-          List<String> medAreas) {
+  public DataResponse getResourceRequest(@Valid ResourceRequest resourceRequest) {
 
     // TODO: it should get the builder dynamically
     QueryBuilder queryBuilder = new BBMRIEricQueryBuilder();
     Query<Entity> q =
-        queryBuilder.getQuery(orphaCode, BBMRIEricQueryBuilder.ORPHANET_ONTOLOGY, name);
+        queryBuilder.getQuery(
+            resourceRequest.getOrphaCode(),
+            BBMRIEricQueryBuilder.ORPHANET_ONTOLOGY, // TODO: this should not be static
+            resourceRequest.getName());
 
     Stream<Entity> entities = dataService.findAll(queryBuilder.getEntityType(), q);
 

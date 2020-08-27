@@ -62,7 +62,7 @@ public interface ResourceApi {
       @ApiParam(value = "The orphacode of the disease.")
           @Valid
           @RequestParam(value = "orphaCode", required = false)
-          Integer orphaCode,
+          String orphaCode,
       @ApiParam(
               value =
                   "The medical areas of the desired resource. If this field is null/not specified, all ressources should be queried.")

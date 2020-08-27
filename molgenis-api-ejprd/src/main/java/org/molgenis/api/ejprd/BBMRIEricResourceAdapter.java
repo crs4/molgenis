@@ -43,6 +43,6 @@ public class BBMRIEricResourceAdapter implements ResourceAdapter {
               String.format("%s:%s", diagnosis.getString("ontology"), diagnosis.getString("code")));
         });
 
-    return ResourceResponse.create(resourceType, name, url, uuid, description);
+    return ResourceResponse.create(name, url, uuid, description, null, null, null, null);
   }
 }

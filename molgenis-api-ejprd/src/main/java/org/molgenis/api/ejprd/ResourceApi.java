@@ -2,16 +2,14 @@ package org.molgenis.api.ejprd;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import java.util.List;
 import javax.validation.Valid;
 import org.molgenis.api.ejprd.model.DataResponse;
 import org.molgenis.api.ejprd.model.ErrorResponse;
+import org.molgenis.api.ejprd.model.ResourceRequest;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Api(value = "resource")
 public interface ResourceApi {
@@ -51,22 +49,5 @@ public interface ResourceApi {
       value = "/resource",
       produces = {"application/json"},
       method = RequestMethod.GET)
-  DataResponse getResourceRequest(
-      @ApiParam(
-              value =
-                  "Reference name of the disease.  Accepting strings on a certain naming convention basis.",
-              required = true)
-          @Valid
-          @RequestParam(value = "name", required = true)
-          String name,
-      @ApiParam(value = "The orphacode of the disease.")
-          @Valid
-          @RequestParam(value = "orphaCode", required = false)
-          String orphaCode,
-      @ApiParam(
-              value =
-                  "The medical areas of the desired resource. If this field is null/not specified, all ressources should be queried.")
-          @Valid
-          @RequestParam(value = "medAreas", required = false)
-          List<String> medAreas);
+  DataResponse getResourceRequest(@Valid ResourceRequest resourceRequest);
 }

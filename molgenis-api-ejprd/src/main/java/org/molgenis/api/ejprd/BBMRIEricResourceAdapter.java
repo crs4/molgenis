@@ -33,15 +33,14 @@ public class BBMRIEricResourceAdapter implements ResourceAdapter {
     String uuid = collection.getString("id");
     Entity biobank = (Entity) collection.get("biobank");
     String name = String.format("%s - %s", biobank.getString("name"), collection.getString("name"));
-
     String description = collection.getString("description");
-    Iterable<Entity> diagnosisAvailable = collection.getEntities("diagnosis_available");
-    List<Object> diagnoses = new ArrayList<>();
-    diagnosisAvailable.forEach(
-        diagnosis -> {
-          diagnoses.add(
-              String.format("%s:%s", diagnosis.getString("ontology"), diagnosis.getString("code")));
-        });
+//    Iterable<Entity> diagnosisAvailable = collection.getEntities("diagnosis_available");
+//    List<Object> diagnoses = new ArrayList<>();
+//    diagnosisAvailable.forEach(
+//        diagnosis -> {
+//          diagnoses.add(
+//              String.format("%s:%s", diagnosis.getString("ontology"), diagnosis.getString("code")));
+//        });
 
     return ResourceResponse.create(name, url, uuid, description, null, null, null, null);
   }

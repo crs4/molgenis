@@ -6,26 +6,25 @@ import org.molgenis.data.support.QueryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BBMRIEricQueryBuilder implements QueryBuilder {
+public class BBMRIEricQueryBuilder extends QueryBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(BBMRIEricQueryBuilder.class);
 
-  public static final String ORPHANET_ONTOLOGY = "orphanet";
-
-  private static final String entityType = "eu_bbmri_eric_collections";
-
   @Override
-  public Query<Entity> getQuery(String diseaseCode, String diseaseOntology, String diseaseName) {
+  public Query<Entity> build() {
+    String diseaseCode = getDiseaseCode();
+    String diseaseOntology = getDiseaseOntology();
+    String diseaseName = getDiseaseName();
+
     if (diseaseCode == null) {
       diseaseOntology = null;
-    }
-
-    if (diseaseOntology != null && diseaseOntology.equals(ORPHANET_ONTOLOGY)) {
+    } else {
+      diseaseOntology = "orphanet";
       diseaseCode = String.format("ORPHA:%s", diseaseCode);
     }
 
     Query<Entity> q = new QueryImpl<>();
-    if (diseaseCode != null && diseaseOntology != null) {
+    if (diseaseCode != null) {
       q.nest();
       q.eq("diagnosis_available.code", diseaseCode);
       q.and();
@@ -40,10 +39,5 @@ public class BBMRIEricQueryBuilder implements QueryBuilder {
       q.like("diagnosis_available.label", diseaseName);
     }
     return q;
-  }
-
-  @Override
-  public String getEntityType() {
-    return entityType;
   }
 }

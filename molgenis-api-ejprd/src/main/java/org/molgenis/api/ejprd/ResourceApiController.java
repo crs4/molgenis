@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import javax.validation.Valid;
 import org.molgenis.api.ApiNamespace;
 import org.molgenis.api.ejprd.model.DataResponse;
+import org.molgenis.api.ejprd.model.DataResponse.Page;
 import org.molgenis.api.ejprd.model.ResourceRequest;
 import org.molgenis.api.ejprd.model.ResourceResponse;
 import org.molgenis.data.DataService;
@@ -43,28 +44,35 @@ public class ResourceApiController implements ResourceApi {
   @RunAsSystem
   public DataResponse getResourceRequest(@Valid ResourceRequest resourceRequest) {
 
-    // TODO: it should get the builder dynamically
-    QueryBuilder queryBuilder = new BBMRIEricQueryBuilder();
+    Integer skip = resourceRequest.getSkip();
+    Integer limit = resourceRequest.getLimit();
+
+    ResourceAccessFactory factory = ResourceAccessFactory.getFactory();
+
+    QueryBuilder queryBuilder = factory.getQueryBuilder();
     Query<Entity> q =
-        queryBuilder.getQuery(
-            resourceRequest.getOrphaCode(),
-            BBMRIEricQueryBuilder.ORPHANET_ONTOLOGY, // TODO: this should not be static
-            resourceRequest.getName());
+        queryBuilder
+            .setDiseaseCode(resourceRequest.getOrphaCode())
+            .setDiseaseName(resourceRequest.getName())
+            .build();
 
-    Stream<Entity> entities = dataService.findAll(queryBuilder.getEntityType(), q);
+    q.pageSize(limit);
+    q.offset(limit * skip);
 
+    Stream<Entity> entities = dataService.findAll(factory.getEntityTypeId(), q);
+
+    ResourceMapper mapper = factory.getResourceMapper();
     List<ResourceResponse> resources = new ArrayList<>();
     Consumer<Entity> entityConsumer =
         collection -> {
-          resources.add(createResource(collection));
+          resources.add(mapper.mapEntity(collection));
         };
     entities.forEach(entityConsumer);
 
-    return DataResponse.create(apiVersion, resources, null);
-  }
-
-  private ResourceResponse createResource(Entity entity) {
-    ResourceAdapter mapper = new BBMRIEricResourceAdapter(entity);
-    return mapper.createResource();
+    return DataResponse.builder()
+        .setApiVersion(apiVersion)
+        .setPage(Page.create(limit * skip, resources.size(), limit))
+        .setResourceResponses(resources)
+        .build();
   }
 }

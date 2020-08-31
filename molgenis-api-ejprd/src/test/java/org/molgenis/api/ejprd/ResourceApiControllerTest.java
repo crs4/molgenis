@@ -52,8 +52,6 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
             .build();
   }
 
-
-
   @Test
   void getAllResourcesTest() throws Exception {
     reset(dataService);
@@ -91,11 +89,19 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
         .andExpect(jsonPath("$.resourceResponses[0].name", is("Biobank_1 - Collection_1")))
         .andExpect(jsonPath("$.resourceResponses[0].id", is("12345")))
         .andExpect(jsonPath("$.resourceResponses[0].description", is("This is biobank 1")))
-        .andExpect(jsonPath("$.resourceResponses[0].url", is("http://molgenis01.gcc.rug.nl:8080/menu/main/app-molgenis-app-biobank-explorer/collection/12345")))
+        .andExpect(
+            jsonPath(
+                "$.resourceResponses[0].url",
+                is(
+                    "http://molgenis01.gcc.rug.nl:8080/menu/main/app-molgenis-app-biobank-explorer/collection/12345")))
         .andExpect(jsonPath("$.resourceResponses[1].name", is("Biobank_2 - Collection_2")))
         .andExpect(jsonPath("$.resourceResponses[1].id", is("6789")))
         .andExpect(jsonPath("$.resourceResponses[1].description", is("This is biobank 2")))
-        .andExpect(jsonPath("$.resourceResponses[1].url", is("http://molgenis01.gcc.rug.nl:8080/menu/main/app-molgenis-app-biobank-explorer/collection/6789")))
+        .andExpect(
+            jsonPath(
+                "$.resourceResponses[1].url",
+                is(
+                    "http://molgenis01.gcc.rug.nl:8080/menu/main/app-molgenis-app-biobank-explorer/collection/6789")))
         .andExpect(content().contentTypeCompatibleWith("application/json"));
   }
 
@@ -118,17 +124,22 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
     q.and();
     q.eq("diagnosis_available.ontology", "orphanet");
     q.unnest();
-    when(dataService.findAll("eu_bbmri_eric_collections", q))
-        .thenReturn(Stream.of(collection));
+    q.pageSize(100);
+    when(dataService.findAll("eu_bbmri_eric_collections", q)).thenReturn(Stream.of(collection));
 
     this.mockMvc
-        .perform(get(URI.create("http://molgenis01.gcc.rug.nl:8080/api/ejprd/resource?orphaCode=145")))
+        .perform(
+            get(URI.create("http://molgenis01.gcc.rug.nl:8080/api/ejprd/resource?orphaCode=145")))
         .andExpect(jsonPath("$.apiVersion", is("v1")))
         .andExpect(jsonPath("$.resourceResponses", hasSize(1)))
         .andExpect(jsonPath("$.resourceResponses[0].name", is("Biobank_1 - Collection_1")))
         .andExpect(jsonPath("$.resourceResponses[0].id", is("12345")))
         .andExpect(jsonPath("$.resourceResponses[0].description", is("This is biobank 1")))
-        .andExpect(jsonPath("$.resourceResponses[0].url", is("http://molgenis01.gcc.rug.nl:8080/menu/main/app-molgenis-app-biobank-explorer/collection/12345")))
+        .andExpect(
+            jsonPath(
+                "$.resourceResponses[0].url",
+                is(
+                    "http://molgenis01.gcc.rug.nl:8080/menu/main/app-molgenis-app-biobank-explorer/collection/12345")))
         .andExpect(status().isOk());
   }
 }

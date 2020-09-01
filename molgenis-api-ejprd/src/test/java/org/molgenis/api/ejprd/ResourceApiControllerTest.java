@@ -15,7 +15,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.molgenis.data.DataService;
@@ -29,11 +28,21 @@ import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @WebAppConfiguration
 @ContextConfiguration(classes = {GsonConfig.class})
 class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
+
+  private static final String BIOBANK_BASE_NAME = "Biobank_";
+  private static final String COLLECTION_BASE_NAME = "Collection_";
+  private static final String COLLECTION_DESCRIPTION = "This is biobank ";
+  private static final String BASE_URL = "http://molgenis01.gcc.rug.nl:8080";
+  private static final String BASE_API_URL = String.format("%s/api/ejprd/resource", BASE_URL);
+  private static final String COLLECTION_URL =
+      String.format("%s/menu/main/app-molgenis-app-biobank-explorer/collection", BASE_URL);
+  private static final String ENTITY_ID = "eu_bbmri_eric_collections";
 
   private DataService dataService;
 
@@ -52,71 +61,133 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
             .build();
   }
 
+  private List<Entity> getMockData(int size) {
+    List<Entity> entities = new ArrayList<>();
+    for (int i = 0; i < size; i++) {
+      Entity biobank = mock(Entity.class);
+      when(biobank.getString(eq("name")))
+          .thenReturn(String.format("%s%d", BIOBANK_BASE_NAME, i + 1));
+
+      Entity collection = mock(Entity.class);
+      when(collection.getString(eq("name")))
+          .thenReturn(String.format("%s%d", COLLECTION_BASE_NAME, i + 1));
+      when(collection.get(eq("biobank"))).thenReturn(biobank);
+      when(collection.getString(eq("id"))).thenReturn(String.valueOf(i + 1));
+      when(collection.getString(eq("description")))
+          .thenReturn(String.format("%s%d", COLLECTION_DESCRIPTION, i + 1));
+
+      entities.add(collection);
+    }
+    return entities;
+  }
+
+  private void checkContentType(ResultActions actions) throws Exception {
+    actions.andExpect(content().contentTypeCompatibleWith("application/json"));
+  }
+
+  private void checkApiVersion(ResultActions actions) throws Exception {
+    actions.andExpect(jsonPath("$.apiVersion", is("v1")));
+  }
+
+  private void checkPageData(
+      ResultActions actions, int size, int totalElements, int totalPages, int number)
+      throws Exception {
+    actions
+        .andExpect(jsonPath("$.page.size", is(size)))
+        .andExpect(jsonPath("$.page.totalElements", is(totalElements)))
+        .andExpect(jsonPath("$.page.totalPages", is(totalPages)))
+        .andExpect(jsonPath("$.page.number", is(number)));
+  }
+
+  private void checkResultData(ResultActions actions, int resultsSize) throws Exception {
+    for (int i = 0; i < resultsSize; i++) {
+      actions
+          .andExpect(jsonPath("$.resourceResponses", hasSize(resultsSize)))
+          .andExpect(
+              jsonPath(
+                  String.format("$.resourceResponses[%d].name", i),
+                  is(
+                      String.format(
+                          "%s%d - %s%d", BIOBANK_BASE_NAME, i + 1, COLLECTION_BASE_NAME, i + 1))))
+          .andExpect(
+              jsonPath(String.format("$.resourceResponses[%s].id", i), is(String.valueOf(i + 1))))
+          .andExpect(
+              jsonPath(
+                  String.format("$.resourceResponses[%s].description", i),
+                  is(String.format("%s%d", COLLECTION_DESCRIPTION, i + 1))))
+          .andExpect(
+              jsonPath(
+                  String.format("$.resourceResponses[%s].url", i),
+                  is(String.format("%s/%d", COLLECTION_URL, i + 1))));
+    }
+  }
+
   @Test
-  void getAllResourcesTest() throws Exception {
+  void getResourcesWithoutParametersTest() throws Exception {
     reset(dataService);
 
-    Entity biobank1 = mock(Entity.class);
-    when(biobank1.getString(eq("name"))).thenReturn("Biobank_1");
+    List<Entity> entities = getMockData(2);
 
-    Entity collection1 = mock(Entity.class);
-    when(collection1.getString(eq("name"))).thenReturn("Collection_1");
-    when(collection1.get(eq("biobank"))).thenReturn(biobank1);
-    when(collection1.getString(eq("id"))).thenReturn("12345");
-    when(collection1.getString(eq("description"))).thenReturn("This is biobank 1");
+    when(dataService.count(eq(ENTITY_ID), any(Query.class))).thenReturn(2L);
+    when(dataService.findAll(eq(ENTITY_ID), any(Query.class))).thenReturn(entities.stream());
 
-    Entity biobank2 = mock(Entity.class);
-    when(biobank2.getString(eq("name"))).thenReturn("Biobank_2");
+    ResultActions resultActions = this.mockMvc.perform(get(URI.create(BASE_API_URL)));
+    resultActions.andExpect(status().isOk());
 
-    Entity collection2 = mock(Entity.class);
-    when(collection2.getString(eq("name"))).thenReturn("Collection_2");
-    when(collection2.get(eq("biobank"))).thenReturn(biobank2);
-    when(collection2.getString(eq("id"))).thenReturn("6789");
-    when(collection2.getString(eq("description"))).thenReturn("This is biobank 2");
+    checkContentType(resultActions);
+    checkApiVersion(resultActions);
+    checkResultData(resultActions, 2);
+    checkPageData(resultActions, 100, 2, 1, 0);
+  }
 
-    List<Entity> entities = new ArrayList<>();
-    entities.add(collection1);
-    entities.add(collection2);
+  @Test
+  void getResourcesWithPagingTest() throws Exception {
+    reset(dataService);
 
-    when(dataService.findAll(eq("eu_bbmri_eric_collections"), any(Query.class)))
-        .thenReturn(entities.stream());
+    Query<Entity> q = new QueryImpl<>();
+    q.pageSize(5);
 
-    this.mockMvc
-        .perform(get(URI.create("http://molgenis01.gcc.rug.nl:8080/api/ejprd/resource")))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.apiVersion", is("v1")))
-        .andExpect(jsonPath("$.resourceResponses", hasSize(2)))
-        .andExpect(jsonPath("$.resourceResponses[0].name", is("Biobank_1 - Collection_1")))
-        .andExpect(jsonPath("$.resourceResponses[0].id", is("12345")))
-        .andExpect(jsonPath("$.resourceResponses[0].description", is("This is biobank 1")))
-        .andExpect(
-            jsonPath(
-                "$.resourceResponses[0].url",
-                is(
-                    "http://molgenis01.gcc.rug.nl:8080/menu/main/app-molgenis-app-biobank-explorer/collection/12345")))
-        .andExpect(jsonPath("$.resourceResponses[1].name", is("Biobank_2 - Collection_2")))
-        .andExpect(jsonPath("$.resourceResponses[1].id", is("6789")))
-        .andExpect(jsonPath("$.resourceResponses[1].description", is("This is biobank 2")))
-        .andExpect(
-            jsonPath(
-                "$.resourceResponses[1].url",
-                is(
-                    "http://molgenis01.gcc.rug.nl:8080/menu/main/app-molgenis-app-biobank-explorer/collection/6789")))
-        .andExpect(content().contentTypeCompatibleWith("application/json"));
+    List<Entity> entities = getMockData(5);
+    when(dataService.count(ENTITY_ID, new QueryImpl<>())).thenReturn(10L);
+    when(dataService.findAll(ENTITY_ID, q)).thenReturn(entities.stream());
+
+    ResultActions resultActions =
+        this.mockMvc.perform(get(URI.create(String.format("%s?limit=5", BASE_API_URL))));
+    resultActions.andExpect(status().isOk());
+
+    checkContentType(resultActions);
+    checkApiVersion(resultActions);
+    checkResultData(resultActions, 5);
+    checkPageData(resultActions, 5, 10, 2, 0);
+  }
+
+  @Test
+  void getResourcesWithPagingSecondPageTest() throws Exception {
+    reset(dataService);
+
+    Query<Entity> q = new QueryImpl<>();
+    q.pageSize(5);
+    q.offset(5);
+
+    List<Entity> entities = getMockData(5);
+    when(dataService.count(ENTITY_ID, new QueryImpl<>())).thenReturn(10L);
+    when(dataService.findAll(ENTITY_ID, q)).thenReturn(entities.stream());
+
+    ResultActions resultActions =
+        this.mockMvc.perform(get(URI.create(String.format("%s?skip=1&limit=5", BASE_API_URL))));
+    resultActions.andExpect(status().isOk());
+
+    checkContentType(resultActions);
+    checkApiVersion(resultActions);
+    checkResultData(resultActions, 5);
+    checkPageData(resultActions, 5, 10, 2, 1);
   }
 
   @Test
   void getOneResourcesTest() throws Exception {
     reset(dataService);
 
-    Entity biobank = mock(Entity.class);
-    when(biobank.getString(eq("name"))).thenReturn("Biobank_1");
-
-    Entity collection = mock(Entity.class);
-    when(collection.getString(eq("name"))).thenReturn("Collection_1");
-    when(collection.get(eq("biobank"))).thenReturn(biobank);
-    when(collection.getString(eq("id"))).thenReturn("12345");
-    when(collection.getString(eq("description"))).thenReturn("This is biobank 1");
+    List<Entity> entities = getMockData(1);
 
     Query<Entity> q = new QueryImpl<>();
     q.nest();
@@ -125,21 +196,17 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
     q.eq("diagnosis_available.ontology", "orphanet");
     q.unnest();
     q.pageSize(100);
-    when(dataService.findAll("eu_bbmri_eric_collections", q)).thenReturn(Stream.of(collection));
 
-    this.mockMvc
-        .perform(
-            get(URI.create("http://molgenis01.gcc.rug.nl:8080/api/ejprd/resource?orphaCode=145")))
-        .andExpect(jsonPath("$.apiVersion", is("v1")))
-        .andExpect(jsonPath("$.resourceResponses", hasSize(1)))
-        .andExpect(jsonPath("$.resourceResponses[0].name", is("Biobank_1 - Collection_1")))
-        .andExpect(jsonPath("$.resourceResponses[0].id", is("12345")))
-        .andExpect(jsonPath("$.resourceResponses[0].description", is("This is biobank 1")))
-        .andExpect(
-            jsonPath(
-                "$.resourceResponses[0].url",
-                is(
-                    "http://molgenis01.gcc.rug.nl:8080/menu/main/app-molgenis-app-biobank-explorer/collection/12345")))
-        .andExpect(status().isOk());
+    when(dataService.count(eq(ENTITY_ID), any(Query.class))).thenReturn(1L);
+    when(dataService.findAll(ENTITY_ID, q)).thenReturn(entities.stream());
+
+    ResultActions resultActions =
+        this.mockMvc.perform(get(URI.create(String.format("%s?orphaCode=145", BASE_API_URL))));
+    resultActions.andExpect(status().isOk());
+
+    checkContentType(resultActions);
+    checkApiVersion(resultActions);
+    checkResultData(resultActions, 1);
+    checkPageData(resultActions, 100, 1, 1, 0);
   }
 }

@@ -10,6 +10,10 @@ public class ResourceRequest {
 
   private List<String> medAreas;
 
+  private Integer skip = 0;
+
+  private Integer limit = 100;
+
   public String getName() {
     return name;
   }
@@ -32,5 +36,21 @@ public class ResourceRequest {
 
   public void setMedAreas(List<String> medAreas) {
     this.medAreas = medAreas;
+  }
+
+  public Integer getSkip() {
+    return skip;
+  }
+
+  public void setSkip(Integer skip) {
+    this.skip = skip;
+  }
+
+  public Integer getLimit() {
+    return limit;
+  }
+
+  public void setLimit(Integer limit) {
+    this.limit = limit;
   }
 }

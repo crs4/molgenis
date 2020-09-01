@@ -9,9 +9,9 @@ import java.util.stream.Stream;
 import javax.validation.Valid;
 import org.molgenis.api.ApiNamespace;
 import org.molgenis.api.ejprd.model.DataResponse;
-import org.molgenis.api.ejprd.model.DataResponse.Page;
 import org.molgenis.api.ejprd.model.ResourceRequest;
 import org.molgenis.api.ejprd.model.ResourceResponse;
+import org.molgenis.api.support.PageUtils;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
 import org.molgenis.data.Query;
@@ -56,6 +56,9 @@ public class ResourceApiController implements ResourceApi {
             .setDiseaseName(resourceRequest.getName())
             .build();
 
+    // Gets the total number of results before applying the limits
+    int totalCount = Math.toIntExact(dataService.count(factory.getEntityTypeId(), q));
+
     q.pageSize(limit);
     q.offset(limit * skip);
 
@@ -71,7 +74,7 @@ public class ResourceApiController implements ResourceApi {
 
     return DataResponse.builder()
         .setApiVersion(apiVersion)
-        .setPage(Page.create(limit * skip, resources.size(), limit))
+        .setPage(PageUtils.getPageResponse(limit, limit * skip, totalCount))
         .setResourceResponses(resources)
         .build();
   }

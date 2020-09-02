@@ -23,14 +23,6 @@ public class BBMRIEricResourceMapper implements ResourceMapper {
     Entity biobank = (Entity) entity.get("biobank");
     String name = String.format("%s - %s", biobank.getString("name"), entity.getString("name"));
     String description = entity.getString("description");
-    //    Iterable<Entity> diagnosisAvailable = collection.getEntities("diagnosis_available");
-    //    List<Object> diagnoses = new ArrayList<>();
-    //    diagnosisAvailable.forEach(
-    //        diagnosis -> {
-    //          diagnoses.add(
-    //              String.format("%s:%s", diagnosis.getString("ontology"),
-    // diagnosis.getString("code")));
-    //        });
 
     return ResourceResponse.create(name, url, uuid, description, null, null, null, null);
   }

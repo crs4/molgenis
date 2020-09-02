@@ -1,5 +1,6 @@
 package org.molgenis.api.ejprd.externalServices;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -18,12 +19,12 @@ public class OrphaCodeLookupService {
   private String apiKey = "test";
   private RestTemplate restTemplate = new RestTemplate();
 
-  public static void main(String args[]) throws Exception {
-    OrphaCodeLookupService s = new OrphaCodeLookupService();
-
-    System.out.println(s.getOrphaCodeByICD10("Q87.4"));
-    System.out.println(s.getICD10ByOrphaCode("558"));
-  }
+  //  public static void main(String args[]) throws Exception {
+  //    OrphaCodeLookupService s = new OrphaCodeLookupService();
+  //
+  //    System.out.println(s.getOrphaCodeByICD10("Q87.4"));
+  //    System.out.println(s.getICD10ByOrphaCode("558"));
+  //  }
 
   private String getCodefromResults(JsonObject results, String key) {
     JsonElement references = results.get("References");
@@ -41,17 +42,18 @@ public class OrphaCodeLookupService {
         UriComponentsBuilder.fromHttpUrl(String.format(serviceURI + "/ICD10/" + icd10));
     HttpEntity<?> entity = new HttpEntity<>(headers);
 
-    ResponseEntity<JsonObject> response =
-        this.restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, JsonObject.class);
+    ResponseEntity<String> response =
+        this.restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, String.class);
 
     if (response.getStatusCode().equals(HttpStatus.OK)) {
       // Explore references from JsonObject, if the service has found one
-      JsonObject results = response.getBody();
-      System.out.println(results.toString());
-      return getCodefromResults(results, "ORPHAcode");
+      Gson gson = new Gson();
+      JsonElement element = gson.fromJson(response.getBody(), JsonElement.class);
+      JsonObject jsonObjResults = element.getAsJsonObject();
+      return getCodefromResults(jsonObjResults, "ORPHAcode");
     } else {
       throw new Exception(
-          "No results foiund or error occurred, service returned code"
+          "No results found or error occurred, service returned code"
               + response.getStatusCode().toString());
     }
   }

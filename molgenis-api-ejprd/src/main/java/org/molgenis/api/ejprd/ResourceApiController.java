@@ -39,7 +39,7 @@ public class ResourceApiController implements ResourceApi {
     this.dataService = requireNonNull(dataService);
   }
 
-  @GetMapping("/resource")
+  @GetMapping("/resource/search")
   @ResponseBody
   @RunAsSystem
   public DataResponse getResourceRequest(@Valid ResourceRequest resourceRequest) {

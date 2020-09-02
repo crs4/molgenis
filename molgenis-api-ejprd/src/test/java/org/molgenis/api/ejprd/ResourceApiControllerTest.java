@@ -39,7 +39,8 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
   private static final String COLLECTION_BASE_NAME = "Collection_";
   private static final String COLLECTION_DESCRIPTION = "This is biobank ";
   private static final String BASE_URL = "http://molgenis01.gcc.rug.nl:8080";
-  private static final String BASE_API_URL = String.format("%s/api/ejprd/resource", BASE_URL);
+  private static final String BASE_API_URL =
+      String.format("%s/api/ejprd/resource/search", BASE_URL);
   private static final String COLLECTION_URL =
       String.format("%s/menu/main/app-molgenis-app-biobank-explorer/collection", BASE_URL);
   private static final String ENTITY_ID = "eu_bbmri_eric_collections";

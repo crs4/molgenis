@@ -24,16 +24,13 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Controller
 @RequestMapping(EJPRDController.BASE_URI)
 public class EJPRDController {
-  private static final Logger LOG = LoggerFactory.getLogger(EJPRDController.class);
-
   static final String BASE_URI = ApiNamespace.API_PATH + "/ejprd";
+  private static final Logger LOG = LoggerFactory.getLogger(EJPRDController.class);
+  @Autowired private DataService dataService;
 
   private static UriComponentsBuilder getBaseUri() {
     return ServletUriComponentsBuilder.fromCurrentContextPath().path(BASE_URI);
   }
-
-  @Autowired
-  private DataService dataService;
 
   @GetMapping("/external_resource/")
   @ResponseBody
@@ -41,35 +38,41 @@ public class EJPRDController {
   public CatalogsResponse getExternalResource() throws Exception {
     List<ResourceResponse> erdriResources = new ArrayList<>();
 
-    //String erdriCatalog = "ERDRI";
-    //String erdriUrl = "https://eu-rd-platform.jrc.ec.europa.eu/erdridor/";
+    // String erdriCatalog = "ERDRI";
+    // String erdriUrl = "https://eu-rd-platform.jrc.ec.europa.eu/erdridor/";
 
-    //ResourceResponse register1 =
+    // ResourceResponse register1 =
     //    ResourceResponse.create(
     //        "Banque Nationale de Données Maladies Rares",
     //        "https://eu-rd-platform.jrc.ec.europa.eu/erdridor/register/2444",
     //        "2444",
-    //        "The French National Registry for Rare Diseases is a national tool for epidemiology and public health purposes in the field of rare diseases (RD). The data collection is mandatory for all the Rare Disease expert centers at the national level. A minimum data set (MDS) of about 60 items is collected for all the rare disease expert centers patients. This MDS strongly inspired the Common Data Elements (CDE) promoted by the EUCERD, and later by the JRC, which will greatly facilitate interoperability.",
+    //        "The French National Registry for Rare Diseases is a national tool for epidemiology
+    // and public health purposes in the field of rare diseases (RD). The data collection is
+    // mandatory for all the Rare Disease expert centers at the national level. A minimum data set
+    // (MDS) of about 60 items is collected for all the rare disease expert centers patients. This
+    // MDS strongly inspired the Common Data Elements (CDE) promoted by the EUCERD, and later by the
+    // JRC, which will greatly facilitate interoperability.",
     //        null,
     //        null,
     //        null,
     //        null);
-    //ResourceResponse register2 =
+    // ResourceResponse register2 =
     //    ResourceResponse.create(
     //        "Degos Disease Registry (Registry for Malignant Atrophic Papulosis)",
     //        "https://eu-rd-platform.jrc.ec.europa.eu/erdridor/register/4607",
     //        "Degos-Disease",
-    //        "Purpose of the registry is the support of research on demographics, epidemiology, prognosis, etiology and treatment of the disease Malignant Atrophic Papulosis (Köhlmeier-Degos disease, Degos disease)",
+    //        "Purpose of the registry is the support of research on demographics, epidemiology,
+    // prognosis, etiology and treatment of the disease Malignant Atrophic Papulosis
+    // (Köhlmeier-Degos disease, Degos disease)",
     //        null,
     //        null,
     //        null,
     //        null);
-    //erdriResources.add(register1);
-    //erdriResources.add(register2);
-    //CatalogResponse erdri = CatalogResponse.create(erdriCatalog, erdriUrl, erdriResources);
+    // erdriResources.add(register1);
+    // erdriResources.add(register2);
+    // CatalogResponse erdri = CatalogResponse.create(erdriCatalog, erdriUrl, erdriResources);
     ERDRIResourcesService s = new ERDRIResourcesService(this.dataService);
-    JsonObject ERDRIRes = s.getERDRIResources("test");//this is a fake param value by now
-    System.out.println(ERDRIRes.toString());
+    JsonObject ERDRIRes = s.getERDRIResources("test"); // this is a fake param value by now
     CatalogResponse erdri = s.CreateERDRICatalogReponse(ERDRIRes);
 
     String orphanetName = "Orphanet";
@@ -93,12 +96,12 @@ public class EJPRDController {
     return CatalogsResponse.create(catalogs);
   }
 
-//  public static void main(String args[]) throws Exception {
-//    ERDRIResourcesService s = new ERDRIResourcesService();
-//    JsonObject resources = s.getERDRIResources("test");
-//    s.CreateERDRICatalogReponse(resources);
-//    //System.out.println(s.getERDRIResources("test"));
-//
-//  }
+  //  public static void main(String args[]) throws Exception {
+  //    ERDRIResourcesService s = new ERDRIResourcesService();
+  //    JsonObject resources = s.getERDRIResources("test");
+  //    s.CreateERDRICatalogReponse(resources);
+  //    //System.out.println(s.getERDRIResources("test"));
+  //
+  //  }
 
 }

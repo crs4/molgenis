@@ -9,9 +9,11 @@ import org.molgenis.api.ejprd.externalServices.ERDRIResourcesService;
 import org.molgenis.api.ejprd.model.CatalogResponse;
 import org.molgenis.api.ejprd.model.CatalogsResponse;
 import org.molgenis.api.ejprd.model.ResourceResponse;
+import org.molgenis.data.DataService;
 import org.molgenis.security.core.runas.RunAsSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +31,9 @@ public class EJPRDController {
   private static UriComponentsBuilder getBaseUri() {
     return ServletUriComponentsBuilder.fromCurrentContextPath().path(BASE_URI);
   }
+
+  @Autowired
+  private DataService dataService;
 
   @GetMapping("/external_resource/")
   @ResponseBody
@@ -62,7 +67,7 @@ public class EJPRDController {
     //erdriResources.add(register1);
     //erdriResources.add(register2);
     //CatalogResponse erdri = CatalogResponse.create(erdriCatalog, erdriUrl, erdriResources);
-    ERDRIResourcesService s = new ERDRIResourcesService();
+    ERDRIResourcesService s = new ERDRIResourcesService(this.dataService);
     JsonObject ERDRIRes = s.getERDRIResources("test");//this is a fake param value by now
     System.out.println(ERDRIRes.toString());
     CatalogResponse erdri = s.CreateERDRICatalogReponse(ERDRIRes);

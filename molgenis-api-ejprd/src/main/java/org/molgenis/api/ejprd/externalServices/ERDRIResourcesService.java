@@ -15,7 +15,6 @@ import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
 import org.molgenis.data.Query;
 import org.molgenis.data.support.QueryImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -27,7 +26,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @Controller
 public class ERDRIResourcesService {
-  //private String serviceURI = "http://host.docker.internal:8089/resource"; // mocked service
+  // private String serviceURI = "http://host.docker.internal:8089/resource"; // mocked service
   private RestTemplate restTemplate = new RestTemplate();
   private final String erdriSourceIdentifier = "id";
   private final String erdriSourceIdentifierValue = "erdri";
@@ -35,12 +34,13 @@ public class ERDRIResourcesService {
   private final String ERDRIServiceURIField = "base_uri";
 
   private DataService dataService;
+
   public ERDRIResourcesService(DataService dataService) {
     this.dataService = requireNonNull(dataService);
   }
 
-  private String getERDRIServiceURI(){
-    //Call dataservice and execute the query to retrieve URI (at the moment mocked service)
+  private String getERDRIServiceURI() {
+    // Call dataservice and execute the query to retrieve URI (at the moment mocked service)
     Query<Entity> q = new QueryImpl<>();
     q.nest();
     q.eq(erdriSourceIdentifier, erdriSourceIdentifierValue);
@@ -71,7 +71,7 @@ public class ERDRIResourcesService {
     }
   }
 
-  public CatalogResponse CreateERDRICatalogReponse(JsonObject results) {
+  public CatalogResponse createERDRICatalogReponse(JsonObject results) {
     JsonElement resources = results.get("resourceResponses");
     JsonArray resourcesArray = resources.getAsJsonArray();
     List<ResourceResponse> erdriResources = new ArrayList<>();

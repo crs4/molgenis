@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
-import org.molgenis.api.ejprd.QueryBuilder;
-import org.molgenis.api.ejprd.ResourceMapper;
 import org.molgenis.api.ejprd.model.DataResponse;
 import org.molgenis.api.ejprd.model.ResourceResponse;
 import org.molgenis.api.support.PageUtils;

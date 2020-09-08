@@ -29,6 +29,7 @@ public class EJPRDController {
   private static final Logger LOG = LoggerFactory.getLogger(EJPRDController.class);
   private static final String ERDRIIdentifier = "erdri";
   private static final String orphanetIdentifier = "orphanet";
+
   @Autowired private DataService dataService;
 
   private static UriComponentsBuilder getBaseUri() {

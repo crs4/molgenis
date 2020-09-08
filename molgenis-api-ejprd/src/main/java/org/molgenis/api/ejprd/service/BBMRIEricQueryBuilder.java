@@ -1,5 +1,6 @@
-package org.molgenis.api.ejprd;
+package org.molgenis.api.ejprd.service;
 
+import org.molgenis.api.ejprd.QueryBuilder;
 import org.molgenis.data.Entity;
 import org.molgenis.data.Query;
 import org.molgenis.data.support.QueryImpl;
@@ -11,7 +12,16 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(BBMRIEricQueryBuilder.class);
 
   @Override
+  public Query<Entity> buildCount() {
+    return getBaseQuery();
+  }
+
+  @Override
   public Query<Entity> build() {
+    return getBaseQuery().pageSize(getPageSize()).offset(getOffset());
+  }
+
+  private Query<Entity> getBaseQuery() {
     String diseaseCode = getDiseaseCode();
     String diseaseOntology = getDiseaseOntology();
     String diseaseName = getDiseaseName();

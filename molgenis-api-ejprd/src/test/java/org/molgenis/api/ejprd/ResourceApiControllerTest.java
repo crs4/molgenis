@@ -17,6 +17,8 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.molgenis.api.ejprd.service.ResourceBuildService;
+import org.molgenis.api.ejprd.service.ResourceBuildServiceImpl;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
 import org.molgenis.data.Query;
@@ -48,6 +50,7 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
   private static final String DISEASE_NAME = "COVID";
 
   private DataService dataService;
+  private ResourceBuildService resourceBuildService;
 
   private MockMvc mockMvc;
 
@@ -56,7 +59,8 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
   @BeforeEach
   void beforeTest() {
     dataService = mock(DataService.class);
-    ResourceApiController controller = new ResourceApiController(dataService);
+    resourceBuildService = new ResourceBuildServiceImpl(dataService);
+    ResourceApiController controller = new ResourceApiController(resourceBuildService);
 
     mockMvc =
         MockMvcBuilders.standaloneSetup(controller)

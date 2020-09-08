@@ -1,6 +1,9 @@
-package org.molgenis.api.ejprd;
+package org.molgenis.api.ejprd.service;
 
-public class BBMRIEricAccessFactory extends ResourceAccessFactory {
+import org.molgenis.api.ejprd.QueryBuilder;
+import org.molgenis.api.ejprd.ResourceMapper;
+
+public class BBMRIEricMappingServiceFactory extends PackageMappingServiceFactory {
 
   @Override
   public QueryBuilder getQueryBuilder() {

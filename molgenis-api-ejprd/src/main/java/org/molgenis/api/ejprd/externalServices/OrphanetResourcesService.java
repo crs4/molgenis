@@ -1,14 +1,13 @@
 package org.molgenis.api.ejprd.externalServices;
 
-import com.google.gson.JsonObject;
 import java.util.Collections;
 import org.molgenis.api.ejprd.model.CatalogResponse;
 import org.molgenis.api.ejprd.model.ResourceResponse;
 
 public class OrphanetResourcesService {
 
-  //At the moment this class has a static implementation, returns an example
-  //of an Orphanet response, without calling a service
+  // At the moment this class has a static implementation, returns an example
+  // of an Orphanet response, without calling a service
 
   public CatalogResponse createOrphanetCatalogReponse() {
     String orphanetName = "Orphanet";
@@ -26,7 +25,5 @@ public class OrphanetResourcesService {
     CatalogResponse orphanet =
         CatalogResponse.create(orphanetName, orphanetUrl, Collections.singletonList(register3));
     return orphanet;
-
   }
-
 }

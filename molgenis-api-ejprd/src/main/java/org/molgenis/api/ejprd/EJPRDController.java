@@ -63,7 +63,6 @@ public class EJPRDController {
           CatalogResponse cResponse =
               es.createExternalServiceCatalogReponse(matchingSource, externalResources);
           catalogs.add(cResponse);
-
         } else {
           throw new Exception("Unknown external resource identifier");
         }

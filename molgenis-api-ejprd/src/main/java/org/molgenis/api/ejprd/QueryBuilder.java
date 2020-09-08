@@ -11,6 +11,12 @@ public abstract class QueryBuilder {
 
   private String diseaseName;
 
+  private int pageSize;
+
+  private int offset;
+
+  public abstract Query<Entity> buildCount();
+
   public abstract Query<Entity> build();
 
   public String getDiseaseCode() {
@@ -37,6 +43,24 @@ public abstract class QueryBuilder {
 
   public QueryBuilder setDiseaseName(String diseaseName) {
     this.diseaseName = diseaseName;
+    return this;
+  }
+
+  public int getPageSize() {
+    return pageSize;
+  }
+
+  public QueryBuilder setPageSize(int pageSize) {
+    this.pageSize = pageSize;
+    return this;
+  }
+
+  public int getOffset() {
+    return offset;
+  }
+
+  public QueryBuilder setOffset(int offset) {
+    this.offset = offset;
     return this;
   }
 }

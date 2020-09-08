@@ -41,6 +41,7 @@ public class EJPRDController {
       throws Exception {
 
     ArrayList<String> externalResourcesList = request.getExternalSources();
+
     System.out.println(externalResourcesList);
     String diagnosisAvailable = request.getDiagnosisAvailable();
     List<CatalogResponse> catalogs = new ArrayList<>();
@@ -62,6 +63,7 @@ public class EJPRDController {
           CatalogResponse cResponse =
               es.createExternalServiceCatalogReponse(matchingSource, externalResources);
           catalogs.add(cResponse);
+
         } else {
           throw new Exception("Unknown external resource identifier");
         }

@@ -1,4 +1,4 @@
-package org.molgenis.api.ejprd;
+package org.molgenis.api.ejprd.service;
 
 import org.molgenis.data.Entity;
 import org.molgenis.data.Query;

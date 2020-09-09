@@ -2,11 +2,11 @@ package org.molgenis.api.ejprd;
 
 import com.google.gson.JsonObject;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javax.validation.Valid;
 import org.molgenis.api.ApiNamespace;
-import org.molgenis.api.ejprd.externalServices.ERDRIResourcesService;
-import org.molgenis.api.ejprd.externalServices.OrphanetResourcesService;
+import org.molgenis.api.ejprd.externalServices.ExternalSourceService;
 import org.molgenis.api.ejprd.model.CatalogResponse;
 import org.molgenis.api.ejprd.model.CatalogsResponse;
 import org.molgenis.api.ejprd.model.ExternalResourceRequest;
@@ -27,8 +27,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class EJPRDController {
   static final String BASE_URI = ApiNamespace.API_PATH + "/ejprd";
   private static final Logger LOG = LoggerFactory.getLogger(EJPRDController.class);
-  private static final String ERDRIIdentifier = "erdri";
-  private static final String orphanetIdentifier = "orphanet";
 
   @Autowired private DataService dataService;
 
@@ -43,21 +41,27 @@ public class EJPRDController {
       throws Exception {
 
     ArrayList<String> externalResourcesList = request.getExternalSources();
+    System.out.println(externalResourcesList);
     String diagnosisAvailable = request.getDiagnosisAvailable();
     List<CatalogResponse> catalogs = new ArrayList<>();
+
+    // Todo: Move them in a Bean or globally in the controller
+    ExternalSourceService es = new ExternalSourceService(dataService);
+    HashMap<String, HashMap<String, String>> configuredExternalSources =
+        es.getConfiguredExternalSources();
 
     if (externalResourcesList != null) {
       // Scan all requested external resources
       for (String resource : externalResourcesList) {
-        if (resource.equals(ERDRIIdentifier)) {
-          ERDRIResourcesService es = new ERDRIResourcesService(this.dataService);
-          JsonObject ERDRIRes = es.getERDRIResources("test"); // this is a fake param value by now
-          CatalogResponse erdri = es.createERDRICatalogReponse(ERDRIRes);
-          catalogs.add(erdri);
-        } else if (resource.equals(orphanetIdentifier)) {
-          OrphanetResourcesService os = new OrphanetResourcesService();
-          CatalogResponse orphanet = os.createOrphanetCatalogReponse();
-          catalogs.add(orphanet);
+        System.out.println(resource);
+        if (configuredExternalSources.keySet().contains(resource)) {
+          HashMap matchingSource = configuredExternalSources.get(resource);
+          String serviceURI = (String) matchingSource.get("service_uri");
+          System.out.println(serviceURI);
+          JsonObject externalResources = es.getExternalResources(serviceURI, "test");
+          CatalogResponse cResponse =
+              es.createExternalServiceCatalogReponse(matchingSource, externalResources);
+          catalogs.add(cResponse);
         } else {
           throw new Exception("Unknown external resource identifier");
         }

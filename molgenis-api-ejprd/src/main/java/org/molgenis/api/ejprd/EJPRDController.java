@@ -42,9 +42,12 @@ public class EJPRDController {
 
     ArrayList<String> externalResourcesList = request.getExternalSources();
 
-    System.out.println(externalResourcesList);
     // Todo: enable diagnosisAvailable filter in the future
     String diagnosisAvailable = request.getDiagnosisAvailable();
+    String orphaCode = diagnosisAvailable;
+    if (diagnosisAvailable.contains("ORPHA:")) {
+      orphaCode = diagnosisAvailable.split(":")[1];
+    }
     List<CatalogResponse> catalogs = new ArrayList<>();
 
     // Todo: Move them in a Bean or globally in the controller
@@ -55,12 +58,12 @@ public class EJPRDController {
     if (externalResourcesList != null) {
       // Scan all requested external resources
       for (String resource : externalResourcesList) {
-        System.out.println(resource);
-        if (configuredExternalSources.keySet().contains(resource)) {
+
+        if (configuredExternalSources.containsKey(resource)) {
           HashMap matchingSource = configuredExternalSources.get(resource);
           String serviceURI = (String) matchingSource.get(es.getExternalSourcesServiceUriColName());
-          System.out.println(serviceURI);
-          JsonObject externalResources = es.getExternalResources(serviceURI, "test");
+
+          JsonObject externalResources = es.getExternalResources(serviceURI, orphaCode);
           CatalogResponse cResponse =
               es.createExternalServiceCatalogReponse(matchingSource, externalResources);
           catalogs.add(cResponse);

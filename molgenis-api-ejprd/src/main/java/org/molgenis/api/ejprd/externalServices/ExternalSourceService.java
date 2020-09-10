@@ -30,14 +30,23 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class ExternalSourceService {
   private final String externalSourceIdentifierFieldName = "id";
   private final String externalSourcesEntity = "eu_bbmri_eric_external_sources";
-  private final String externalSourceURIFieldName = "service_uri";
-  // private String serviceURI = "http://host.docker.internal:8089/resource"; // mocked service
+
+  private final String externalSourcesIDColName = "id";
+  private final String externalSourcesNameColName = "name";
+  private final String externalSourcesDescColName = "description";
+  private final String externalSourcesBaseUriColName = "base_uri";
+  private final String externalSourcesServiceUriColName = "service_uri";
+
   private RestTemplate restTemplate = new RestTemplate();
   private DataService dataService;
 
   public ExternalSourceService(DataService dataService) {
     // this.externalSourceIdentifierValue = requireNonNull(externalSourceIdentifierValue);
     this.dataService = requireNonNull(dataService);
+  }
+
+  public String getExternalSourcesServiceUriColName() {
+    return externalSourcesServiceUriColName;
   }
 
   public HashMap<String, HashMap<String, String>> getConfiguredExternalSources() {
@@ -51,11 +60,17 @@ public class ExternalSourceService {
       Entity configuredEntity = i.next();
       HashMap<String, String> entity = new HashMap();
       String entity_id = (String) configuredEntity.get("id");
-      entity.put("id", (String) configuredEntity.get("id"));
-      entity.put("name", (String) configuredEntity.get("name"));
-      entity.put("description", (String) configuredEntity.get("description"));
-      entity.put("base_uri", (String) configuredEntity.get("base_uri"));
-      entity.put("service_uri", (String) configuredEntity.get("service_uri"));
+      entity.put(externalSourcesIDColName, (String) configuredEntity.get(externalSourcesIDColName));
+      entity.put(
+          externalSourcesNameColName, (String) configuredEntity.get(externalSourcesNameColName));
+      entity.put(
+          externalSourcesDescColName, (String) configuredEntity.get(externalSourcesDescColName));
+      entity.put(
+          externalSourcesBaseUriColName,
+          (String) configuredEntity.get(externalSourcesBaseUriColName));
+      entity.put(
+          externalSourcesServiceUriColName,
+          (String) configuredEntity.get(externalSourcesServiceUriColName));
       configuredEntities.put(entity_id, entity);
     }
     return configuredEntities;
@@ -88,8 +103,8 @@ public class ExternalSourceService {
     JsonElement resources = results.get("resourceResponses");
     JsonArray resourcesArray = resources.getAsJsonArray();
     List<ResourceResponse> erdriResources = new ArrayList<>();
-    String catalogName = (String) source.get("name");
-    String catalogUrl = (String) source.get("base_uri");
+    String catalogName = (String) source.get(externalSourcesNameColName);
+    String catalogUrl = (String) source.get(externalSourcesBaseUriColName);
     for (JsonElement resource : resourcesArray) {
       JsonObject res = resource.getAsJsonObject();
       ResourceResponse register =

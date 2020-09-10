@@ -43,6 +43,7 @@ public class EJPRDController {
     ArrayList<String> externalResourcesList = request.getExternalSources();
 
     System.out.println(externalResourcesList);
+    // Todo: enable diagnosisAvailable filter in the future
     String diagnosisAvailable = request.getDiagnosisAvailable();
     List<CatalogResponse> catalogs = new ArrayList<>();
 
@@ -57,7 +58,7 @@ public class EJPRDController {
         System.out.println(resource);
         if (configuredExternalSources.keySet().contains(resource)) {
           HashMap matchingSource = configuredExternalSources.get(resource);
-          String serviceURI = (String) matchingSource.get("service_uri");
+          String serviceURI = (String) matchingSource.get(es.getExternalSourcesServiceUriColName());
           System.out.println(serviceURI);
           JsonObject externalResources = es.getExternalResources(serviceURI, "test");
           CatalogResponse cResponse =

@@ -76,11 +76,11 @@ public class ExternalSourceService {
     return configuredEntities;
   }
 
-  public JsonObject getExternalResources(String serviceURI, String name) throws Exception {
+  public JsonObject getExternalResources(String serviceURI, String orphaCode) throws Exception {
     HttpHeaders headers = new HttpHeaders();
     headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
     UriComponentsBuilder builder =
-        UriComponentsBuilder.fromHttpUrl(String.format(serviceURI + "?name=" + name));
+        UriComponentsBuilder.fromHttpUrl(String.format(serviceURI + "?orphaCode=" + orphaCode));
     HttpEntity<?> entity = new HttpEntity<>(headers);
     ResponseEntity<String> response =
         this.restTemplate.getForEntity(builder.toUriString(), String.class);

@@ -3,6 +3,7 @@ package org.molgenis.api.ejprd.service;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -53,6 +54,18 @@ public class ResourceBuildServiceImpl implements ResourceBuildService {
         .build();
   }
 
+  @Override
+  public DataResponse build(String resourceId) {
+    Entity entity =
+        this.dataService.findOneById(packageMappingServiceFactory.getEntityTypeId(), resourceId);
+
+    ResourceResponse resourceResponse = mapEntity(entity);
+    return DataResponse.builder()
+        .setApiVersion(apiVersion)
+        .setResourceResponses(Collections.singletonList(resourceResponse))
+        .build();
+  }
+
   private int getTotalCount(Query<Entity> query) {
     return Math.toIntExact(
         dataService.count(packageMappingServiceFactory.getEntityTypeId(), query));
@@ -60,6 +73,11 @@ public class ResourceBuildServiceImpl implements ResourceBuildService {
 
   private Stream<Entity> query(Query<Entity> query) {
     return dataService.findAll(packageMappingServiceFactory.getEntityTypeId(), query);
+  }
+
+  private ResourceResponse mapEntity(Entity entity) {
+    ResourceMapper mapper = packageMappingServiceFactory.getResourceMapper();
+    return mapper.mapEntity(entity);
   }
 
   private List<ResourceResponse> mapEntity(Stream<Entity> entities) {

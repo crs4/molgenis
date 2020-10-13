@@ -29,11 +29,9 @@ import com.google.common.collect.Multimap;
 import java.io.StringWriter;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
-import javax.xml.datatype.DatatypeConfigurationException;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
@@ -107,16 +105,23 @@ class EntityModelWriterTest extends AbstractMockitoTest {
 
     when(entityType.getAtomicAttributes()).thenReturn(attributeList);
 
-    when(attr1.getName()).thenReturn("attributeName1");
-    when(attr1.getDataType()).thenReturn(AttributeType.STRING);
+    when(attribute.getName()).thenReturn("attributeName1");
+    when(attribute.getDataType()).thenReturn(STRING);
+
+    when(tagService.getTagsForEntity(entityType)).thenReturn(List.of(entityTag, entityTag2));
+    when(entityTag.getRelation()).thenReturn(isAssociatedWith);
+    when(entityTag.getObject()).thenReturn(labeledResource);
+    when(labeledResource.getIri()).thenReturn(DCAT_RESOURCE);
+
+    when(entityTag2.getRelation()).thenReturn(isAssociatedWith);
+    when(entityTag2.getObject()).thenReturn(labeledResource2);
+    when(labeledResource2.getIri()).thenReturn(R3D_REPOSITORY);
 
     LabeledResource tag1 = new LabeledResource("http://IRI1.nl", "tag1Label");
-    Multimap<Relation, LabeledResource> tags =
-        ImmutableMultimap.of(Relation.isAssociatedWith, tag1);
-    when(tagService.getTagsForAttribute(entityType, attr1)).thenReturn(tags);
+    Multimap<Relation, LabeledResource> tags = ImmutableMultimap.of(isAssociatedWith, tag1);
+    when(tagService.getTagsForAttribute(entityType, attribute)).thenReturn(tags);
 
-    Model result =
-        writer.createRdfModel(objectEntity, getStreamEntity());
+    Model result = writer.createRdfModel(objectEntity, getStreamEntity());
 
     assertEquals(9, result.size());
     StringWriter writer = new StringWriter();
@@ -217,8 +222,7 @@ class EntityModelWriterTest extends AbstractMockitoTest {
     when(labeledResource.getIri()).thenReturn("http://example.org/iri");
     when(tagService.getTagsForAttribute(entityType, attribute)).thenReturn(tags);
 
-    Model result =
-        writer.createRdfModel(objectEntity, getStreamEntity());
+    Model result = writer.createRdfModel(objectEntity, getStreamEntity());
 
     StringWriter writer = new StringWriter();
     Rio.write(result, writer, TURTLE, new WriterConfig().set(INLINE_BLANK_NODES, true));
@@ -305,8 +309,7 @@ class EntityModelWriterTest extends AbstractMockitoTest {
     Multimap<Relation, LabeledResource> tags = ImmutableMultimap.of(isAssociatedWith, tag);
     when(tagService.getTagsForAttribute(entityType, attribute)).thenReturn(tags);
 
-    Model result =
-        writer.createRdfModel(objectEntity, getStreamEntity());
+    Model result = writer.createRdfModel(objectEntity, getStreamEntity());
 
     assertEquals(3, result.size());
     StringWriter writer = new StringWriter();
@@ -322,8 +325,7 @@ class EntityModelWriterTest extends AbstractMockitoTest {
     when(objectEntity.get("attributeName1")).thenReturn(null);
     when(attribute.getName()).thenReturn("attributeName1");
 
-    Model result =
-        writer.createRdfModel(objectEntity, getStreamEntity());
+    Model result = writer.createRdfModel(objectEntity, getStreamEntity());
 
     assertTrue(result.isEmpty());
   }

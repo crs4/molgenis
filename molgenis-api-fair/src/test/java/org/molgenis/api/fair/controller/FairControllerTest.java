@@ -6,11 +6,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.net.URI;
-<<<<<<< HEAD
 import java.util.Optional;
-=======
 import java.util.stream.Stream;
->>>>>>> 388014de9d... Modifies fair api to get namespaces to add namespaces dinamycally from a model
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

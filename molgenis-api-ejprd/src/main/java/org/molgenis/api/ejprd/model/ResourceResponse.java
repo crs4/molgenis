@@ -12,6 +12,8 @@ public abstract class ResourceResponse {
 
   public abstract String getId();
 
+  public abstract String getType();
+
   @Nullable
   public abstract String getDescription();
 
@@ -31,6 +33,7 @@ public abstract class ResourceResponse {
       String name,
       String url,
       String id,
+      String type,
       String description,
       String createDateTime,
       String updateDateTime,
@@ -40,6 +43,7 @@ public abstract class ResourceResponse {
         .setName(name)
         .setUrl(url)
         .setId(id)
+        .setType(type)
         .setDescription(description)
         .setCreateDateTime(createDateTime)
         .setUpdateDateTime(updateDateTime)
@@ -72,6 +76,8 @@ public abstract class ResourceResponse {
     public abstract ResourceResponse.Builder setVersion(String version);
 
     public abstract ResourceResponse.Builder setInfo(String info);
+
+    public abstract Builder setType(String type);
 
     public abstract ResourceResponse build();
   }

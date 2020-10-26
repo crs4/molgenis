@@ -13,6 +13,8 @@ import org.molgenis.api.support.PageUtils;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
 import org.molgenis.data.Query;
+import org.molgenis.data.meta.model.EntityType;
+import org.molgenis.data.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -56,12 +58,16 @@ public class ResourceBuildServiceImpl implements ResourceBuildService {
 
   @Override
   public DataResponse build(String resourceId) {
+    EntityType entityType =
+        dataService.getEntityType(packageMappingServiceFactory.getEntityTypeId());
+    Object id = EntityUtils.getTypedValue(resourceId, entityType.getIdAttribute());
     Entity entity =
-        this.dataService.findOneById(packageMappingServiceFactory.getEntityTypeId(), resourceId);
+        this.dataService.findOneById(packageMappingServiceFactory.getEntityTypeId(), id);
 
     ResourceResponse resourceResponse = mapEntity(entity);
     return DataResponse.builder()
         .setApiVersion(apiVersion)
+        .setPage(PageUtils.getPageResponse(1, 0, 1))
         .setResourceResponses(Collections.singletonList(resourceResponse))
         .build();
   }

@@ -20,22 +20,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ResourceBuildServiceImpl implements ResourceBuildService {
+public class InternalResourceQueryService implements ResourceQueryService {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ResourceBuildServiceImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(InternalResourceQueryService.class);
 
   private final DataService dataService;
 
   private static final String apiVersion = "v1";
   private final PackageMappingServiceFactory packageMappingServiceFactory;
 
-  public ResourceBuildServiceImpl(DataService dataService) {
+  public InternalResourceQueryService(DataService dataService) {
     this.dataService = requireNonNull(dataService);
     this.packageMappingServiceFactory = PackageMappingServiceFactory.getFactory();
   }
 
   @Override
-  public DataResponse build(String orphaCode, String diseaseName, Integer skip, Integer limit) {
+  public DataResponse query(String orphaCode, String diseaseName, Integer skip, Integer limit) {
     QueryBuilder queryBuilder =
         packageMappingServiceFactory
             .getQueryBuilder()
@@ -45,7 +45,7 @@ public class ResourceBuildServiceImpl implements ResourceBuildService {
             .setOffset(skip * limit);
 
     int totalCount = getTotalCount(queryBuilder.buildCount());
-    Stream<Entity> entities = query(queryBuilder.build());
+    Stream<Entity> entities = getById(queryBuilder.build());
 
     List<ResourceResponse> resources = mapEntity(entities);
 
@@ -57,7 +57,7 @@ public class ResourceBuildServiceImpl implements ResourceBuildService {
   }
 
   @Override
-  public DataResponse build(String resourceId) {
+  public DataResponse getById(String resourceId) {
     EntityType entityType =
         dataService.getEntityType(packageMappingServiceFactory.getEntityTypeId());
     Object id = EntityUtils.getTypedValue(resourceId, entityType.getIdAttribute());
@@ -77,7 +77,7 @@ public class ResourceBuildServiceImpl implements ResourceBuildService {
         dataService.count(packageMappingServiceFactory.getEntityTypeId(), query));
   }
 
-  private Stream<Entity> query(Query<Entity> query) {
+  private Stream<Entity> getById(Query<Entity> query) {
     return dataService.findAll(packageMappingServiceFactory.getEntityTypeId(), query);
   }
 

@@ -6,7 +6,7 @@ import javax.validation.Valid;
 import org.molgenis.api.ApiNamespace;
 import org.molgenis.api.ejprd.model.DataResponse;
 import org.molgenis.api.ejprd.model.ResourceRequest;
-import org.molgenis.api.ejprd.service.ResourceBuildService;
+import org.molgenis.api.ejprd.service.InternalResourceQueryService;
 import org.molgenis.security.core.runas.RunAsSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,12 +24,12 @@ public class ResourceApiController implements ResourceApi {
 
   static final String BASE_URI = ApiNamespace.API_PATH + "/ejprd";
 
-  private final ResourceBuildService resourceBuildService;
+  private final InternalResourceQueryService resourceQueryService;
 
   private static final String apiVersion = "v1";
 
-  ResourceApiController(ResourceBuildService resourceBuildService) {
-    this.resourceBuildService = requireNonNull(resourceBuildService);
+  ResourceApiController(InternalResourceQueryService resourceQueryService) {
+    this.resourceQueryService = requireNonNull(resourceQueryService);
   }
 
   @GetMapping("/resource/search")
@@ -41,13 +41,13 @@ public class ResourceApiController implements ResourceApi {
     Integer skip = resourceRequest.getSkip();
     Integer limit = resourceRequest.getLimit();
 
-    return resourceBuildService.build(orphaCode, name, skip, limit);
+    return resourceQueryService.query(orphaCode, name, skip, limit);
   }
 
   @GetMapping("/resource/{resourceId}")
   @ResponseBody
   @RunAsSystem
   public DataResponse getResourceById(@PathVariable("resourceId") String resourceId) {
-    return resourceBuildService.build(resourceId);
+    return resourceQueryService.getById(resourceId);
   }
 }

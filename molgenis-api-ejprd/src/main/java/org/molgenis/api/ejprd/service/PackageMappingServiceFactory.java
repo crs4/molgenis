@@ -11,4 +11,6 @@ public abstract class PackageMappingServiceFactory {
   public abstract ResourceMapper getResourceMapper();
 
   public abstract String getEntityTypeId();
+
+  public abstract String getExternalSourcesEntityTypeId();
 }

@@ -1,6 +1,11 @@
 package org.molgenis.api.ejprd.model;
 
 import com.google.auto.value.AutoValue;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.molgenis.api.model.response.PageResponse;
@@ -12,10 +17,25 @@ public abstract class DataResponse {
 
   public abstract List<ResourceResponse> getResourceResponses();
 
+  @Nullable
   public abstract PageResponse getPage();
 
   @Nullable
   public abstract ErrorResponse getError();
+
+  public static DataResponse fromJson(String jsonString) {
+    Gson gson = new Gson();
+    JsonObject jsonDataResponse = gson.fromJson(jsonString, JsonElement.class).getAsJsonObject();
+    String version = jsonDataResponse.getAsJsonPrimitive("apiVersion").getAsString();
+    JsonArray jsonResources = jsonDataResponse.getAsJsonArray("resourceResponses");
+
+    List<ResourceResponse> resources = new ArrayList<>();
+    for (JsonElement resource : jsonResources) {
+      ResourceResponse resourceResponse = ResourceResponse.fromJson(resource.getAsJsonObject());
+      resources.add(resourceResponse);
+    }
+    return DataResponse.create(version, resources, null, null);
+  }
 
   public static DataResponse create(
       String apiVersion,

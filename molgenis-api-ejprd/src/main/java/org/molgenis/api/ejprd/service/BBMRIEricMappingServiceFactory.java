@@ -16,4 +16,9 @@ public class BBMRIEricMappingServiceFactory extends PackageMappingServiceFactory
   public String getEntityTypeId() {
     return "eu_bbmri_eric_collections";
   }
+
+  @Override
+  public String getExternalSourcesEntityTypeId() {
+    return "eu_bbmri_eric_external_sources";
+  }
 }

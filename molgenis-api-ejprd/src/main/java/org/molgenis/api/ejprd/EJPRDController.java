@@ -1,20 +1,16 @@
 package org.molgenis.api.ejprd;
 
-import com.google.gson.JsonObject;
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import javax.validation.Valid;
 import org.molgenis.api.ApiNamespace;
-import org.molgenis.api.ejprd.externalServices.ExternalSourceService;
-import org.molgenis.api.ejprd.model.CatalogResponse;
 import org.molgenis.api.ejprd.model.CatalogsResponse;
 import org.molgenis.api.ejprd.model.ExternalResourceRequest;
-import org.molgenis.data.DataService;
+import org.molgenis.api.ejprd.service.ExternalSourceService;
 import org.molgenis.security.core.runas.RunAsSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +24,11 @@ public class EJPRDController {
   static final String BASE_URI = ApiNamespace.API_PATH + "/ejprd";
   private static final Logger LOG = LoggerFactory.getLogger(EJPRDController.class);
 
-  @Autowired private DataService dataService;
+  private final ExternalSourceService externalSourceService;
+
+  EJPRDController(ExternalSourceService externalSourceService) {
+    this.externalSourceService = requireNonNull(externalSourceService);
+  }
 
   private static UriComponentsBuilder getBaseUri() {
     return ServletUriComponentsBuilder.fromCurrentContextPath().path(BASE_URI);
@@ -37,41 +37,16 @@ public class EJPRDController {
   @GetMapping("/external_resource/")
   @ResponseBody
   @RunAsSystem
-  public CatalogsResponse getExternalResource(@Valid ExternalResourceRequest request)
-      throws Exception {
-
-    ArrayList<String> externalResourcesList = request.getExternalSources();
+  public CatalogsResponse getExternalResource(@Valid ExternalResourceRequest request) {
+    ArrayList<String> externalSourcesIds = request.getExternalSources();
 
     // Todo: enable diagnosisAvailable filter in the future
     String diagnosisAvailable = request.getDiagnosisAvailable();
     String orphaCode = diagnosisAvailable;
+
     if (diagnosisAvailable.contains("ORPHA:")) {
       orphaCode = diagnosisAvailable.split(":")[1];
     }
-    List<CatalogResponse> catalogs = new ArrayList<>();
-
-    // Todo: Move them in a Bean or globally in the controller
-    ExternalSourceService es = new ExternalSourceService(dataService);
-    HashMap<String, HashMap<String, String>> configuredExternalSources =
-        es.getConfiguredExternalSources();
-
-    if (externalResourcesList != null) {
-      // Scan all requested external resources
-      for (String resource : externalResourcesList) {
-
-        if (configuredExternalSources.containsKey(resource)) {
-          HashMap matchingSource = configuredExternalSources.get(resource);
-          String serviceURI = (String) matchingSource.get(es.getExternalSourcesServiceUriColName());
-
-          JsonObject externalResources = es.getExternalResources(serviceURI, orphaCode);
-          CatalogResponse cResponse =
-              es.createExternalServiceCatalogReponse(matchingSource, externalResources);
-          catalogs.add(cResponse);
-        } else {
-          throw new Exception("Unknown external resource identifier");
-        }
-      }
-    }
-    return CatalogsResponse.create(catalogs);
+    return externalSourceService.getExternalCatalogs(externalSourcesIds, orphaCode);
   }
 }

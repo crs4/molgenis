@@ -150,6 +150,7 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
                           "%s%d - %s%d", BIOBANK_BASE_NAME, i + 1, COLLECTION_BASE_NAME, i + 1))))
           .andExpect(
               jsonPath(String.format("$.resourceResponses[%s].id", i), is(String.valueOf(i + 1))))
+          .andExpect(jsonPath(String.format("$.resourceResponses[%s].type", i), is("Biobank")))
           .andExpect(
               jsonPath(
                   String.format("$.resourceResponses[%s].description", i),

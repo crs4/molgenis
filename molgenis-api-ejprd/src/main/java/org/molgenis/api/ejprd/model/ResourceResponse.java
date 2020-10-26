@@ -1,6 +1,7 @@
 package org.molgenis.api.ejprd.model;
 
 import com.google.auto.value.AutoValue;
+import com.google.gson.JsonObject;
 import javax.annotation.Nullable;
 
 @AutoValue
@@ -28,6 +29,19 @@ public abstract class ResourceResponse {
 
   @Nullable
   public abstract String getInfo();
+
+  public static ResourceResponse fromJson(JsonObject jsonObject) {
+    return ResourceResponse.create(
+        jsonObject.get("name").getAsString(),
+        jsonObject.get("url").getAsString(),
+        jsonObject.get("id").getAsString(),
+        jsonObject.get("type").getAsString(),
+        jsonObject.get("description").getAsString(),
+        null,
+        null,
+        null,
+        null);
+  }
 
   public static ResourceResponse create(
       String name,

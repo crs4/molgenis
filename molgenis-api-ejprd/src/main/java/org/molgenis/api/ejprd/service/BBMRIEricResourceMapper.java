@@ -22,8 +22,9 @@ public class BBMRIEricResourceMapper implements ResourceMapper {
     String uuid = entity.getString("id");
     Entity biobank = (Entity) entity.get("biobank");
     String name = String.format("%s - %s", biobank.getString("name"), entity.getString("name"));
+    String type = "Biobank";
     String description = entity.getString("description");
 
-    return ResourceResponse.create(name, url, uuid, description, null, null, null, null);
+    return ResourceResponse.create(name, url, uuid, type, description, null, null, null, null);
   }
 }

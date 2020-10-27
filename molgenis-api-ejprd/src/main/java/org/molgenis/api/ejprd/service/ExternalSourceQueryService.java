@@ -29,6 +29,7 @@ public class ExternalSourceQueryService implements ResourceQueryService {
       return null;
     }
 
+    //TODO: handle NullPointerException in case response.getBody() is malformed
     if (response.getStatusCode().equals(HttpStatus.OK)) {
       return DataResponse.fromJson(response.getBody());
     }

@@ -1,10 +1,13 @@
 package org.molgenis.api.ejprd.model;
 
 import com.google.auto.value.AutoValue;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import javax.annotation.Nullable;
+import org.molgenis.util.AutoGson;
 
 @AutoValue
+@AutoGson(autoValueClass = ResourceResponse.class)
 public abstract class ResourceResponse {
 
   public abstract String getName();
@@ -31,6 +34,7 @@ public abstract class ResourceResponse {
   public abstract String getInfo();
 
   public static ResourceResponse fromJson(JsonObject jsonObject) {
+
     return ResourceResponse.create(
         jsonObject.get("name").getAsString(),
         jsonObject.get("url").getAsString(),
@@ -41,6 +45,13 @@ public abstract class ResourceResponse {
         null,
         null,
         null);
+  }
+
+  public static ResourceResponse fromJson(String jsonString) {
+    Gson gson = new Gson();
+    return gson.fromJson(jsonString, ResourceResponse.class);
+    //    JsonObject jsonDataResponse = gson.fromJson(jsonString, JsonObject.class);
+    //    return fromJson(jsonDataResponse);
   }
 
   public static ResourceResponse create(

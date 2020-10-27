@@ -45,7 +45,7 @@ public class InternalResourceQueryService implements ResourceQueryService {
             .setOffset(skip * limit);
 
     int totalCount = getTotalCount(queryBuilder.buildCount());
-    Stream<Entity> entities = getById(queryBuilder.build());
+    Stream<Entity> entities = query(queryBuilder.build());
 
     List<ResourceResponse> resources = mapEntity(entities);
 
@@ -77,7 +77,7 @@ public class InternalResourceQueryService implements ResourceQueryService {
         dataService.count(packageMappingServiceFactory.getEntityTypeId(), query));
   }
 
-  private Stream<Entity> getById(Query<Entity> query) {
+  private Stream<Entity> query(Query<Entity> query) {
     return dataService.findAll(packageMappingServiceFactory.getEntityTypeId(), query);
   }
 

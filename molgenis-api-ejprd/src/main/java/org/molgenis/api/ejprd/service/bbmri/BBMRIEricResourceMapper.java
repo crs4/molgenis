@@ -1,6 +1,7 @@
-package org.molgenis.api.ejprd.service;
+package org.molgenis.api.ejprd.service.bbmri;
 
 import org.molgenis.api.ejprd.model.ResourceResponse;
+import org.molgenis.api.ejprd.service.ResourceMapper;
 import org.molgenis.data.Entity;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;

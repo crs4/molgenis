@@ -1,8 +1,5 @@
 package org.molgenis.api.ejprd.model;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -14,10 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.molgenis.api.model.response.PageResponse;
-import org.molgenis.util.AutoGson;
 
 @AutoValue
-@AutoGson(autoValueClass = AutoValue_DataResponse.class)
 public abstract class DataResponse {
 
   @SerializedName("apiVersion")
@@ -51,7 +46,8 @@ public abstract class DataResponse {
     PageResponse pageResponse = null;
     JsonObject jsonPage = jsonDataResponse.getAsJsonObject("page");
     if (jsonPage != null) {
-          pageResponse = PageResponse.create(
+      pageResponse =
+          PageResponse.create(
               jsonPage.getAsJsonPrimitive("size").getAsInt(),
               jsonPage.getAsJsonPrimitive("totalElements").getAsInt(),
               jsonPage.getAsJsonPrimitive("number").getAsInt());

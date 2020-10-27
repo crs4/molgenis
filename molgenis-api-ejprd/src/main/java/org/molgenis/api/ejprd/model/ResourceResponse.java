@@ -4,10 +4,8 @@ import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import javax.annotation.Nullable;
-import org.molgenis.util.AutoGson;
 
 @AutoValue
-@AutoGson(autoValueClass = ResourceResponse.class)
 public abstract class ResourceResponse {
 
   public abstract String getName();

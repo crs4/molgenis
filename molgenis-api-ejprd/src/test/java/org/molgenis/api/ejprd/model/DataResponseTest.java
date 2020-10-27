@@ -1,14 +1,14 @@
 package org.molgenis.api.ejprd.model;
 
-import java.util.Collections;
-import java.util.List;
-import org.junit.jupiter.api.Test;
-import org.molgenis.api.model.response.PageResponse;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.Collections;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.molgenis.api.model.response.PageResponse;
 
 public class DataResponseTest {
 

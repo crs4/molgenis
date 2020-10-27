@@ -3,6 +3,7 @@ package org.molgenis.api.ejprd;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.validation.Valid;
 import org.molgenis.api.ApiNamespace;
@@ -10,6 +11,7 @@ import org.molgenis.api.ejprd.model.CatalogResponse;
 import org.molgenis.api.ejprd.model.CatalogsResponse;
 import org.molgenis.api.ejprd.model.DataResponse;
 import org.molgenis.api.ejprd.model.ExternalResourceRequest;
+import org.molgenis.api.ejprd.model.ResourceResponse;
 import org.molgenis.api.ejprd.service.ExternalSourceQueryService;
 import org.molgenis.api.ejprd.service.PackageMappingServiceFactory;
 import org.molgenis.data.DataService;
@@ -75,12 +77,12 @@ public class ExternalResourcesController {
       ExternalSourceQueryService queryService = new ExternalSourceQueryService(serviceBaseUrl);
 
       DataResponse response = queryService.query(orphaCode, null, null, null);
-      if (response != null) {
-        CatalogResponse catalogResponse =
-            CatalogResponse.create(catalogName, catalogUrl, response.getResourceResponses());
-        if (catalogResponse != null) {
-          catalogs.add(catalogResponse);
-        }
+      List<ResourceResponse> resourceResponses =
+          response != null ? response.getResourceResponses() : Collections.emptyList();
+      CatalogResponse catalogResponse =
+          CatalogResponse.create(catalogName, catalogUrl, resourceResponses);
+      if (catalogResponse != null) {
+        catalogs.add(catalogResponse);
       }
     }
 

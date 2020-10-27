@@ -36,22 +36,25 @@ public abstract class ResourceResponse {
   public static ResourceResponse fromJson(JsonObject jsonObject) {
 
     return ResourceResponse.create(
-        jsonObject.get("name").getAsString(),
-        jsonObject.get("url").getAsString(),
-        jsonObject.get("id").getAsString(),
-        jsonObject.get("type").getAsString(),
-        jsonObject.get("description").getAsString(),
-        null,
-        null,
-        null,
-        null);
+        jsonObject.get("name") != null ? jsonObject.get("name").getAsString() : null,
+        jsonObject.get("url") != null ? jsonObject.get("url").getAsString() : null,
+        jsonObject.get("id") != null ? jsonObject.get("id").getAsString() : null,
+        jsonObject.get("type") != null ? jsonObject.get("type").getAsString() : null,
+        jsonObject.get("description") != null ? jsonObject.get("description").getAsString() : null,
+        jsonObject.get("createDateTime") != null
+            ? jsonObject.get("createDateTime").getAsString()
+            : null,
+        jsonObject.get("updateDateTime") != null
+            ? jsonObject.get("updateDateTime").getAsString()
+            : null,
+        jsonObject.get("version") != null ? jsonObject.get("version").getAsString() : null,
+        jsonObject.get("info") != null ? jsonObject.get("info").getAsString() : null);
   }
 
   public static ResourceResponse fromJson(String jsonString) {
     Gson gson = new Gson();
-    return gson.fromJson(jsonString, ResourceResponse.class);
-    //    JsonObject jsonDataResponse = gson.fromJson(jsonString, JsonObject.class);
-    //    return fromJson(jsonDataResponse);
+    JsonObject jsonDataResponse = gson.fromJson(jsonString, JsonObject.class);
+    return fromJson(jsonDataResponse);
   }
 
   public static ResourceResponse create(

@@ -1,4 +1,8 @@
-package org.molgenis.api.ejprd.service;
+package org.molgenis.api.ejprd.service.bbmri;
+
+import org.molgenis.api.ejprd.service.PackageMappingServiceFactory;
+import org.molgenis.api.ejprd.service.QueryBuilder;
+import org.molgenis.api.ejprd.service.ResourceMapper;
 
 public class BBMRIEricMappingServiceFactory extends PackageMappingServiceFactory {
 

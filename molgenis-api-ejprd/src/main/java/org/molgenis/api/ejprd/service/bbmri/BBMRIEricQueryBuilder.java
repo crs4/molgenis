@@ -1,5 +1,6 @@
-package org.molgenis.api.ejprd.service;
+package org.molgenis.api.ejprd.service.bbmri;
 
+import org.molgenis.api.ejprd.service.QueryBuilder;
 import org.molgenis.data.Entity;
 import org.molgenis.data.Query;
 import org.molgenis.data.support.QueryImpl;

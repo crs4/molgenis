@@ -15,20 +15,6 @@ import org.molgenis.api.model.response.PageResponse;
 @AutoValue
 public abstract class DataResponse {
 
-  @SerializedName("apiVersion")
-  public abstract String getApiVersion();
-
-  @SerializedName("resourceResponses")
-  public abstract List<ResourceResponse> getResourceResponses();
-
-  @Nullable
-  @SerializedName("page")
-  public abstract PageResponse getPage();
-
-  @Nullable
-  @SerializedName("error")
-  public abstract ErrorResponse getError();
-
   public static DataResponse fromJson(JsonObject jsonDataResponse) {
     JsonPrimitive jsonVersion = jsonDataResponse.getAsJsonPrimitive("apiVersion");
     String version = jsonVersion != null ? jsonVersion.getAsString() : null;
@@ -83,6 +69,20 @@ public abstract class DataResponse {
   public static DataResponse.Builder builder() {
     return new AutoValue_DataResponse.Builder();
   }
+
+  @SerializedName("apiVersion")
+  public abstract String getApiVersion();
+
+  @SerializedName("resourceResponses")
+  public abstract List<ResourceResponse> getResourceResponses();
+
+  @Nullable
+  @SerializedName("page")
+  public abstract PageResponse getPage();
+
+  @Nullable
+  @SerializedName("error")
+  public abstract ErrorResponse getError();
 
   @SuppressWarnings(
       "java:S1610") // Abstract classes without fields should be converted to interfaces

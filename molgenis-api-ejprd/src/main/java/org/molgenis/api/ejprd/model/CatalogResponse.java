@@ -5,12 +5,6 @@ import java.util.List;
 
 @AutoValue
 public abstract class CatalogResponse {
-  public abstract String getName();
-
-  public abstract String getUrl();
-
-  public abstract List<ResourceResponse> getResources();
-
   public static CatalogResponse create(String name, String url, List<ResourceResponse> resources) {
     return builder().setName(name).setUrl(url).setResources(resources).build();
   }
@@ -18,6 +12,12 @@ public abstract class CatalogResponse {
   public static Builder builder() {
     return new AutoValue_CatalogResponse.Builder();
   }
+
+  public abstract String getName();
+
+  public abstract String getUrl();
+
+  public abstract List<ResourceResponse> getResources();
 
   @SuppressWarnings(
       "java:S1610") // Abstract classes without fields should be converted to interfaces

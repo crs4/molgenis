@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiResponses;
 import javax.validation.Valid;
 import org.molgenis.api.ejprd.model.DataResponse;
 import org.molgenis.api.ejprd.model.ErrorResponse;
+import org.molgenis.api.ejprd.model.InternalResourceRequest;
 import org.molgenis.api.ejprd.model.ResourceRequest;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -49,5 +50,5 @@ public interface ResourceApi {
       value = "/resource",
       produces = {"application/json"},
       method = RequestMethod.GET)
-  DataResponse getResourceRequest(@Valid ResourceRequest resourceRequest);
+  DataResponse getResourceRequest(@Valid InternalResourceRequest resourceRequest);
 }

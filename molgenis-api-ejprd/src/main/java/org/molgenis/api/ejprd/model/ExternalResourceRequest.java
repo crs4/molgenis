@@ -1,6 +1,5 @@
 package org.molgenis.api.ejprd.model;
 
-import java.util.ArrayList;
 import javax.validation.constraints.AssertFalse;
 import javax.validation.constraints.NotNull;
 
@@ -19,6 +18,6 @@ public class ExternalResourceRequest extends ResourceRequest {
 
   @AssertFalse(message = "At least one search paramaters must be present")
   private boolean isQueryEmpty() {
-    return getDiagnosisAvailable() == null ;
+    return getDiagnosisAvailable() == null;
   }
 }

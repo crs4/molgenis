@@ -1,7 +1,6 @@
 package org.molgenis.api.ejprd.model;
 
 import java.util.List;
-import javax.validation.constraints.AssertFalse;
 
 public class ResourceRequest {
 
@@ -46,5 +45,4 @@ public class ResourceRequest {
   public void setLimit(Integer limit) {
     this.limit = limit;
   }
-
 }

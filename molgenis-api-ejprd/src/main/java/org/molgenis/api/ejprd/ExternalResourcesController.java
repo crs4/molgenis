@@ -90,7 +90,7 @@ public class ExternalResourcesController {
 //    return CatalogsResponse.create(catalogs);
 //  }
 
-  @GetMapping("/external_resource/{sourceId}")
+  @GetMapping("/external_sources/{sourceId}")
   @ResponseBody
   @RunAsSystem
   public CatalogsResponse getExternalResource(@PathVariable("sourceId") String sourceId, @Valid ExternalResourceRequest request) {

@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -52,38 +53,74 @@ public class ExternalResourcesController {
         packageMappingServiceFactory.getExternalSourcesEntityTypeId(), sourceId);
   }
 
-  @GetMapping("/external_resource/")
+//  @GetMapping("/external_resource/")
+//  @ResponseBody
+//  @RunAsSystem
+//  public CatalogsResponse getExternalResource(@Valid ExternalResourceRequest request) {
+//    ArrayList<String> externalSourcesIds = request.getExternalSources();
+//
+//    // Todo: enable diagnosisAvailable filter in the future
+//    String diagnosisAvailable = request.getDiagnosisAvailable();
+//    String orphaCode = diagnosisAvailable;
+//
+//    if (diagnosisAvailable.contains("ORPHA:")) {
+//      orphaCode = diagnosisAvailable.split(":")[1];
+//    }
+//    List<CatalogResponse> catalogs = new ArrayList<>();
+//
+//    for (String sourceId : externalSourcesIds) {
+//      Entity source = findExternalSourceById(sourceId);
+//
+//      String serviceBaseUrl = source.getString(SERVICE_URI_COLUMN);
+//      String catalogName = source.getString(NAME_COLUMN);
+//      String catalogUrl = source.getString(BASE_URI_COLUMN);
+//
+//      ExternalSourceQueryService queryService = new ExternalSourceQueryService(serviceBaseUrl);
+//
+//      DataResponse response = queryService.query(orphaCode, null, null, null);
+//      List<ResourceResponse> resourceResponses =
+//          response != null ? response.getResourceResponses() : Collections.emptyList();
+//      CatalogResponse catalogResponse =
+//          CatalogResponse.create(catalogName, catalogUrl, resourceResponses);
+//      if (catalogResponse != null) {
+//        catalogs.add(catalogResponse);
+//      }
+//    }
+//
+//    return CatalogsResponse.create(catalogs);
+//  }
+
+  @GetMapping("/external_resource/{sourceId}")
   @ResponseBody
   @RunAsSystem
-  public CatalogsResponse getExternalResource(@Valid ExternalResourceRequest request) {
-    ArrayList<String> externalSourcesIds = request.getExternalSources();
+  public CatalogsResponse getExternalResource(@PathVariable("sourceId") String sourceId, @Valid ExternalResourceRequest request) {
 
     // Todo: enable diagnosisAvailable filter in the future
     String diagnosisAvailable = request.getDiagnosisAvailable();
     String orphaCode = diagnosisAvailable;
+    Integer skip = request.getSkip();
+    Integer limit = request.getLimit();
 
     if (diagnosisAvailable.contains("ORPHA:")) {
       orphaCode = diagnosisAvailable.split(":")[1];
     }
     List<CatalogResponse> catalogs = new ArrayList<>();
 
-    for (String sourceId : externalSourcesIds) {
-      Entity source = findExternalSourceById(sourceId);
+    Entity source = findExternalSourceById(sourceId);
 
-      String serviceBaseUrl = source.getString(SERVICE_URI_COLUMN);
-      String catalogName = source.getString(NAME_COLUMN);
-      String catalogUrl = source.getString(BASE_URI_COLUMN);
+    String serviceBaseUrl = source.getString(SERVICE_URI_COLUMN);
+    String catalogName = source.getString(NAME_COLUMN);
+    String catalogUrl = source.getString(BASE_URI_COLUMN);
 
-      ExternalSourceQueryService queryService = new ExternalSourceQueryService(serviceBaseUrl);
+    ExternalSourceQueryService queryService = new ExternalSourceQueryService(serviceBaseUrl);
 
-      DataResponse response = queryService.query(orphaCode, null, null, null);
-      List<ResourceResponse> resourceResponses =
-          response != null ? response.getResourceResponses() : Collections.emptyList();
-      CatalogResponse catalogResponse =
-          CatalogResponse.create(catalogName, catalogUrl, resourceResponses);
-      if (catalogResponse != null) {
-        catalogs.add(catalogResponse);
-      }
+    DataResponse response = queryService.query(orphaCode, null, skip, limit);
+    List<ResourceResponse> resourceResponses =
+        response != null ? response.getResourceResponses() : Collections.emptyList();
+    CatalogResponse catalogResponse =
+        CatalogResponse.create(catalogName, catalogUrl, resourceResponses);
+    if (catalogResponse != null) {
+      catalogs.add(catalogResponse);
     }
 
     return CatalogsResponse.create(catalogs);

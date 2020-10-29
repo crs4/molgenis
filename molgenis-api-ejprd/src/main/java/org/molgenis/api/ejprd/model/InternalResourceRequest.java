@@ -4,21 +4,22 @@ import java.util.ArrayList;
 import javax.validation.constraints.AssertFalse;
 import javax.validation.constraints.NotNull;
 
-public class ExternalResourceRequest extends ResourceRequest {
-
+public class InternalResourceRequest extends ResourceRequest {
   // At the moment ORPHA code is expected; TODO: implement lookup in case of IDC10 code
-  @NotNull private String diagnosisAvailable;
 
-  public String getDiagnosisAvailable() {
-    return diagnosisAvailable;
+  @NotNull
+  private String orphaCode;
+
+  public String getOrphaCode() {
+    return orphaCode;
   }
 
-  public void setDiagnosisAvailable(String diagnosisAvailable) {
-    this.diagnosisAvailable = diagnosisAvailable;
+  public void setOrphaCode(String orphaCode) {
+    this.orphaCode = orphaCode;
   }
 
   @AssertFalse(message = "At least one search paramaters must be present")
   private boolean isQueryEmpty() {
-    return getDiagnosisAvailable() == null ;
+    return getOrphaCode() == null;
   }
 }

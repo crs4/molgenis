@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import javax.validation.Valid;
 import org.molgenis.api.ApiNamespace;
 import org.molgenis.api.ejprd.model.DataResponse;
+import org.molgenis.api.ejprd.model.InternalResourceRequest;
 import org.molgenis.api.ejprd.model.ResourceRequest;
 import org.molgenis.api.ejprd.service.InternalResourceQueryService;
 import org.molgenis.security.core.runas.RunAsSystem;
@@ -35,7 +36,7 @@ public class ResourceApiController implements ResourceApi {
   @GetMapping("/resource/search")
   @ResponseBody
   @RunAsSystem
-  public DataResponse getResourceRequest(@Valid ResourceRequest resourceRequest) {
+  public DataResponse getResourceRequest(@Valid InternalResourceRequest resourceRequest) {
     String orphaCode = resourceRequest.getOrphaCode();
     String name = resourceRequest.getName();
     Integer skip = resourceRequest.getSkip();

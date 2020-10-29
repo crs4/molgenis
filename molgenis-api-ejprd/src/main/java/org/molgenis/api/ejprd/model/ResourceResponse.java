@@ -8,29 +8,6 @@ import javax.annotation.Nullable;
 @AutoValue
 public abstract class ResourceResponse {
 
-  public abstract String getName();
-
-  public abstract String getUrl();
-
-  public abstract String getId();
-
-  public abstract String getType();
-
-  @Nullable
-  public abstract String getDescription();
-
-  @Nullable
-  public abstract String getCreateDateTime();
-
-  @Nullable
-  public abstract String getUpdateDateTime();
-
-  @Nullable
-  public abstract String getVersion();
-
-  @Nullable
-  public abstract String getInfo();
-
   public static ResourceResponse fromJson(JsonObject jsonObject) {
 
     return ResourceResponse.create(
@@ -81,6 +58,29 @@ public abstract class ResourceResponse {
   public static Builder builder() {
     return new AutoValue_ResourceResponse.Builder();
   }
+
+  public abstract String getName();
+
+  public abstract String getUrl();
+
+  public abstract String getId();
+
+  public abstract String getType();
+
+  @Nullable
+  public abstract String getDescription();
+
+  @Nullable
+  public abstract String getCreateDateTime();
+
+  @Nullable
+  public abstract String getUpdateDateTime();
+
+  @Nullable
+  public abstract String getVersion();
+
+  @Nullable
+  public abstract String getInfo();
 
   @SuppressWarnings(
       "java:S1610") // Abstract classes without fields should be converted to interfaces

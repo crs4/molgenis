@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InternalResourceQueryService implements ResourceQueryService {
+public class InternalResourceQueryService  implements ResourceQueryService {
 
   private static final Logger LOG = LoggerFactory.getLogger(InternalResourceQueryService.class);
 

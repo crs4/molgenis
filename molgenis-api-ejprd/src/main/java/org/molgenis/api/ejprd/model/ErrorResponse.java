@@ -7,10 +7,6 @@ import com.google.gson.JsonObject;
 @AutoValue
 public abstract class ErrorResponse {
 
-  public abstract Integer getCode();
-
-  public abstract String getMessage();
-
   public static ErrorResponse create(Integer code, String message) {
     return builder().setCode(code).setMessage(message).build();
   }
@@ -29,6 +25,10 @@ public abstract class ErrorResponse {
   public static ErrorResponse.Builder builder() {
     return new AutoValue_ErrorResponse.Builder();
   }
+
+  public abstract Integer getCode();
+
+  public abstract String getMessage();
 
   @SuppressWarnings(
       "java:S1610") // Abstract classes without fields should be converted to interfaces

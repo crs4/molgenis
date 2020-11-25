@@ -6,8 +6,6 @@ import java.util.List;
 @AutoValue
 public abstract class CatalogsResponse {
 
-  public abstract List<CatalogResponse> getCatalogs();
-
   public static CatalogsResponse create(List<CatalogResponse> catalogs) {
     return builder().setCatalogs(catalogs).build();
   }
@@ -15,6 +13,8 @@ public abstract class CatalogsResponse {
   public static Builder builder() {
     return new AutoValue_CatalogsResponse.Builder();
   }
+
+  public abstract List<CatalogResponse> getCatalogs();
 
   // Abstract classes without fields should be converted to interfaces
   @SuppressWarnings({

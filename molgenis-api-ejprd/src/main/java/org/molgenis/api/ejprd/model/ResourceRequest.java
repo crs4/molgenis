@@ -1,13 +1,10 @@
 package org.molgenis.api.ejprd.model;
 
 import java.util.List;
-import javax.validation.constraints.AssertFalse;
 
 public class ResourceRequest {
 
   private String name;
-
-  private String orphaCode;
 
   private List<String> medAreas;
 
@@ -23,14 +20,6 @@ public class ResourceRequest {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public String getOrphaCode() {
-    return orphaCode;
-  }
-
-  public void setOrphaCode(String orphaCode) {
-    this.orphaCode = orphaCode;
   }
 
   public List<String> getMedAreas() {
@@ -55,10 +44,5 @@ public class ResourceRequest {
 
   public void setLimit(Integer limit) {
     this.limit = limit;
-  }
-
-  @AssertFalse(message = "At least one search paramaters must be present")
-  private boolean isQueryEmpty() {
-    return getName() == null && getOrphaCode() == null;
   }
 }

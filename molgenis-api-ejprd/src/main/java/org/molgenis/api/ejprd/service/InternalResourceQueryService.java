@@ -23,10 +23,8 @@ import org.springframework.stereotype.Component;
 public class InternalResourceQueryService implements ResourceQueryService {
 
   private static final Logger LOG = LoggerFactory.getLogger(InternalResourceQueryService.class);
-
-  private final DataService dataService;
-
   private static final String apiVersion = "v1";
+  private final DataService dataService;
   private final PackageMappingServiceFactory packageMappingServiceFactory;
 
   public InternalResourceQueryService(DataService dataService) {

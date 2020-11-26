@@ -17,15 +17,7 @@ public class DataResponseTest {
     String apiVersion = "v1";
     ResourceResponse resourceResponse =
         ResourceResponse.create(
-            "Biobank 1",
-            "https://biobank.url/",
-            "biobank:1",
-            "Biobank",
-            "This is biobank 1",
-            null,
-            null,
-            null,
-            null);
+            "Biobank 1", "biobank:1", "https://biobank.url/", "Biobank", "This is biobank 1", null);
     List<ResourceResponse> resourceResponses = Collections.singletonList(resourceResponse);
     PageResponse pageResponse = PageResponse.create(2, 10, 1);
     ErrorResponse errorResponse = ErrorResponse.create(1, "Error");
@@ -42,15 +34,7 @@ public class DataResponseTest {
     String apiVersion = "v1";
     ResourceResponse resourceResponse =
         ResourceResponse.create(
-            "Biobank 1",
-            "https://biobank.url/",
-            "biobank:1",
-            "Biobank",
-            "This is biobank 1",
-            null,
-            null,
-            null,
-            null);
+            "Biobank 1", "biobank:1", "https://biobank.url/", "Biobank", "This is biobank 1", null);
     List<ResourceResponse> resourceResponses = Collections.singletonList(resourceResponse);
     DataResponse dataResponse = DataResponse.create(apiVersion, resourceResponses, null, null);
     assertEquals(dataResponse.getApiVersion(), apiVersion);
@@ -64,15 +48,7 @@ public class DataResponseTest {
     String apiVersion = "v1";
     ResourceResponse resourceResponse =
         ResourceResponse.create(
-            "Biobank 1",
-            "https://biobank.url/",
-            "biobank:1",
-            "Biobank",
-            "This is biobank 1",
-            null,
-            null,
-            null,
-            null);
+            "Biobank 1", "biobank:1", "https://biobank.url/", "Biobank", "This is biobank 1", null);
     List<ResourceResponse> resourceResponses = Collections.singletonList(resourceResponse);
     assertThrows(
         NullPointerException.class,
@@ -95,7 +71,7 @@ public class DataResponseTest {
             + "    \"resourceResponses\": ["
             + "        {"
             + "            \"name\": \"Biobank\","
-            + "            \"url\": \"http://biobank.url/biobank_id\","
+            + "            \"homepage\": \"http://biobank.url/biobank_id\","
             + "            \"id\": \"biobank_id\","
             + "            \"type\": \"Biobank\","
             + "            \"description\": \"Biobank description\""
@@ -117,7 +93,7 @@ public class DataResponseTest {
     assertEquals(dataResponse.getResourceResponses().size(), 1);
     assertEquals(dataResponse.getResourceResponses().get(0).getName(), "Biobank");
     assertEquals(
-        dataResponse.getResourceResponses().get(0).getUrl(), "http://biobank.url/biobank_id");
+        dataResponse.getResourceResponses().get(0).getHomepage(), "http://biobank.url/biobank_id");
     assertEquals(dataResponse.getResourceResponses().get(0).getId(), "biobank_id");
     assertEquals(dataResponse.getResourceResponses().get(0).getType(), "Biobank");
     assertEquals(
@@ -140,7 +116,7 @@ public class DataResponseTest {
             + "\"resourceResponses\": ["
             + "{"
             + "   \"name\": \"Biobank\","
-            + "   \"url\": \"http://biobank.url/biobank_id\","
+            + "   \"homepage\": \"http://biobank.url/biobank_id\","
             + "   \"id\": \"biobank_id\","
             + "   \"type\": \"Biobank\","
             + "   \"description\": \"Biobank description\""
@@ -151,7 +127,7 @@ public class DataResponseTest {
     assertEquals(dataResponse.getResourceResponses().size(), 1);
     assertEquals(dataResponse.getResourceResponses().get(0).getName(), "Biobank");
     assertEquals(
-        dataResponse.getResourceResponses().get(0).getUrl(), "http://biobank.url/biobank_id");
+        dataResponse.getResourceResponses().get(0).getHomepage(), "http://biobank.url/biobank_id");
     assertEquals(dataResponse.getResourceResponses().get(0).getId(), "biobank_id");
     assertEquals(dataResponse.getResourceResponses().get(0).getType(), "Biobank");
     assertEquals(
@@ -174,7 +150,7 @@ public class DataResponseTest {
             + "\"resourceResponses\": ["
             + "{"
             + "   \"name\": \"Biobank\","
-            + "   \"url\": \"http://biobank.url/biobank_id\","
+            + "   \"homepage\": \"http://biobank.url/biobank_id\","
             + "   \"id\": \"biobank_id\","
             + "   \"type\": \"Biobank\","
             + "   \"description\": \"Biobank description\""

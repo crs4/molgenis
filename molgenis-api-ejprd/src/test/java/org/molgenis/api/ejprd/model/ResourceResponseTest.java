@@ -10,50 +10,38 @@ public class ResourceResponseTest {
 
   @Test
   void testBuildComplete() {
+    Location location = Location.create("Location1", "IT", "Roma", "Lazio");
+    Organization organization =
+        Organization.create(
+            "ORG_1", "Organization 1 ", "This is the organization 1", "http://org1.it", location);
     ResourceResponse resourceResponse =
         ResourceResponse.create(
-            "Biobank 1",
-            "https://biobank.url/",
             "biobank:1",
             "Biobank",
+            "Biobank 1",
             "This is biobank 1",
-            "2020-01-01",
-            "2020-01-01",
-            "v1",
-            "Some info about this biobank");
+            "https://biobank.url/",
+            organization);
+
     assertEquals(resourceResponse.getName(), "Biobank 1");
-    assertEquals(resourceResponse.getUrl(), "https://biobank.url/");
+    assertEquals(resourceResponse.getHomepage(), "https://biobank.url/");
     assertEquals(resourceResponse.getId(), "biobank:1");
     assertEquals(resourceResponse.getType(), "Biobank");
     assertEquals(resourceResponse.getDescription(), "This is biobank 1");
-    assertEquals(resourceResponse.getCreateDateTime(), "2020-01-01");
-    assertEquals(resourceResponse.getUpdateDateTime(), "2020-01-01");
-    assertEquals(resourceResponse.getVersion(), "v1");
-    assertEquals(resourceResponse.getInfo(), "Some info about this biobank");
+    assertEquals(resourceResponse.getPublisher(), organization);
   }
 
   @Test
   void testBuildMissingOptionalFields() {
     ResourceResponse resourceResponse =
         ResourceResponse.create(
-            "Biobank 1",
-            "https://biobank.url/",
-            "biobank:1",
-            "Biobank",
-            null,
-            null,
-            null,
-            null,
-            null);
+            "biobank:1", "Biobank", "Biobank 1", "Biobank", "https://biobank.url/", null);
     assertEquals(resourceResponse.getName(), "Biobank 1");
-    assertEquals(resourceResponse.getUrl(), "https://biobank.url/");
+    assertEquals(resourceResponse.getHomepage(), "https://biobank.url/");
     assertEquals(resourceResponse.getId(), "biobank:1");
     assertEquals(resourceResponse.getType(), "Biobank");
-    assertNull(resourceResponse.getDescription());
-    assertNull(resourceResponse.getCreateDateTime());
-    assertNull(resourceResponse.getUpdateDateTime());
-    assertNull(resourceResponse.getVersion());
-    assertNull(resourceResponse.getInfo());
+    assertEquals(resourceResponse.getDescription(), "Biobank");
+    assertNull(resourceResponse.getPublisher());
   }
 
   @Test
@@ -62,57 +50,25 @@ public class ResourceResponseTest {
         NullPointerException.class,
         () -> {
           ResourceResponse.create(
-              null,
-              "https://biobank.url/",
-              "biobank:1",
-              "Biobank",
-              "This is biobank 1",
-              null,
-              null,
-              null,
-              null);
+              null, "Biobank", "Biobank 1", "Biobank", "https://biobank.url/", null);
         });
     assertThrows(
         NullPointerException.class,
         () -> {
           ResourceResponse.create(
-              "Biobank 1",
-              null,
-              "biobank:1",
-              "Biobank",
-              "This is biobank 1",
-              null,
-              null,
-              null,
-              null);
+              "biobank:1", null, "Biobank 1", "Biobank", "https://biobank.url/", null);
         });
     assertThrows(
         NullPointerException.class,
         () -> {
           ResourceResponse.create(
-              "Biobank 1",
-              "https://biobank.url/",
-              null,
-              "Biobank",
-              "This is biobank 1",
-              null,
-              null,
-              null,
-              null);
+              "biobank:1", "Biobank", null, "Biobank", "https://biobank.url/", null);
         });
     assertThrows(
         NullPointerException.class,
         () -> {
           ResourceResponse.create(
-              "Biobank 1",
-              "https://biobank.url/",
-              "biobank:1",
-              null,
-              "This is biobank 1",
-              null,
-              null,
-              null,
-              null);
+              "biobank:1", "Biobank", "Biobank 1", null, "https://biobank.url/", null);
         });
   }
 
@@ -121,26 +77,26 @@ public class ResourceResponseTest {
     String jsonString =
         "{"
             + "  \"name\": \"Biobank\","
-            + "  \"url\": \"http://biobank.url/biobank:id\","
+            + "  \"homepage\": \"http://biobank.url/biobank:id\","
             + "  \"id\": \"biobank:id\","
             + "  \"type\": \"Biobank\","
-            + "  \"description\": \"This is biobank 1\","
-            + "  \"createDateTime\": \"2020-01-01\","
-            + "  \"updateDateTime\": \"2020-01-01\","
-            + "  \"version\": \"v1\","
-            + "  \"info\": \"Some info about this biobank\""
+            + "  \"description\": \"This is biobank 1\", "
+            + "  \"publisher\": {"
+            + "\"id\": \"Publisher_1\","
+            + "\"name\": \"Publisher 1\","
+            + "\"location\": {"
+            + "\"id\": \"IT\","
+            + "\"country\": \"Italy\""
+            + "}"
+            + "}"
             + "}";
 
     ResourceResponse resourceResponse = ResourceResponse.fromJson(jsonString);
     assertEquals(resourceResponse.getName(), "Biobank");
-    assertEquals(resourceResponse.getUrl(), "http://biobank.url/biobank:id");
+    assertEquals(resourceResponse.getHomepage(), "http://biobank.url/biobank:id");
     assertEquals(resourceResponse.getId(), "biobank:id");
     assertEquals(resourceResponse.getType(), "Biobank");
     assertEquals(resourceResponse.getDescription(), "This is biobank 1");
-    assertEquals(resourceResponse.getCreateDateTime(), "2020-01-01");
-    assertEquals(resourceResponse.getUpdateDateTime(), "2020-01-01");
-    assertEquals(resourceResponse.getVersion(), "v1");
-    assertEquals(resourceResponse.getInfo(), "Some info about this biobank");
   }
 
   @Test
@@ -148,21 +104,18 @@ public class ResourceResponseTest {
     String jsonString =
         "{"
             + "  \"name\": \"Biobank\","
-            + "  \"url\": \"http://biobank.url/biobank:id\","
+            + "  \"description\": \" My Biobank\","
+            + "  \"homepage\": \"http://biobank.url/biobank:id\","
             + "  \"id\": \"biobank:id\","
             + "  \"type\": \"Biobank\""
             + "}";
 
     ResourceResponse resourceResponse = ResourceResponse.fromJson(jsonString);
     assertEquals(resourceResponse.getName(), "Biobank");
-    assertEquals(resourceResponse.getUrl(), "http://biobank.url/biobank:id");
+    assertEquals(resourceResponse.getHomepage(), "http://biobank.url/biobank:id");
     assertEquals(resourceResponse.getId(), "biobank:id");
     assertEquals(resourceResponse.getType(), "Biobank");
-    assertNull(resourceResponse.getDescription());
-    assertNull(resourceResponse.getCreateDateTime());
-    assertNull(resourceResponse.getUpdateDateTime());
-    assertNull(resourceResponse.getVersion());
-    assertNull(resourceResponse.getInfo());
+    assertNull(resourceResponse.getPublisher());
   }
 
   @Test

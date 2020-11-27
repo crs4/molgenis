@@ -9,11 +9,11 @@ import javax.annotation.Nullable;
 public abstract class ResourceResponse {
 
   public static ResourceResponse fromJson(JsonObject jsonObject) {
-
+    
     return ResourceResponse.create(
         jsonObject.get("id") != null ? jsonObject.get("id").getAsString() : null,
-        jsonObject.get("name") != null ? jsonObject.get("name").getAsString() : null,
         jsonObject.get("type") != null ? jsonObject.get("type").getAsString() : null,
+        jsonObject.get("name") != null ? jsonObject.get("name").getAsString() : null,
         jsonObject.get("description") != null ? jsonObject.get("description").getAsString() : null,
         jsonObject.get("homepage") != null ? jsonObject.get("homepage").getAsString() : null,
         // TODO: import publisher from external when not null

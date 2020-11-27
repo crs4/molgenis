@@ -31,7 +31,7 @@ public class BBMRIEricResourceMapper implements ResourceMapper {
     String homepage = url;
 
     return ResourceResponse.create(
-        uuid, name, type, description, homepage, mapOrganization(biobank, mapLocation(country)));
+        uuid, type, name, description, homepage, mapOrganization(biobank, mapLocation(country)));
   }
 
   public Location mapLocation(Entity country) {

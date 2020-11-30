@@ -1,6 +1,7 @@
 package org.molgenis.api.ejprd.service;
 
 import org.molgenis.api.ejprd.model.DataResponse;
+import org.molgenis.api.ejprd.model.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -12,15 +13,19 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class ExternalSourceQueryService implements ResourceQueryService {
   private static final Logger LOG = LoggerFactory.getLogger(InternalResourceQueryService.class);
 
-  private final RestTemplate restTemplate = new RestTemplate();
+  private RestTemplate restTemplate = new RestTemplate();
   private final String serviceBaseURL;
+
+  public void setRestTemplate(RestTemplate restTemplate){
+    this.restTemplate = restTemplate;
+  }
 
   public ExternalSourceQueryService(String serviceBaseURL) {
     this.serviceBaseURL = serviceBaseURL;
   }
 
   @Override
-  public DataResponse query(String orphaCode, String diseaseName, Integer skip, Integer limit) {
+  public <T> T query(String orphaCode, String diseaseName, Integer skip, Integer limit) {
     UriComponentsBuilder builder =
         UriComponentsBuilder.fromHttpUrl(
             String.format("%s?orphaCode=%s", serviceBaseURL, orphaCode));
@@ -34,9 +39,9 @@ public class ExternalSourceQueryService implements ResourceQueryService {
 
     // TODO: handle NullPointerException in case response.getBody() is malformed
     if (response.getStatusCode().equals(HttpStatus.OK)) {
-      return DataResponse.fromJson(response.getBody());
+      return (T) DataResponse.fromJson(response.getBody());
     }
-    return null;
+    return (T) ErrorResponse.fromJson(response.getBody());
   }
 
   @Override

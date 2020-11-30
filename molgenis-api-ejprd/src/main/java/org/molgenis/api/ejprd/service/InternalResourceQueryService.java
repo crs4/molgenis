@@ -33,7 +33,7 @@ public class InternalResourceQueryService implements ResourceQueryService {
   }
 
   @Override
-  public DataResponse query(String orphaCode, String diseaseName, Integer skip, Integer limit) {
+  public <T> T query(String orphaCode, String diseaseName, Integer skip, Integer limit) {
     QueryBuilder queryBuilder =
         packageMappingServiceFactory
             .getQueryBuilder()
@@ -47,7 +47,7 @@ public class InternalResourceQueryService implements ResourceQueryService {
 
     List<ResourceResponse> resources = mapEntity(entities);
 
-    return DataResponse.builder()
+    return (T) DataResponse.builder()
         .setApiVersion(apiVersion)
         .setPage(PageUtils.getPageResponse(limit, limit * skip, totalCount))
         .setResourceResponses(resources)

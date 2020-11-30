@@ -9,15 +9,50 @@ import javax.annotation.Nullable;
 public abstract class ResourceResponse {
 
   public static ResourceResponse fromJson(JsonObject jsonObject) {
-    
+
+    Organization organization = null;
+    Location location = null;
+
+    if (jsonObject.get("publisher") != null) {
+      JsonObject publisher = jsonObject.get("publisher").getAsJsonObject();
+      String publisherName = publisher.get("name").getAsString();
+      String publisherId = publisher.get("id").getAsString();
+
+      if (publisher.get("location") != null) {
+        JsonObject publisherLocation = publisher.get("location").getAsJsonObject();
+        String publisherLocationId = publisherLocation.get("id").getAsString();
+        String publisherLocationCountry = publisherLocation.get("country").getAsString();
+        location =
+            Location.create(
+                publisherLocationId,
+                publisherLocationCountry,
+                publisherLocation.get("city") != null
+                    ? publisherLocation.get("city").getAsString()
+                    : null,
+                publisherLocation.get("region") != null
+                    ? publisherLocation.get("region").getAsString()
+                    : null);
+      }
+      organization =
+          Organization.create(
+              publisherId,
+              publisherName,
+              publisher.get("description") != null
+                  ? publisher.get("description").getAsString()
+                  : null,
+              publisher.get("homepage") != null ? publisher.get("homepage").getAsString() : null,
+              location);
+    }
+
     return ResourceResponse.create(
         jsonObject.get("id") != null ? jsonObject.get("id").getAsString() : null,
         jsonObject.get("type") != null ? jsonObject.get("type").getAsString() : null,
         jsonObject.get("name") != null ? jsonObject.get("name").getAsString() : null,
         jsonObject.get("description") != null ? jsonObject.get("description").getAsString() : null,
-        jsonObject.get("homepage") != null ? jsonObject.get("homepage").getAsString() : null,
-        // TODO: import publisher from external when not null
-        null);
+        jsonObject.get("homepage") != null
+            ? jsonObject.get("homepage").getAsString()
+            : null, // ,null
+        organization);
   }
 
   public static ResourceResponse fromJson(String jsonString) {

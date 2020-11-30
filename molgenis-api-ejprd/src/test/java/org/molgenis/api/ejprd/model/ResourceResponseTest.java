@@ -169,4 +169,110 @@ public class ResourceResponseTest {
           DataResponse.fromJson(jsonStringWithoutType);
         });
   }
+
+  @Test
+  public void testFromJsonWithOrganizationMissingOptionalFields() {
+    String jsonString =
+        "{"
+            + "  \"name\": \"Biobank\","
+            + "  \"homepage\": \"http://biobank.url/biobank:id\","
+            + "  \"id\": \"biobank:id\","
+            + "  \"type\": \"Biobank\","
+            + "  \"description\": \"This is biobank 1\", "
+            + "  \"publisher\": {"
+            + "\"id\": \"Publisher_1\","
+            + "\"name\": \"Publisher 1\""
+            + "}"
+            + "}";
+
+    ResourceResponse resourceResponse = ResourceResponse.fromJson(jsonString);
+    assertEquals(resourceResponse.getName(), "Biobank");
+    assertEquals(resourceResponse.getHomepage(), "http://biobank.url/biobank:id");
+    assertEquals(resourceResponse.getId(), "biobank:id");
+    assertEquals(resourceResponse.getType(), "Biobank");
+    assertEquals(resourceResponse.getDescription(), "This is biobank 1");
+    Organization publisher = resourceResponse.getPublisher();
+    assertEquals(publisher.getId(), "Publisher_1");
+    assertEquals(publisher.getName(), "Publisher 1");
+    assertEquals(publisher.getDescription(), null);
+    assertEquals(publisher.getHomepage(), null);
+    assertEquals(publisher.getLocation(), null);
+  }
+
+  @Test
+  public void testFromJsonWithOrganizationAndLocationMissingOptionalFields() {
+    String jsonString =
+        "{"
+            + "  \"name\": \"Biobank\","
+            + "  \"homepage\": \"http://biobank.url/biobank:id\","
+            + "  \"id\": \"biobank:id\","
+            + "  \"type\": \"Biobank\","
+            + "  \"description\": \"This is biobank 1\", "
+            + "  \"publisher\": {"
+            + "\"id\": \"Publisher_1\","
+            + "\"name\": \"Publisher 1\","
+            + "\"location\": {"
+            + "\"id\": \"IT\","
+            + "\"country\": \"Italy\""
+            + "}"
+            + "}"
+            + "}";
+
+    ResourceResponse resourceResponse = ResourceResponse.fromJson(jsonString);
+    assertEquals(resourceResponse.getName(), "Biobank");
+    assertEquals(resourceResponse.getHomepage(), "http://biobank.url/biobank:id");
+    assertEquals(resourceResponse.getId(), "biobank:id");
+    assertEquals(resourceResponse.getType(), "Biobank");
+    assertEquals(resourceResponse.getDescription(), "This is biobank 1");
+    Organization publisher = resourceResponse.getPublisher();
+    assertEquals(publisher.getId(), "Publisher_1");
+    assertEquals(publisher.getName(), "Publisher 1");
+    assertEquals(publisher.getDescription(), null);
+    assertEquals(publisher.getHomepage(), null);
+    Location location = publisher.getLocation();
+    assertEquals(location.getId(), "IT");
+    assertEquals(location.getCountry(), "Italy");
+    assertEquals(location.getRegion(), null);
+    assertEquals(location.getCity(), null);
+  }
+
+  public void testFromJsonWithOrganizationAndLocationBothWithAllFields() {
+    String jsonString =
+        "{"
+            + "  \"name\": \"Biobank\","
+            + "  \"homepage\": \"http://biobank.url/biobank:id\","
+            + "  \"id\": \"biobank:id\","
+            + "  \"type\": \"Biobank\","
+            + "  \"description\": \"This is biobank 1\", "
+            + "  \"publisher\": {"
+            + "\"id\": \"Publisher_1\","
+            + "\"name\": \"Publisher 1\","
+            + "\"description\": \"This is Publisher 1\","
+            + "\"homepage\": \"http://www.publisher1.com\","
+            + "\"location\": {"
+            + "\"id\": \"IT\","
+            + "\"country\": \"Italy\""
+            + "\"city\": \"Roma\""
+            + "\"region\": \"Lazio\""
+            + "}"
+            + "}"
+            + "}";
+
+    ResourceResponse resourceResponse = ResourceResponse.fromJson(jsonString);
+    assertEquals(resourceResponse.getName(), "Biobank");
+    assertEquals(resourceResponse.getHomepage(), "http://biobank.url/biobank:id");
+    assertEquals(resourceResponse.getId(), "biobank:id");
+    assertEquals(resourceResponse.getType(), "Biobank");
+    assertEquals(resourceResponse.getDescription(), "This is biobank 1");
+    Organization publisher = resourceResponse.getPublisher();
+    assertEquals(publisher.getId(), "Publisher_1");
+    assertEquals(publisher.getName(), "Publisher 1");
+    assertEquals(publisher.getDescription(), "This is Publisher 1");
+    assertEquals(publisher.getHomepage(), "http://www.publisher1.com");
+    Location location = publisher.getLocation();
+    assertEquals(location.getId(), "IT");
+    assertEquals(location.getCountry(), "Italy");
+    assertEquals(location.getRegion(), "Lazio");
+    assertEquals(location.getCity(), "Roma");
+  }
 }

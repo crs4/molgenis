@@ -53,43 +53,6 @@ public class ExternalResourcesController {
         packageMappingServiceFactory.getExternalSourcesEntityTypeId(), sourceId);
   }
 
-  //  @GetMapping("/external_resource/")
-  //  @ResponseBody
-  //  @RunAsSystem
-  //  public CatalogsResponse getExternalResource(@Valid ExternalResourceRequest request) {
-  //    ArrayList<String> externalSourcesIds = request.getExternalSources();
-  //
-  //    // Todo: enable diagnosisAvailable filter in the future
-  //    String diagnosisAvailable = request.getDiagnosisAvailable();
-  //    String orphaCode = diagnosisAvailable;
-  //
-  //    if (diagnosisAvailable.contains("ORPHA:")) {
-  //      orphaCode = diagnosisAvailable.split(":")[1];
-  //    }
-  //    List<CatalogResponse> catalogs = new ArrayList<>();
-  //
-  //    for (String sourceId : externalSourcesIds) {
-  //      Entity source = findExternalSourceById(sourceId);
-  //
-  //      String serviceBaseUrl = source.getString(SERVICE_URI_COLUMN);
-  //      String catalogName = source.getString(NAME_COLUMN);
-  //      String catalogUrl = source.getString(BASE_URI_COLUMN);
-  //
-  //      ExternalSourceQueryService queryService = new ExternalSourceQueryService(serviceBaseUrl);
-  //
-  //      DataResponse response = queryService.query(orphaCode, null, null, null);
-  //      List<ResourceResponse> resourceResponses =
-  //          response != null ? response.getResourceResponses() : Collections.emptyList();
-  //      CatalogResponse catalogResponse =
-  //          CatalogResponse.create(catalogName, catalogUrl, resourceResponses);
-  //      if (catalogResponse != null) {
-  //        catalogs.add(catalogResponse);
-  //      }
-  //    }
-  //
-  //    return CatalogsResponse.create(catalogs);
-  //  }
-
   @GetMapping("/external_sources/{sourceId}")
   @ResponseBody
   @RunAsSystem

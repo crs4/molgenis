@@ -10,7 +10,7 @@ public abstract class ResourceResponse {
 
   public static ResourceResponse fromJson(JsonObject jsonObject) {
 
-    Organization organization = null;
+    Organisation organisation = null;
     Location location = null;
 
     if (jsonObject.get("publisher") != null) {
@@ -33,8 +33,8 @@ public abstract class ResourceResponse {
                     ? publisherLocation.get("region").getAsString()
                     : null);
       }
-      organization =
-          Organization.create(
+      organisation =
+          Organisation.create(
               publisherId,
               publisherName,
               publisher.get("description") != null
@@ -52,7 +52,7 @@ public abstract class ResourceResponse {
         jsonObject.get("homepage") != null
             ? jsonObject.get("homepage").getAsString()
             : null, // ,null
-        organization);
+        organisation);
   }
 
   public static ResourceResponse fromJson(String jsonString) {
@@ -67,7 +67,7 @@ public abstract class ResourceResponse {
       String name,
       String description,
       String homepage,
-      Organization publisher) {
+      Organisation publisher) {
     return builder()
         .setId(id)
         .setType(type)
@@ -93,7 +93,7 @@ public abstract class ResourceResponse {
   public abstract String getHomepage();
 
   @Nullable
-  public abstract Organization getPublisher();
+  public abstract Organisation getPublisher();
 
   @SuppressWarnings(
       "java:S1610") // Abstract classes without fields should be converted to interfaces
@@ -110,7 +110,7 @@ public abstract class ResourceResponse {
 
     public abstract ResourceResponse.Builder setHomepage(String homepage);
 
-    public abstract ResourceResponse.Builder setPublisher(Organization publisher);
+    public abstract ResourceResponse.Builder setPublisher(Organisation publisher);
 
     public abstract ResourceResponse build();
   }

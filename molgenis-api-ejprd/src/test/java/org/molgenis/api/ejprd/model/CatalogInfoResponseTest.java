@@ -12,11 +12,11 @@ public class CatalogInfoResponseTest {
 
   @Test
   public void testCatalogInfoResponseComplete(){
-    Organization org =
-        Organization.create(
+    Organisation org =
+        Organisation.create(
             "ORG",
             "Orgnanization",
-            "This is the ORG organization",
+            "This is the ORG organisation",
             "https://org.eu",
             null);
 
@@ -24,7 +24,7 @@ public class CatalogInfoResponseTest {
         CatalogInfoResponse.create(
             "ORG_Catalog",
             new ArrayList(Arrays.asList("CatalogOfRegistries", "CatalogOfBiobanks")),
-            "Organization ORG Catalog",
+            "Organisation ORG Catalog",
             "This is the ORG Catalog",
             "https://org-catalog.eu",
             org,
@@ -35,7 +35,7 @@ public class CatalogInfoResponseTest {
                     "/resource/search?orphaCode={orphacode} will return results based on the specified {orphacode}")));
 
     assertEquals(catalog.getId(), "ORG_Catalog");
-    assertEquals(catalog.getOrganization(), org);
+    assertEquals(catalog.getOrganisation(), org);
 
   }
 
@@ -61,11 +61,11 @@ public class CatalogInfoResponseTest {
   @Test
   public void testMissingMandatoryFields(){
 
-    Organization org =
-        Organization.create(
+    Organisation org =
+        Organisation.create(
             "ORG",
-            "Orgnanization",
-            "This is the ORG organization",
+            "Orgnanisation",
+            "This is the ORG organisation",
             "https://org.eu",
             null);
 
@@ -76,7 +76,7 @@ public class CatalogInfoResponseTest {
               CatalogInfoResponse.create(
                   null,
                   new ArrayList(Arrays.asList("CatalogOfRegistries", "CatalogOfBiobanks")),
-                  "Organization ORG Catalog",
+                  "Organisation ORG Catalog",
                   "This is the ORG Catalog",
                   "https://org-catalog.eu",
                   org,
@@ -95,7 +95,7 @@ public class CatalogInfoResponseTest {
               CatalogInfoResponse.create(
                   "ORG_Catalog",
                   null,
-                  "Organization ORG Catalog",
+                  "Organisation ORG Catalog",
                   "This is the ORG Catalog",
                   "https://org-catalog.eu",
                   org,

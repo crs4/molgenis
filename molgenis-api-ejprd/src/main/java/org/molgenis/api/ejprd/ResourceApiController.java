@@ -9,7 +9,7 @@ import org.molgenis.api.ApiNamespace;
 import org.molgenis.api.ejprd.model.CatalogInfoResponse;
 import org.molgenis.api.ejprd.model.DataResponse;
 import org.molgenis.api.ejprd.model.InternalResourceRequest;
-import org.molgenis.api.ejprd.model.Organization;
+import org.molgenis.api.ejprd.model.Organisation;
 import org.molgenis.api.ejprd.service.InternalResourceQueryService;
 import org.molgenis.security.core.runas.RunAsSystem;
 import org.slf4j.Logger;
@@ -38,8 +38,8 @@ public class ResourceApiController implements ResourceApi {
   @RunAsSystem
   public CatalogInfoResponse getCatalogInfo() {
 
-    Organization bbmri =
-        Organization.create(
+    Organisation bbmri =
+        Organisation.create(
             "BBMRI.ERIC",
             "BBMRI-ERIC Orgnanization",
             "European research infrastructure for biobanking",

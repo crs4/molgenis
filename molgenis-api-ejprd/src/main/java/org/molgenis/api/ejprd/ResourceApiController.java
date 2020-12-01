@@ -22,7 +22,7 @@ public class ResourceApiController implements ResourceApi {
 
   static final String BASE_URI = ApiNamespace.API_PATH + "/ejprd";
   private static final Logger LOG = LoggerFactory.getLogger(ResourceApiController.class);
-  private static final String apiVersion = "v1";
+  private static final String apiVersion = "v0.2";
   private final InternalResourceQueryService resourceQueryService;
 
   ResourceApiController(InternalResourceQueryService resourceQueryService) {

@@ -1,5 +1,7 @@
 package org.molgenis.api.ejprd.service.bbmri;
 
+import org.molgenis.api.ejprd.model.Location;
+import org.molgenis.api.ejprd.model.Organization;
 import org.molgenis.api.ejprd.model.ResourceResponse;
 import org.molgenis.api.ejprd.service.ResourceMapper;
 import org.molgenis.data.Entity;
@@ -22,10 +24,28 @@ public class BBMRIEricResourceMapper implements ResourceMapper {
 
     String uuid = entity.getString("id");
     Entity biobank = (Entity) entity.get("biobank");
+    Entity country = (Entity) entity.get("country");
     String name = String.format("%s - %s", biobank.getString("name"), entity.getString("name"));
     String type = "Biobank";
     String description = entity.getString("description");
+    String homepage = url;
 
-    return ResourceResponse.create(name, url, uuid, type, description, null, null, null, null);
+    return ResourceResponse.create(
+        uuid, type, name, description, homepage, mapOrganization(biobank, mapLocation(country)));
+  }
+
+  public Location mapLocation(Entity country) {
+    String id = country.getString("id");
+    String name = country.getString("name");
+    return Location.create(id, name, null, null);
+  }
+
+  public Organization mapOrganization(Entity biobank, Location location) {
+    return Organization.create(
+        biobank.getString("juridical_person"),
+        biobank.getString("juridical_person"),
+        null,
+        null,
+        location);
   }
 }

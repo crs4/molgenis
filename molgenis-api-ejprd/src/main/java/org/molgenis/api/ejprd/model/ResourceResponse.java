@@ -10,20 +10,49 @@ public abstract class ResourceResponse {
 
   public static ResourceResponse fromJson(JsonObject jsonObject) {
 
+    Organization organization = null;
+    Location location = null;
+
+    if (jsonObject.get("publisher") != null) {
+      JsonObject publisher = jsonObject.get("publisher").getAsJsonObject();
+      String publisherName = publisher.get("name").getAsString();
+      String publisherId = publisher.get("id").getAsString();
+
+      if (publisher.get("location") != null) {
+        JsonObject publisherLocation = publisher.get("location").getAsJsonObject();
+        String publisherLocationId = publisherLocation.get("id").getAsString();
+        String publisherLocationCountry = publisherLocation.get("country").getAsString();
+        location =
+            Location.create(
+                publisherLocationId,
+                publisherLocationCountry,
+                publisherLocation.get("city") != null
+                    ? publisherLocation.get("city").getAsString()
+                    : null,
+                publisherLocation.get("region") != null
+                    ? publisherLocation.get("region").getAsString()
+                    : null);
+      }
+      organization =
+          Organization.create(
+              publisherId,
+              publisherName,
+              publisher.get("description") != null
+                  ? publisher.get("description").getAsString()
+                  : null,
+              publisher.get("homepage") != null ? publisher.get("homepage").getAsString() : null,
+              location);
+    }
+
     return ResourceResponse.create(
-        jsonObject.get("name") != null ? jsonObject.get("name").getAsString() : null,
-        jsonObject.get("url") != null ? jsonObject.get("url").getAsString() : null,
         jsonObject.get("id") != null ? jsonObject.get("id").getAsString() : null,
         jsonObject.get("type") != null ? jsonObject.get("type").getAsString() : null,
+        jsonObject.get("name") != null ? jsonObject.get("name").getAsString() : null,
         jsonObject.get("description") != null ? jsonObject.get("description").getAsString() : null,
-        jsonObject.get("createDateTime") != null
-            ? jsonObject.get("createDateTime").getAsString()
-            : null,
-        jsonObject.get("updateDateTime") != null
-            ? jsonObject.get("updateDateTime").getAsString()
-            : null,
-        jsonObject.get("version") != null ? jsonObject.get("version").getAsString() : null,
-        jsonObject.get("info") != null ? jsonObject.get("info").getAsString() : null);
+        jsonObject.get("homepage") != null
+            ? jsonObject.get("homepage").getAsString()
+            : null, // ,null
+        organization);
   }
 
   public static ResourceResponse fromJson(String jsonString) {
@@ -33,25 +62,19 @@ public abstract class ResourceResponse {
   }
 
   public static ResourceResponse create(
-      String name,
-      String url,
       String id,
       String type,
+      String name,
       String description,
-      String createDateTime,
-      String updateDateTime,
-      String version,
-      String info) {
+      String homepage,
+      Organization publisher) {
     return builder()
-        .setName(name)
-        .setUrl(url)
         .setId(id)
         .setType(type)
+        .setName(name)
         .setDescription(description)
-        .setCreateDateTime(createDateTime)
-        .setUpdateDateTime(updateDateTime)
-        .setVersion(version)
-        .setInfo(info)
+        .setHomepage(homepage)
+        .setPublisher(publisher)
         .build();
   }
 
@@ -59,51 +82,35 @@ public abstract class ResourceResponse {
     return new AutoValue_ResourceResponse.Builder();
   }
 
-  public abstract String getName();
-
-  public abstract String getUrl();
-
   public abstract String getId();
+
+  public abstract String getName();
 
   public abstract String getType();
 
-  @Nullable
   public abstract String getDescription();
 
-  @Nullable
-  public abstract String getCreateDateTime();
+  public abstract String getHomepage();
 
   @Nullable
-  public abstract String getUpdateDateTime();
-
-  @Nullable
-  public abstract String getVersion();
-
-  @Nullable
-  public abstract String getInfo();
+  public abstract Organization getPublisher();
 
   @SuppressWarnings(
       "java:S1610") // Abstract classes without fields should be converted to interfaces
   @AutoValue.Builder
   public abstract static class Builder {
 
+    public abstract ResourceResponse.Builder setId(String id);
+
     public abstract ResourceResponse.Builder setName(String name);
 
-    public abstract ResourceResponse.Builder setUrl(String url);
-
-    public abstract ResourceResponse.Builder setId(String id);
+    public abstract Builder setType(String type);
 
     public abstract ResourceResponse.Builder setDescription(String description);
 
-    public abstract ResourceResponse.Builder setCreateDateTime(String createDateTime);
+    public abstract ResourceResponse.Builder setHomepage(String homepage);
 
-    public abstract ResourceResponse.Builder setUpdateDateTime(String updateDateTime);
-
-    public abstract ResourceResponse.Builder setVersion(String version);
-
-    public abstract ResourceResponse.Builder setInfo(String info);
-
-    public abstract Builder setType(String type);
+    public abstract ResourceResponse.Builder setPublisher(Organization publisher);
 
     public abstract ResourceResponse build();
   }

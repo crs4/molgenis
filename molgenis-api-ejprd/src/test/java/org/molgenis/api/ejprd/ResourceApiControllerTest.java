@@ -3,6 +3,7 @@ package org.molgenis.api.ejprd;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
@@ -37,6 +38,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
 
   private static final String BIOBANK_BASE_NAME = "Biobank_";
+  private static final String ORGANIZER_BASE_NAME  = "Organizer_";
   private static final String COLLECTION_BASE_NAME = "Collection_";
   private static final String COLLECTION_DESCRIPTION = "This is biobank ";
   private static final String BASE_URL = "http://molgenis01.gcc.rug.nl:8080";
@@ -68,19 +70,27 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
   }
 
   private List<Entity> getMockData(int size) {
+    Entity country = mock(Entity.class);
+    lenient().when(country.getString(eq("id")))
+        .thenReturn("IT");
+    lenient().when(country.getString(eq("name")))
+        .thenReturn("Italy");
+
     List<Entity> entities = new ArrayList<>();
     for (int i = 0; i < size; i++) {
       Entity biobank = mock(Entity.class);
-      when(biobank.getString(eq("name")))
+      lenient().when(biobank.getString(eq("name")))
           .thenReturn(String.format("%s%d", BIOBANK_BASE_NAME, i + 1));
-
+      lenient().when(biobank.getString(eq("juridical_person")))
+          .thenReturn(String.format("%s%d", ORGANIZER_BASE_NAME, i + 1));
       Entity collection = mock(Entity.class);
-      when(collection.getString(eq("name")))
+      lenient().when(collection.getString(eq("name")))
           .thenReturn(String.format("%s%d", COLLECTION_BASE_NAME, i + 1));
-      when(collection.get(eq("biobank"))).thenReturn(biobank);
-      when(collection.getString(eq("id"))).thenReturn(String.valueOf(i + 1));
-      when(collection.getString(eq("description")))
+      lenient().when(collection.get(eq("biobank"))).thenReturn(biobank);
+      lenient().when(collection.getString(eq("id"))).thenReturn(String.valueOf(i + 1));
+      lenient().when(collection.getString(eq("description")))
           .thenReturn(String.format("%s%d", COLLECTION_DESCRIPTION, i + 1));
+      lenient().when(collection.get(eq("country"))).thenReturn(country);
 
       entities.add(collection);
     }
@@ -124,7 +134,7 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
   }
 
   private void checkApiVersion(ResultActions actions) throws Exception {
-    actions.andExpect(jsonPath("$.apiVersion", is("v1")));
+    actions.andExpect(jsonPath("$.apiVersion", is("v0.2")));
   }
 
   private void checkPageData(
@@ -156,7 +166,7 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
                   is(String.format("%s%d", COLLECTION_DESCRIPTION, i + 1))))
           .andExpect(
               jsonPath(
-                  String.format("$.resourceResponses[%s].url", i),
+                  String.format("$.resourceResponses[%s].homepage", i),
                   is(String.format("%s/%d", COLLECTION_URL, i + 1))));
     }
   }

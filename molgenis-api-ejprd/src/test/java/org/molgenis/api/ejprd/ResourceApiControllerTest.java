@@ -134,7 +134,7 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
   }
 
   private void checkApiVersion(ResultActions actions) throws Exception {
-    actions.andExpect(jsonPath("$.apiVersion", is("v1")));
+    actions.andExpect(jsonPath("$.apiVersion", is("v0.2")));
   }
 
   private void checkPageData(

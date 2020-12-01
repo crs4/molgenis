@@ -14,7 +14,7 @@ public class DataResponseTest {
 
   @Test
   void testBuildComplete() {
-    String apiVersion = "v1";
+    String apiVersion = "v0.2";
     ResourceResponse resourceResponse =
         ResourceResponse.create(
             "Biobank 1", "biobank:1", "https://biobank.url/", "Biobank", "This is biobank 1", null);
@@ -31,7 +31,7 @@ public class DataResponseTest {
 
   @Test
   void testBuildMissingOptionalFields() {
-    String apiVersion = "v1";
+    String apiVersion = "v0.2";
     ResourceResponse resourceResponse =
         ResourceResponse.create(
             "Biobank 1", "biobank:1", "https://biobank.url/", "Biobank", "This is biobank 1", null);
@@ -45,7 +45,7 @@ public class DataResponseTest {
 
   @Test
   void testBuildMissingMandatoryFields() {
-    String apiVersion = "v1";
+    String apiVersion = "v0.2";
     ResourceResponse resourceResponse =
         ResourceResponse.create(
             "Biobank 1", "biobank:1", "https://biobank.url/", "Biobank", "This is biobank 1", null);
@@ -67,7 +67,7 @@ public class DataResponseTest {
   public void testFromJsonComplete() {
     String jsonString =
         "{\n"
-            + "    \"apiVersion\": \"v1\","
+            + "    \"apiVersion\": \"v0.2\","
             + "    \"resourceResponses\": ["
             + "        {"
             + "            \"name\": \"Biobank\","
@@ -89,7 +89,7 @@ public class DataResponseTest {
             + "    }"
             + "}";
     DataResponse dataResponse = DataResponse.fromJson(jsonString);
-    assertEquals(dataResponse.getApiVersion(), "v1");
+    assertEquals(dataResponse.getApiVersion(), "v0.2");
     assertEquals(dataResponse.getResourceResponses().size(), 1);
     assertEquals(dataResponse.getResourceResponses().get(0).getName(), "Biobank");
     assertEquals(
@@ -112,7 +112,7 @@ public class DataResponseTest {
   public void testFromJsonMissingOptionalFields() {
     String jsonString =
         "{"
-            + "\"apiVersion\": \"v1\","
+            + "\"apiVersion\": \"v0.2\","
             + "\"resourceResponses\": ["
             + "{"
             + "   \"name\": \"Biobank\","
@@ -123,7 +123,7 @@ public class DataResponseTest {
             + "}]"
             + "}";
     DataResponse dataResponse = DataResponse.fromJson(jsonString);
-    assertEquals(dataResponse.getApiVersion(), "v1");
+    assertEquals(dataResponse.getApiVersion(), "v0.2");
     assertEquals(dataResponse.getResourceResponses().size(), 1);
     assertEquals(dataResponse.getResourceResponses().get(0).getName(), "Biobank");
     assertEquals(
@@ -139,7 +139,7 @@ public class DataResponseTest {
 
   @Test
   public void testFromJsonMissingMandatoryFields() {
-    String jsonStringWithVersion = "{\"apiVersion\": \"v1\"}";
+    String jsonStringWithVersion = "{\"apiVersion\": \"v0.2\"}";
     assertThrows(
         NullPointerException.class,
         () -> {

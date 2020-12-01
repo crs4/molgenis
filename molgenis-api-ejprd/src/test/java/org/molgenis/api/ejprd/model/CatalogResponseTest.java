@@ -12,9 +12,9 @@ public class CatalogResponseTest {
   @Test
   public void testCatalogResponseComplete() {
     Location location = Location.create("Location1", "IT", "Roma", "Lazio");
-    Organization organization =
-        Organization.create(
-            "ORG_1", "Organization 1 ", "This is the organization 1", "http://org1.it", location);
+    Organisation organisation =
+        Organisation.create(
+            "ORG_1", "organisation 1 ", "This is the organisation 1", "http://org1.it", location);
     ResourceResponse resourceResponse =
         ResourceResponse.create(
             "biobank:1",
@@ -22,7 +22,7 @@ public class CatalogResponseTest {
             "Biobank 1",
             "This is biobank 1",
             "https://biobank.url/",
-            organization);
+            organisation);
     List<ResourceResponse> resourceResponses = new ArrayList();
     resourceResponses.add(resourceResponse);
 
@@ -38,9 +38,9 @@ public class CatalogResponseTest {
   @Test
   public void testCatalogResponseMissingMandatoryField() {
     Location location = Location.create("Location1", "IT", "Roma", "Lazio");
-    Organization organization =
-        Organization.create(
-            "ORG_1", "Organization 1 ", "This is the organization 1", "http://org1.it", location);
+    Organisation organisation =
+        Organisation.create(
+            "ORG_1", "Organisation 1 ", "This is the organisation 1", "http://org1.it", location);
     ResourceResponse resourceResponse =
         ResourceResponse.create(
             "biobank:1",
@@ -48,7 +48,7 @@ public class CatalogResponseTest {
             "Biobank 1",
             "This is biobank 1",
             "https://biobank.url/",
-            organization);
+            organisation);
     List<ResourceResponse> resourceResponses = new ArrayList();
     resourceResponses.add(resourceResponse);
 
@@ -68,9 +68,9 @@ public class CatalogResponseTest {
   @Test
   public void testCatalogsResponseComplete() {
     Location location1 = Location.create("Location1", "IT", "Roma", "Lazio");
-    Organization organization1 =
-        Organization.create(
-            "ORG_1", "Organization 1 ", "This is the organization 1", "http://org1.it", location1);
+    Organisation organisation1 =
+        Organisation.create(
+            "ORG_1", "organisation 1 ", "This is the organisation 1", "http://org1.it", location1);
     ResourceResponse resourceResponse1 =
         ResourceResponse.create(
             "biobank:1",
@@ -78,7 +78,7 @@ public class CatalogResponseTest {
             "Biobank 1",
             "This is biobank 1",
             "https://biobank.url/",
-            organization1);
+            organisation1);
     List<ResourceResponse> resourceResponses = new ArrayList();
     resourceResponses.add(resourceResponse1);
 
@@ -86,9 +86,9 @@ public class CatalogResponseTest {
         CatalogResponse.create("Catalog 1", "http://www.catalog1.it", resourceResponses);
 
     Location location2 = Location.create("Location2", "IT", "Cagliari", "Sardegna");
-    Organization organization2 =
-        Organization.create(
-            "ORG_2", "Organization 2 ", "This is the organization 2", "http://org2.it", location2);
+    Organisation organisation2 =
+        Organisation.create(
+            "ORG_2", "organisation 2 ", "This is the organisation 2", "http://org2.it", location2);
     ResourceResponse resourceResponse2 =
         ResourceResponse.create(
             "biobank:1",
@@ -96,7 +96,7 @@ public class CatalogResponseTest {
             "Biobank 1",
             "This is biobank 1",
             "https://biobank.url/",
-            organization2);
+            organisation2);
     List<ResourceResponse> resourceResponses2 = new ArrayList();
     resourceResponses2.add(resourceResponse2);
 

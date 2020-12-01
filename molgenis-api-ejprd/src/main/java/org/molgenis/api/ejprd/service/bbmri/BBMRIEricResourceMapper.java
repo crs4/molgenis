@@ -1,7 +1,7 @@
 package org.molgenis.api.ejprd.service.bbmri;
 
 import org.molgenis.api.ejprd.model.Location;
-import org.molgenis.api.ejprd.model.Organization;
+import org.molgenis.api.ejprd.model.Organisation;
 import org.molgenis.api.ejprd.model.ResourceResponse;
 import org.molgenis.api.ejprd.service.ResourceMapper;
 import org.molgenis.data.Entity;
@@ -31,7 +31,7 @@ public class BBMRIEricResourceMapper implements ResourceMapper {
     String homepage = url;
 
     return ResourceResponse.create(
-        uuid, type, name, description, homepage, mapOrganization(biobank, mapLocation(country)));
+        uuid, type, name, description, homepage, mapOrganisation(biobank, mapLocation(country)));
   }
 
   public Location mapLocation(Entity country) {
@@ -40,8 +40,8 @@ public class BBMRIEricResourceMapper implements ResourceMapper {
     return Location.create(id, name, null, null);
   }
 
-  public Organization mapOrganization(Entity biobank, Location location) {
-    return Organization.create(
+  public Organisation mapOrganisation(Entity biobank, Location location) {
+    return Organisation.create(
         biobank.getString("juridical_person"),
         biobank.getString("juridical_person"),
         null,

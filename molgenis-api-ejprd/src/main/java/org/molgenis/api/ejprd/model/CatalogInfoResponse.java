@@ -17,7 +17,7 @@ public abstract class CatalogInfoResponse {
       String name,
       String description,
       String homepage,
-      Organization organization,
+      Organisation organisation,
       String apiVersion,
       ArrayList<String> sampleRequests
       ) {
@@ -27,7 +27,7 @@ public abstract class CatalogInfoResponse {
         .setName(name)
         .setDescription(description)
         .setHomepage(homepage)
-        .setOrganization(organization)
+        .setOrganisation(organisation)
         .setApiVersion(apiVersion)
         .setSampleRequests(sampleRequests)
         .build();
@@ -57,7 +57,7 @@ public abstract class CatalogInfoResponse {
 
   @Nullable
   @SerializedName("organisation")
-  public abstract Organization getOrganization();
+  public abstract Organisation getOrganisation();
 
   @Nullable
   @SerializedName("apiVersion")
@@ -82,7 +82,7 @@ public abstract class CatalogInfoResponse {
 
     public abstract Builder setHomepage(String homepage);
 
-    public abstract Builder setOrganization(Organization organization);
+    public abstract Builder setOrganisation(Organisation organisation);
 
     public abstract Builder setApiVersion(String apiVersion);
 

@@ -5,9 +5,9 @@ import com.google.gson.annotations.SerializedName;
 import javax.annotation.Nullable;
 
 @AutoValue
-public abstract class Organization {
+public abstract class Organisation {
 
-  public static Organization create(
+  public static Organisation create(
       String id, String name, String description, String homepage, Location location) {
     return builder()
         .setId(id)
@@ -18,8 +18,8 @@ public abstract class Organization {
         .build();
   }
 
-  public static Organization.Builder builder() {
-    return new AutoValue_Organization.Builder();
+  public static Organisation.Builder builder() {
+    return new AutoValue_Organisation.Builder();
   }
 
   @SerializedName("id")
@@ -45,16 +45,16 @@ public abstract class Organization {
   @AutoValue.Builder
   public abstract static class Builder {
 
-    public abstract Organization.Builder setId(String id);
+    public abstract Organisation.Builder setId(String id);
 
-    public abstract Organization.Builder setName(String name);
+    public abstract Organisation.Builder setName(String name);
 
-    public abstract Organization.Builder setDescription(String description);
+    public abstract Organisation.Builder setDescription(String description);
 
-    public abstract Organization.Builder setHomepage(String homepage);
+    public abstract Organisation.Builder setHomepage(String homepage);
 
-    public abstract Organization.Builder setLocation(Location location);
+    public abstract Organisation.Builder setLocation(Location location);
 
-    public abstract Organization build();
+    public abstract Organisation build();
   }
 }

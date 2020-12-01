@@ -11,9 +11,9 @@ public class ResourceResponseTest {
   @Test
   void testBuildComplete() {
     Location location = Location.create("Location1", "IT", "Roma", "Lazio");
-    Organization organization =
-        Organization.create(
-            "ORG_1", "Organization 1 ", "This is the organization 1", "http://org1.it", location);
+    Organisation organisation =
+        Organisation.create(
+            "ORG_1", "organisation 1 ", "This is the organisation 1", "http://org1.it", location);
     ResourceResponse resourceResponse =
         ResourceResponse.create(
             "biobank:1",
@@ -21,14 +21,14 @@ public class ResourceResponseTest {
             "Biobank 1",
             "This is biobank 1",
             "https://biobank.url/",
-            organization);
+            organisation);
 
     assertEquals(resourceResponse.getName(), "Biobank 1");
     assertEquals(resourceResponse.getHomepage(), "https://biobank.url/");
     assertEquals(resourceResponse.getId(), "biobank:1");
     assertEquals(resourceResponse.getType(), "Biobank");
     assertEquals(resourceResponse.getDescription(), "This is biobank 1");
-    assertEquals(resourceResponse.getPublisher(), organization);
+    assertEquals(resourceResponse.getPublisher(), organisation);
   }
 
   @Test
@@ -171,7 +171,7 @@ public class ResourceResponseTest {
   }
 
   @Test
-  public void testFromJsonWithOrganizationMissingOptionalFields() {
+  public void testFromJsonWithorganisationMissingOptionalFields() {
     String jsonString =
         "{"
             + "  \"name\": \"Biobank\","
@@ -191,7 +191,7 @@ public class ResourceResponseTest {
     assertEquals(resourceResponse.getId(), "biobank:id");
     assertEquals(resourceResponse.getType(), "Biobank");
     assertEquals(resourceResponse.getDescription(), "This is biobank 1");
-    Organization publisher = resourceResponse.getPublisher();
+    Organisation publisher = resourceResponse.getPublisher();
     assertEquals(publisher.getId(), "Publisher_1");
     assertEquals(publisher.getName(), "Publisher 1");
     assertEquals(publisher.getDescription(), null);
@@ -200,7 +200,7 @@ public class ResourceResponseTest {
   }
 
   @Test
-  public void testFromJsonWithOrganizationAndLocationMissingOptionalFields() {
+  public void testFromJsonWithorganisationAndLocationMissingOptionalFields() {
     String jsonString =
         "{"
             + "  \"name\": \"Biobank\","
@@ -224,7 +224,7 @@ public class ResourceResponseTest {
     assertEquals(resourceResponse.getId(), "biobank:id");
     assertEquals(resourceResponse.getType(), "Biobank");
     assertEquals(resourceResponse.getDescription(), "This is biobank 1");
-    Organization publisher = resourceResponse.getPublisher();
+    Organisation publisher = resourceResponse.getPublisher();
     assertEquals(publisher.getId(), "Publisher_1");
     assertEquals(publisher.getName(), "Publisher 1");
     assertEquals(publisher.getDescription(), null);
@@ -236,7 +236,7 @@ public class ResourceResponseTest {
     assertEquals(location.getCity(), null);
   }
 
-  public void testFromJsonWithOrganizationAndLocationBothWithAllFields() {
+  public void testFromJsonWithorganisationAndLocationBothWithAllFields() {
     String jsonString =
         "{"
             + "  \"name\": \"Biobank\","
@@ -264,7 +264,7 @@ public class ResourceResponseTest {
     assertEquals(resourceResponse.getId(), "biobank:id");
     assertEquals(resourceResponse.getType(), "Biobank");
     assertEquals(resourceResponse.getDescription(), "This is biobank 1");
-    Organization publisher = resourceResponse.getPublisher();
+    Organisation publisher = resourceResponse.getPublisher();
     assertEquals(publisher.getId(), "Publisher_1");
     assertEquals(publisher.getName(), "Publisher 1");
     assertEquals(publisher.getDescription(), "This is Publisher 1");

@@ -2,10 +2,14 @@ package org.molgenis.api.ejprd;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import javax.validation.Valid;
 import org.molgenis.api.ApiNamespace;
+import org.molgenis.api.ejprd.model.CatalogInfoResponse;
 import org.molgenis.api.ejprd.model.DataResponse;
 import org.molgenis.api.ejprd.model.InternalResourceRequest;
+import org.molgenis.api.ejprd.model.Organization;
 import org.molgenis.api.ejprd.service.InternalResourceQueryService;
 import org.molgenis.security.core.runas.RunAsSystem;
 import org.slf4j.Logger;
@@ -27,6 +31,36 @@ public class ResourceApiController implements ResourceApi {
 
   ResourceApiController(InternalResourceQueryService resourceQueryService) {
     this.resourceQueryService = requireNonNull(resourceQueryService);
+  }
+
+  @GetMapping("/")
+  @ResponseBody
+  @RunAsSystem
+  public CatalogInfoResponse getCatalogInfo() {
+
+    Organization bbmri =
+        Organization.create(
+            "BBMRI.ERIC",
+            "BBMRI-ERIC Orgnanization",
+            "European research infrastructure for biobanking",
+            "https://www.bbmri-eric.eu",
+            null);
+
+    CatalogInfoResponse catalog =
+        CatalogInfoResponse.create(
+            "BBMRI-ERIC-Catalog",
+            new ArrayList(Arrays.asList("CatalogOfRegistries", "CatalogOfBiobanks")),
+            "BBMRI ERIC Catalog",
+            "BBMRI Eric Europen Catalog of Biobanks and Registries",
+            "https://www.bbmri-eric.eu/services/directory/",
+            bbmri,
+            "v0.2",
+            new ArrayList(
+                Arrays.asList(
+                    "/ will return endpoint information",
+                    "/resource/search?orphaCode={orphacode} will return results based on the specified {orphacode}")));
+
+    return catalog;
   }
 
   @GetMapping("/resource/search")

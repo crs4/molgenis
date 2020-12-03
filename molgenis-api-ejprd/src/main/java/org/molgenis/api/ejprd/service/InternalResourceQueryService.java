@@ -47,11 +47,12 @@ public class InternalResourceQueryService implements ResourceQueryService {
 
     List<ResourceResponse> resources = mapEntity(entities);
 
-    return (T) DataResponse.builder()
-        .setApiVersion(apiVersion)
-        .setPage(PageUtils.getPageResponse(limit, limit * skip, totalCount))
-        .setResourceResponses(resources)
-        .build();
+    return (T)
+        DataResponse.builder()
+            .setApiVersion(apiVersion)
+            .setPage(PageUtils.getPageResponse(limit, limit * skip, totalCount))
+            .setResourceResponses(resources)
+            .build();
   }
 
   @Override

@@ -16,7 +16,7 @@ public class ExternalSourceQueryService implements ResourceQueryService {
   private RestTemplate restTemplate = new RestTemplate();
   private final String serviceBaseURL;
 
-  public void setRestTemplate(RestTemplate restTemplate){
+  public void setRestTemplate(RestTemplate restTemplate) {
     this.restTemplate = restTemplate;
   }
 

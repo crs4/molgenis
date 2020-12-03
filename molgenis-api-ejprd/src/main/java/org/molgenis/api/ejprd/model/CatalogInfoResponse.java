@@ -13,14 +13,13 @@ public abstract class CatalogInfoResponse {
 
   public static CatalogInfoResponse create(
       String id,
-      ArrayList <String> type,
+      ArrayList<String> type,
       String name,
       String description,
       String homepage,
       Organisation organisation,
       String apiVersion,
-      ArrayList<String> sampleRequests
-      ) {
+      ArrayList<String> sampleRequests) {
     return builder()
         .setId(id)
         .setType(type)
@@ -41,7 +40,7 @@ public abstract class CatalogInfoResponse {
   public abstract String getId();
 
   @SerializedName("type")
-  public abstract ArrayList <String> getType();
+  public abstract ArrayList<String> getType();
 
   @Nullable
   @SerializedName("name")
@@ -65,7 +64,7 @@ public abstract class CatalogInfoResponse {
 
   @Nullable
   @SerializedName("sampleRequests")
-  public abstract ArrayList <String> getSampleRequests();
+  public abstract ArrayList<String> getSampleRequests();
 
   @SuppressWarnings(
       "java:S1610") // Abstract classes without fields should be converted to interfaces
@@ -74,7 +73,7 @@ public abstract class CatalogInfoResponse {
 
     public abstract Builder setId(String id);
 
-    public abstract Builder setType(ArrayList <String> type);
+    public abstract Builder setType(ArrayList<String> type);
 
     public abstract Builder setName(String name);
 
@@ -86,10 +85,8 @@ public abstract class CatalogInfoResponse {
 
     public abstract Builder setApiVersion(String apiVersion);
 
-    public abstract Builder setSampleRequests(ArrayList <String> sampleRequests);
+    public abstract Builder setSampleRequests(ArrayList<String> sampleRequests);
 
     public abstract CatalogInfoResponse build();
-
-
   }
 }

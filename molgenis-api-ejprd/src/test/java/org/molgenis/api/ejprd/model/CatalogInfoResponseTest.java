@@ -11,14 +11,10 @@ import org.junit.jupiter.api.Test;
 public class CatalogInfoResponseTest {
 
   @Test
-  public void testCatalogInfoResponseComplete(){
+  public void testCatalogInfoResponseComplete() {
     Organisation org =
         Organisation.create(
-            "ORG",
-            "Orgnanization",
-            "This is the ORG organisation",
-            "https://org.eu",
-            null);
+            "ORG", "Orgnanization", "This is the ORG organisation", "https://org.eu", null);
 
     CatalogInfoResponse catalog =
         CatalogInfoResponse.create(
@@ -36,11 +32,10 @@ public class CatalogInfoResponseTest {
 
     assertEquals(catalog.getId(), "ORG_Catalog");
     assertEquals(catalog.getOrganisation(), org);
-
   }
 
   @Test
-  public void testMandatoryFieldsOnly(){
+  public void testMandatoryFieldsOnly() {
     CatalogInfoResponse catalog =
         CatalogInfoResponse.create(
             "ORG_Catalog",
@@ -50,24 +45,20 @@ public class CatalogInfoResponseTest {
             null,
             null,
             null,
-            null
-        );
+            null);
 
     assertEquals(catalog.getId(), "ORG_Catalog");
-    assertEquals(catalog.getType(), new ArrayList(Arrays.asList("CatalogOfRegistries", "CatalogOfBiobanks")));
-
+    assertEquals(
+        catalog.getType(),
+        new ArrayList(Arrays.asList("CatalogOfRegistries", "CatalogOfBiobanks")));
   }
 
   @Test
-  public void testMissingMandatoryFields(){
+  public void testMissingMandatoryFields() {
 
     Organisation org =
         Organisation.create(
-            "ORG",
-            "Orgnanisation",
-            "This is the ORG organisation",
-            "https://org.eu",
-            null);
+            "ORG", "Orgnanisation", "This is the ORG organisation", "https://org.eu", null);
 
     assertThrows(
         NullPointerException.class,
@@ -85,7 +76,6 @@ public class CatalogInfoResponseTest {
                       Arrays.asList(
                           "/ will return endpoint information",
                           "/resource/search?orphaCode={orphacode} will return results based on the specified {orphacode}")));
-
         });
 
     assertThrows(
@@ -104,7 +94,6 @@ public class CatalogInfoResponseTest {
                       Arrays.asList(
                           "/ will return endpoint information",
                           "/resource/search?orphaCode={orphacode} will return results based on the specified {orphacode}")));
-
         });
   }
 }

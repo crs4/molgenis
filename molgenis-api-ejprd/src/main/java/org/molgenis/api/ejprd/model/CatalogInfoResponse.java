@@ -1,12 +1,9 @@
 package org.molgenis.api.ejprd.model;
 
 import com.google.auto.value.AutoValue;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import javax.annotation.Nullable;
-import org.molgenis.api.ejprd.model.CatalogResponse.Builder;
 
 @AutoValue
 public abstract class CatalogInfoResponse {

@@ -37,6 +37,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 @ContextConfiguration(classes = {GsonConfig.class})
 class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
 
+  private static final String EJPRD_BIOBANK_TYPE = "BiobankDataset";
+  private static final String EJPRD_REGISTRY_TYPE = "PatientRegistryDataset";
+  private static final String BBMRI_BIOBANK_TYPE = "BIOBANK";
+  private static final String BBMRI_REGISTRY_TYPE = "REGISTRY";
   private static final String BIOBANK_BASE_NAME = "Biobank_";
   private static final String ORGANIZER_BASE_NAME = "Organizer_";
   private static final String COLLECTION_BASE_NAME = "Collection_";
@@ -51,7 +55,6 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
   private static final String DISEASE_NAME = "COVID";
 
   private DataService dataService;
-  private InternalResourceQueryService resourceQueryService;
 
   private MockMvc mockMvc;
 
@@ -60,7 +63,8 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
   @BeforeEach
   void beforeTest() {
     dataService = mock(DataService.class);
-    resourceQueryService = new InternalResourceQueryService(dataService);
+    InternalResourceQueryService resourceQueryService =
+        new InternalResourceQueryService(dataService);
     ResourceApiController controller = new ResourceApiController(resourceQueryService);
 
     mockMvc =
@@ -74,6 +78,9 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
     lenient().when(country.getString(eq("id"))).thenReturn("IT");
     lenient().when(country.getString(eq("name"))).thenReturn("Italy");
 
+    Entity ressourceType = mock(Entity.class);
+    lenient().when(ressourceType.getString(eq("id"))).thenReturn(BBMRI_BIOBANK_TYPE);
+
     List<Entity> entities = new ArrayList<>();
     for (int i = 0; i < size; i++) {
       Entity biobank = mock(Entity.class);
@@ -83,6 +90,7 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
       lenient()
           .when(biobank.getString(eq("juridical_person")))
           .thenReturn(String.format("%s%d", ORGANIZER_BASE_NAME, i + 1));
+      lenient().when(biobank.get(eq("ressource_types"))).thenReturn(ressourceType);
       Entity collection = mock(Entity.class);
       lenient()
           .when(collection.getString(eq("name")))
@@ -107,7 +115,7 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
     Query<Entity> q = new QueryImpl<>();
     if (includeCode) {
       q.nest();
-      q.eq("diagnosis_available.code", "ORPHA:145");
+      q.eq("diagnosis_available.code", String.format("ORPHA:%s", ORPHA_CODE));
       q.and();
       q.eq("diagnosis_available.ontology", "orphanet");
       q.unnest();
@@ -116,7 +124,7 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
       if (includeCode) {
         q.or();
       }
-      q.like("diagnosis_available.label", "COVID");
+      q.like("diagnosis_available.label", DISEASE_NAME);
     }
     if (pageSize != null) {
       q.pageSize(pageSize);
@@ -161,7 +169,8 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
                           "%s%d - %s%d", BIOBANK_BASE_NAME, i + 1, COLLECTION_BASE_NAME, i + 1))))
           .andExpect(
               jsonPath(String.format("$.resourceResponses[%s].id", i), is(String.valueOf(i + 1))))
-          .andExpect(jsonPath(String.format("$.resourceResponses[%s].type", i), is("Biobank")))
+          .andExpect(
+              jsonPath(String.format("$.resourceResponses[%s].type", i), is(EJPRD_BIOBANK_TYPE)))
           .andExpect(
               jsonPath(
                   String.format("$.resourceResponses[%s].description", i),
@@ -195,7 +204,7 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
 
     ResultActions resultActions =
         this.mockMvc.perform(
-            get(URI.create(String.format("%s?orphaCode=145&limit=5", BASE_API_URL))));
+            get(URI.create(String.format("%s?orphaCode=%s&limit=5", BASE_API_URL, ORPHA_CODE))));
     resultActions.andExpect(status().isOk());
 
     checkContentType(resultActions);
@@ -219,7 +228,9 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
 
     ResultActions resultActions =
         this.mockMvc.perform(
-            get(URI.create(String.format("%s?orphaCode=145&skip=1&limit=5", BASE_API_URL))));
+            get(
+                URI.create(
+                    String.format("%s?orphaCode=%s&skip=1&limit=5", BASE_API_URL, ORPHA_CODE))));
     resultActions.andExpect(status().isOk());
 
     checkContentType(resultActions);
@@ -240,7 +251,8 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
     when(dataService.findAll(ENTITY_ID, findAllQuery)).thenReturn(entities.stream());
 
     ResultActions resultActions =
-        this.mockMvc.perform(get(URI.create(String.format("%s?orphaCode=145", BASE_API_URL))));
+        this.mockMvc.perform(
+            get(URI.create(String.format("%s?orphaCode=%s", BASE_API_URL, ORPHA_CODE))));
     resultActions.andExpect(status().isOk());
 
     checkContentType(resultActions);
@@ -262,7 +274,8 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
     when(dataService.findAll(ENTITY_ID, findAllQuery)).thenReturn(entities.stream());
 
     ResultActions resultActions =
-        this.mockMvc.perform(get(URI.create(String.format("%s?name=COVID", BASE_API_URL))));
+        this.mockMvc.perform(
+            get(URI.create(String.format("%s?name=%s", BASE_API_URL, DISEASE_NAME))));
     resultActions.andExpect(status().isOk());
 
     checkContentType(resultActions);
@@ -285,7 +298,10 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
 
     ResultActions resultActions =
         this.mockMvc.perform(
-            get(URI.create(String.format("%s?name=COVID&orphaCode=145", BASE_API_URL))));
+            get(
+                URI.create(
+                    String.format(
+                        "%s?name=%s&orphaCode=%s", BASE_API_URL, DISEASE_NAME, ORPHA_CODE))));
     resultActions.andExpect(status().isOk());
 
     checkContentType(resultActions);

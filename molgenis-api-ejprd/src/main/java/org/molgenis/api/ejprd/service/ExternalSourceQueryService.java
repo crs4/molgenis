@@ -12,16 +12,15 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 public class ExternalSourceQueryService implements ResourceQueryService {
   private static final Logger LOG = LoggerFactory.getLogger(InternalResourceQueryService.class);
-
-  private RestTemplate restTemplate = new RestTemplate();
   private final String serviceBaseURL;
-
-  public void setRestTemplate(RestTemplate restTemplate) {
-    this.restTemplate = restTemplate;
-  }
+  private RestTemplate restTemplate = new RestTemplate();
 
   public ExternalSourceQueryService(String serviceBaseURL) {
     this.serviceBaseURL = serviceBaseURL;
+  }
+
+  public void setRestTemplate(RestTemplate restTemplate) {
+    this.restTemplate = restTemplate;
   }
 
   @Override

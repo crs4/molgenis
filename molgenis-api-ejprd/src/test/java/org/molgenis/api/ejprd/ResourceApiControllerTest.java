@@ -45,7 +45,7 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
   private static final String ORGANIZER_BASE_NAME = "Organizer_";
   private static final String COLLECTION_BASE_NAME = "Collection_";
   private static final String COLLECTION_DESCRIPTION = "This is biobank ";
-  private static final String BASE_URL = "http://molgenis01.gcc.rug.nl:8080";
+  private static final String BASE_URL = "http://test.url";
   private static final String BASE_API_URL =
       String.format("%s/api/ejprd/resource/search", BASE_URL);
   private static final String COLLECTION_URL =
@@ -185,6 +185,15 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
   @Test
   void testGetResourcesWithoutParameters() throws Exception {
     this.mockMvc.perform(get(URI.create(BASE_API_URL))).andExpect(status().isBadRequest());
+
+    this.mockMvc
+        .perform(get(URI.create(String.format("%s?orphaCode", BASE_API_URL))))
+        .andExpect(status().isBadRequest());
+
+    this.mockMvc
+        .perform(get(URI.create(String.format("%s?orphaCode=", BASE_API_URL))))
+        .andExpect(status().isBadRequest());
+
     this.mockMvc
         .perform(get(URI.create(String.format("%s?skip=1&limit=5", BASE_API_URL))))
         .andExpect(status().isBadRequest());
@@ -261,28 +270,28 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
     checkPageData(resultActions, 100, resultSize, 1, 0);
   }
 
-  @Test
-  void testGetResourcesByName() throws Exception {
-    reset(dataService);
-    int resultSize = 10;
-    List<Entity> entities = getMockData(resultSize);
-
-    Query<Entity> findAllQuery = getQuery(false, true, 100, null);
-    Query<Entity> countQuery = getQuery(false, true, null, null);
-
-    when(dataService.count(ENTITY_ID, countQuery)).thenReturn((long) resultSize);
-    when(dataService.findAll(ENTITY_ID, findAllQuery)).thenReturn(entities.stream());
-
-    ResultActions resultActions =
-        this.mockMvc.perform(
-            get(URI.create(String.format("%s?name=%s", BASE_API_URL, DISEASE_NAME))));
-    resultActions.andExpect(status().isOk());
-
-    checkContentType(resultActions);
-    checkApiVersion(resultActions);
-    checkResultData(resultActions, resultSize);
-    checkPageData(resultActions, 100, resultSize, 1, 0);
-  }
+  //  @Test
+  //  void testGetResourcesByName() throws Exception {
+  //    reset(dataService);
+  //    int resultSize = 10;
+  //    List<Entity> entities = getMockData(resultSize);
+  //
+  //    Query<Entity> findAllQuery = getQuery(false, true, 100, null);
+  //    Query<Entity> countQuery = getQuery(false, true, null, null);
+  //
+  //    when(dataService.count(ENTITY_ID, countQuery)).thenReturn((long) resultSize);
+  //    when(dataService.findAll(ENTITY_ID, findAllQuery)).thenReturn(entities.stream());
+  //
+  //    ResultActions resultActions =
+  //        this.mockMvc.perform(
+  //            get(URI.create(String.format("%s?name=%s", BASE_API_URL, DISEASE_NAME))));
+  //    resultActions.andExpect(status().isOk());
+  //
+  //    checkContentType(resultActions);
+  //    checkApiVersion(resultActions);
+  //    checkResultData(resultActions, resultSize);
+  //    checkPageData(resultActions, 100, resultSize, 1, 0);
+  //  }
 
   @Test
   void testGetResourcesByCodeAndName() throws Exception {
@@ -308,5 +317,13 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
     checkApiVersion(resultActions);
     checkResultData(resultActions, resultSize);
     checkPageData(resultActions, 100, resultSize, 1, 0);
+  }
+
+  @Test
+  void testGetResourcesWithParamsWithoutValues() throws Exception {
+    ResultActions resultActions =
+        this.mockMvc.perform(get(URI.create(String.format("%s?orphaCode", BASE_API_URL))));
+    resultActions.andExpect(status().isBadRequest());
+    //      resultActions.andExpect(jsonPath("$.errors", is("")));
   }
 }

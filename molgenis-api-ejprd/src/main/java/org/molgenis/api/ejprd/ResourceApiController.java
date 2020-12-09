@@ -46,21 +46,18 @@ public class ResourceApiController implements ResourceApi {
             "https://www.bbmri-eric.eu",
             null);
 
-    CatalogInfoResponse catalog =
-        CatalogInfoResponse.create(
-            "BBMRI-ERIC-Catalog",
-            new ArrayList(Arrays.asList("CatalogOfRegistries", "CatalogOfBiobanks")),
-            "BBMRI ERIC Catalog",
-            "BBMRI Eric Europen Catalog of Biobanks and Registries",
-            "https://www.bbmri-eric.eu/services/directory/",
-            bbmri,
-            "v0.2",
-            new ArrayList(
-                Arrays.asList(
-                    "/ will return endpoint information",
-                    "/resource/search?orphaCode={orphacode} will return results based on the specified {orphacode}")));
-
-    return catalog;
+    return CatalogInfoResponse.create(
+        "BBMRI-ERIC-Catalog",
+        new ArrayList<>(Arrays.asList("CatalogOfRegistries", "CatalogOfBiobanks")),
+        "BBMRI ERIC Catalog",
+        "BBMRI Eric Europen Catalog of Biobanks and Registries",
+        "https://www.bbmri-eric.eu/services/directory/",
+        bbmri,
+        "v0.2",
+        new ArrayList<>(
+            Arrays.asList(
+                "/ will return endpoint information",
+                "/resource/search?orphaCode={orphacode} will return results based on the specified {orphacode}")));
   }
 
   @GetMapping("/resource/search")

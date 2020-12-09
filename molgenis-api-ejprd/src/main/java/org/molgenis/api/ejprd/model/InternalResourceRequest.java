@@ -1,10 +1,11 @@
 package org.molgenis.api.ejprd.model;
 
-import javax.validation.constraints.AssertFalse;
+import javax.validation.constraints.NotBlank;
 
 public class InternalResourceRequest extends ResourceRequest {
   // At the moment ORPHA code is expected; TODO: implement lookup in case of IDC10 code
 
+  @NotBlank(message = "OrphaCode is mandatory")
   private String orphaCode;
 
   public String getOrphaCode() {
@@ -15,8 +16,8 @@ public class InternalResourceRequest extends ResourceRequest {
     this.orphaCode = orphaCode;
   }
 
-  @AssertFalse(message = "At least one search paramaters must be present")
-  private boolean isQueryEmpty() {
-    return getOrphaCode() == null && getName() == null;
-  }
+  //  @AssertFalse(message = "At least one search paramaters must be present")
+  //  private boolean isQueryEmpty() {
+  //    return getOrphaCode() == null && getName() == null;
+  //  }
 }

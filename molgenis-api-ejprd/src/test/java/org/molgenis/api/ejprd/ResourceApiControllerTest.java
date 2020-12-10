@@ -223,6 +223,32 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
   }
 
   @Test
+  void testGetResourceWithPagingMinLimit() throws Exception {
+    this.mockMvc
+        .perform(
+            get(URI.create(String.format("%s?orphaCode=%s&limit=0", BASE_API_URL, ORPHA_CODE))))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void testGetResourceWithPagingMinSkip() throws Exception {
+    this.mockMvc
+        .perform(
+            get(URI.create(String.format("%s?orphaCode=%s&skip=-1", BASE_API_URL, ORPHA_CODE))))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void testGetResourceWithPagingMaxOffset() throws Exception {
+    this.mockMvc
+        .perform(
+            get(
+                URI.create(
+                    String.format("%s?orphaCode=%s&skip=100&limit=100", BASE_API_URL, ORPHA_CODE))))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
   void testGetResourcesWithPagingSecondPage() throws Exception {
     reset(dataService);
     int resultSize = 5;

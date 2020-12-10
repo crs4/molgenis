@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.validation.Valid;
 import org.molgenis.api.ApiNamespace;
+import org.molgenis.api.ejprd.exceptions.ExternalSourceNotFoundException;
 import org.molgenis.api.ejprd.model.CatalogResponse;
 import org.molgenis.api.ejprd.model.CatalogsResponse;
 import org.molgenis.api.ejprd.model.DataResponse;
@@ -19,6 +20,7 @@ import org.molgenis.data.Entity;
 import org.molgenis.security.core.runas.RunAsSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,10 +40,12 @@ public class ExternalResourcesController {
   private static final Logger LOG = LoggerFactory.getLogger(ExternalResourcesController.class);
   private final DataService dataService;
   private final PackageMappingServiceFactory packageMappingServiceFactory;
+  private final ExternalSourceQueryService queryService;
 
-  ExternalResourcesController(DataService dataService) {
+  ExternalResourcesController(DataService dataService, ExternalSourceQueryService queryService) {
     this.dataService = requireNonNull(dataService);
     this.packageMappingServiceFactory = PackageMappingServiceFactory.getFactory();
+    this.queryService = requireNonNull(queryService);
   }
 
   private static UriComponentsBuilder getBaseUri() {
@@ -72,11 +76,18 @@ public class ExternalResourcesController {
 
     Entity source = findExternalSourceById(sourceId);
 
+    if (source == null) {
+      throw new ExternalSourceNotFoundException(
+          HttpStatus.NOT_FOUND, String.format("External source %s not found", sourceId));
+    }
+
     String serviceBaseUrl = source.getString(SERVICE_URI_COLUMN);
     String catalogName = source.getString(NAME_COLUMN);
     String catalogUrl = source.getString(BASE_URI_COLUMN);
 
-    ExternalSourceQueryService queryService = new ExternalSourceQueryService(serviceBaseUrl);
+    // ExternalSourceQueryService queryService = new ExternalSourceQueryService(serviceBaseUrl);
+
+    queryService.setServiceBaseURL(serviceBaseUrl);
 
     DataResponse response = queryService.query(orphaCode, null, skip, limit);
     List<ResourceResponse> resourceResponses =

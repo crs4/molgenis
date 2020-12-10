@@ -54,7 +54,8 @@ public class ExternalSourceQueryServiceTest {
             restTemplate.getForEntity("http://mock.it/resource/search?orphaCode=63", String.class))
         .thenReturn(new ResponseEntity<>(expectedResponse, HttpStatus.OK));
     ExternalSourceQueryService service =
-        new ExternalSourceQueryService("http://mock.it/resource/search");
+        new ExternalSourceQueryService();
+    service.setServiceBaseURL("http://mock.it/resource/search");
     service.setRestTemplate(restTemplate);
     DataResponse response = service.query("63", null, null, null);
     assertEquals(response.getApiVersion(), "v2");
@@ -71,7 +72,8 @@ public class ExternalSourceQueryServiceTest {
         .thenReturn(new ResponseEntity<>(errorResponseJson, HttpStatus.BAD_REQUEST));
 
     ExternalSourceQueryService service =
-        new ExternalSourceQueryService("http://mock.it/resource/search");
+        new ExternalSourceQueryService();
+    service.setServiceBaseURL("http://mock.it/resource/search");
     service.setRestTemplate(restTemplate);
     ErrorResponse errorResponse = service.query("", null, null, null);
     assertEquals(errorResponse.getCode(), 400);
@@ -86,7 +88,8 @@ public class ExternalSourceQueryServiceTest {
     Mockito.when(restTemplate.getForEntity("http://mock.it/search?orphaCode=63", String.class))
         .thenReturn(new ResponseEntity<>(errorResponseJson, HttpStatus.NOT_FOUND));
 
-    ExternalSourceQueryService service = new ExternalSourceQueryService("http://mock.it/search");
+    ExternalSourceQueryService service = new ExternalSourceQueryService();
+    service.setServiceBaseURL("http://mock.it/search");
     service.setRestTemplate(restTemplate);
     ErrorResponse errorResponse = service.query("63", null, null, null);
     assertEquals(errorResponse.getCode(), 404);

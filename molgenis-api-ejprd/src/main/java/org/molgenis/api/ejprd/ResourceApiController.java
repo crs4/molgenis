@@ -68,7 +68,6 @@ public class ResourceApiController implements ResourceApi {
     String name = resourceRequest.getName();
     Integer skip = resourceRequest.getSkip();
     Integer limit = resourceRequest.getLimit();
-
     return resourceQueryService.query(orphaCode, name, skip, limit);
   }
 

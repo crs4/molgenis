@@ -1,12 +1,13 @@
 package org.molgenis.api.ejprd.model;
 
 import javax.validation.constraints.AssertFalse;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 public class ExternalResourceRequest extends ResourceRequest {
 
   // At the moment ORPHA code is expected; TODO: implement lookup in case of IDC10 code
-  @NotNull private String diagnosisAvailable;
+  @NotNull @NotBlank private String diagnosisAvailable;
 
   public String getDiagnosisAvailable() {
     return diagnosisAvailable;

@@ -121,6 +121,17 @@ public class ExternalResourcesControllerTest extends AbstractMockitoSpringContex
             .andExpect(MockMvcResultMatchers.status().is4xxClientError());
   }
 
+  @Test
+  void testRequestMandatoryParameterProvidedNull() throws Exception {
+    controller = mock(ExternalResourcesController.class);
+    ResultActions resultActions =
+        mockMvc
+            .perform(
+                MockMvcRequestBuilders.get(
+                    String.format("%sEXT_1?diagnosisAvailable=&skip=1&limit=5", BASE_API_URL)))
+            .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+  }
+
   @Configuration
   static class Config {
 

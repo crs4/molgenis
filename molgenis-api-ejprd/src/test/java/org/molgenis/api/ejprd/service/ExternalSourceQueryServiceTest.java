@@ -53,8 +53,7 @@ public class ExternalSourceQueryServiceTest {
     Mockito.when(
             restTemplate.getForEntity("http://mock.it/resource/search?orphaCode=63", String.class))
         .thenReturn(new ResponseEntity<>(expectedResponse, HttpStatus.OK));
-    ExternalSourceQueryService service =
-        new ExternalSourceQueryService();
+    ExternalSourceQueryService service = new ExternalSourceQueryService();
     service.setServiceBaseURL("http://mock.it/resource/search");
     service.setRestTemplate(restTemplate);
     DataResponse response = service.query("63", null, null, null);
@@ -71,8 +70,7 @@ public class ExternalSourceQueryServiceTest {
             restTemplate.getForEntity("http://mock.it/resource/search?orphaCode=", String.class))
         .thenReturn(new ResponseEntity<>(errorResponseJson, HttpStatus.BAD_REQUEST));
 
-    ExternalSourceQueryService service =
-        new ExternalSourceQueryService();
+    ExternalSourceQueryService service = new ExternalSourceQueryService();
     service.setServiceBaseURL("http://mock.it/resource/search");
     service.setRestTemplate(restTemplate);
     ErrorResponse errorResponse = service.query("", null, null, null);

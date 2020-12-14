@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -104,11 +103,7 @@ public class ExternalResourcesControllerTest extends AbstractMockitoSpringContex
                 MockMvcRequestBuilders.get(
                     String.format(
                         "%sUNKNOWN?diagnosisAvailable=ORPHA:63&skip=1&limit=5", BASE_API_URL)))
-            .andExpect(MockMvcResultMatchers.status().is4xxClientError());
-
-    MvcResult result = resultActions.andReturn();
-    MockHttpServletResponse response = result.getResponse();
-    assertEquals(response.getStatus(), 404);
+            .andExpect(MockMvcResultMatchers.status().isNotFound());
   }
 
   @Test

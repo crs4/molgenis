@@ -2,19 +2,18 @@ package org.molgenis.api.ejprd;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.validation.Valid;
 import org.molgenis.api.ApiNamespace;
 import org.molgenis.api.ejprd.exceptions.ExternalSourceNotFoundException;
 import org.molgenis.api.ejprd.model.CatalogResponse;
-import org.molgenis.api.ejprd.model.CatalogsResponse;
 import org.molgenis.api.ejprd.model.DataResponse;
 import org.molgenis.api.ejprd.model.ExternalResourceRequest;
 import org.molgenis.api.ejprd.model.ResourceResponse;
 import org.molgenis.api.ejprd.service.ExternalSourceQueryService;
 import org.molgenis.api.ejprd.service.PackageMappingServiceFactory;
+import org.molgenis.api.model.response.PageResponse;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
 import org.molgenis.security.core.runas.RunAsSystem;
@@ -60,7 +59,7 @@ public class ExternalResourcesController {
   @GetMapping("/external_sources/{sourceId}")
   @ResponseBody
   @RunAsSystem
-  public CatalogsResponse getExternalResource(
+  public CatalogResponse getExternalResource(
       @PathVariable("sourceId") String sourceId, @Valid ExternalResourceRequest request) {
 
     // Todo: enable diagnosisAvailable filter in the future
@@ -72,7 +71,6 @@ public class ExternalResourcesController {
     if (diagnosisAvailable.contains("ORPHA:")) {
       orphaCode = diagnosisAvailable.split(":")[1];
     }
-    List<CatalogResponse> catalogs = new ArrayList<>();
 
     Entity source = findExternalSourceById(sourceId);
 
@@ -85,19 +83,13 @@ public class ExternalResourcesController {
     String catalogName = source.getString(NAME_COLUMN);
     String catalogUrl = source.getString(BASE_URI_COLUMN);
 
-    // ExternalSourceQueryService queryService = new ExternalSourceQueryService(serviceBaseUrl);
-
     queryService.setServiceBaseURL(serviceBaseUrl);
 
     DataResponse response = queryService.query(orphaCode, null, skip, limit);
+
     List<ResourceResponse> resourceResponses =
         response != null ? response.getResourceResponses() : Collections.emptyList();
-    CatalogResponse catalogResponse =
-        CatalogResponse.create(catalogName, catalogUrl, resourceResponses);
-    if (catalogResponse != null) {
-      catalogs.add(catalogResponse);
-    }
-
-    return CatalogsResponse.create(catalogs);
+    PageResponse page = response != null ? response.getPage() : null;
+    return CatalogResponse.create(catalogName, catalogUrl, resourceResponses, page);
   }
 }

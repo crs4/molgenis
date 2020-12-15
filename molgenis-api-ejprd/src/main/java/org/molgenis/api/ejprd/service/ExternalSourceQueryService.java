@@ -30,9 +30,13 @@ public class ExternalSourceQueryService implements ResourceQueryService {
 
   @Override
   public <T> T query(String orphaCode, String diseaseName, Integer skip, Integer limit) {
+    String orphacCodeQp = String.format("orphaCode=%s", orphaCode);
+    String skipQp = skip != null ? String.format("skip=%d", skip) : "";
+    String limitQp = limit != null ? String.format("limit=%d", limit) : "";
+    String queryParameters = String.join("&", orphacCodeQp, skipQp, limitQp);
+
     UriComponentsBuilder builder =
-        UriComponentsBuilder.fromHttpUrl(
-            String.format("%s?orphaCode=%s", serviceBaseURL, orphaCode));
+        UriComponentsBuilder.fromHttpUrl(String.format("%s?%s", serviceBaseURL, queryParameters));
 
     ResponseEntity<String> response;
     try {

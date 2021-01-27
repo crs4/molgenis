@@ -56,7 +56,7 @@ public class ExternalSourceQueryServiceTest {
     ExternalSourceQueryService service = new ExternalSourceQueryService();
     service.setServiceBaseURL("http://mock.it/resource/search");
     service.setRestTemplate(restTemplate);
-    DataResponse response = service.query("63", null, null, null);
+    DataResponse response = service.query("63", null, null, null, null);
     assertEquals(response.getApiVersion(), "v2");
   }
 
@@ -73,7 +73,7 @@ public class ExternalSourceQueryServiceTest {
     ExternalSourceQueryService service = new ExternalSourceQueryService();
     service.setServiceBaseURL("http://mock.it/resource/search");
     service.setRestTemplate(restTemplate);
-    ErrorResponse errorResponse = service.query("", null, null, null);
+    ErrorResponse errorResponse = service.query("", null, null, null, null);
     assertEquals(errorResponse.getCode(), 400);
     assertEquals(errorResponse.getMessage(), "Bad Request: missing orphaCode parameter");
   }
@@ -89,7 +89,7 @@ public class ExternalSourceQueryServiceTest {
     ExternalSourceQueryService service = new ExternalSourceQueryService();
     service.setServiceBaseURL("http://mock.it/search");
     service.setRestTemplate(restTemplate);
-    ErrorResponse errorResponse = service.query("63", null, null, null);
+    ErrorResponse errorResponse = service.query("63", null, null, null, null);
     assertEquals(errorResponse.getCode(), 404);
     assertEquals(errorResponse.getMessage(), "The requested resource cannot be found");
   }

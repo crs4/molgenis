@@ -5,6 +5,8 @@ import org.molgenis.data.Query;
 
 public abstract class QueryBuilder {
 
+  private String resourceType;
+
   private String diseaseCode;
 
   private String diseaseOntology;
@@ -18,6 +20,15 @@ public abstract class QueryBuilder {
   public abstract Query<Entity> buildCount();
 
   public abstract Query<Entity> build();
+
+  public String getResourceType() {
+    return resourceType;
+  }
+
+  public QueryBuilder setResourceType(String resourceType) {
+    this.resourceType = resourceType;
+    return this;
+  }
 
   public String getDiseaseCode() {
     return diseaseCode;

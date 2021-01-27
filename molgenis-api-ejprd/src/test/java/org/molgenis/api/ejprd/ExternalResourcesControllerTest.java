@@ -156,7 +156,7 @@ public class ExternalResourcesControllerTest extends AbstractMockitoSpringContex
       DataResponse dataResponse =
           DataResponse.create(apiVersion, resourceResponses, pageResponse, errorResponse);
 
-      lenient().when(queryService.query("63", null, 0, 5)).thenReturn(dataResponse);
+      lenient().when(queryService.query("63", null, null, 0, 5)).thenReturn(dataResponse);
       return queryService;
     }
 

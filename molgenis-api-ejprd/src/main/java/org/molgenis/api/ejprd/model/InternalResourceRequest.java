@@ -13,12 +13,23 @@ public class InternalResourceRequest extends ResourceRequest {
   @NotBlank(message = "OrphaCode is mandatory")
   private String orphaCode;
 
+  // @Pattern(regexp="PatientRegistryDataset|BiobankDataset")
+  private String type;
+
   public String getOrphaCode() {
     return orphaCode;
   }
 
   public void setOrphaCode(String orphaCode) {
     this.orphaCode = orphaCode;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
   }
 
   //  @AssertFalse(message = "At least one search paramaters must be present")

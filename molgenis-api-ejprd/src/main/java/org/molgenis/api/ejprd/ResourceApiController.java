@@ -65,10 +65,11 @@ public class ResourceApiController implements ResourceApi {
   @RunAsSystem
   public DataResponse getResourceRequest(@Valid InternalResourceRequest resourceRequest) {
     String orphaCode = resourceRequest.getOrphaCode();
+    String type = resourceRequest.getType();
     String name = resourceRequest.getName();
     Integer skip = resourceRequest.getSkip();
     Integer limit = resourceRequest.getLimit();
-    return resourceQueryService.query(orphaCode, name, skip, limit);
+    return resourceQueryService.query(orphaCode, type, name, skip, limit);
   }
 
   @GetMapping("/resource/{resourceId}")

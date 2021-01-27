@@ -29,7 +29,8 @@ public class ExternalSourceQueryService implements ResourceQueryService {
   }
 
   @Override
-  public <T> T query(String orphaCode, String diseaseName, Integer skip, Integer limit) {
+  public <T> T query(
+      String orphaCode, String type, String diseaseName, Integer skip, Integer limit) {
     String orphacCodeQp = String.format("orphaCode=%s", orphaCode);
     String skipQp = skip != null ? String.format("skip=%d", skip) : "";
     String limitQp = limit != null ? String.format("limit=%d", limit) : "";

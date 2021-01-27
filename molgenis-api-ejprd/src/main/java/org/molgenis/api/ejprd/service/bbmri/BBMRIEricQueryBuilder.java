@@ -10,6 +10,10 @@ import org.slf4j.LoggerFactory;
 public class BBMRIEricQueryBuilder extends QueryBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(BBMRIEricQueryBuilder.class);
+  private static final String EJPRD_BIOBANK_DATASET_TYPE_NAME = "BiobankDataset";
+  private static final String EJPRD_PATIENT_REGISTRY_DATASET_TYPE_NAME = "PatientRegistryDataset";
+  private static final String BBMRI_BIOBANK_DATASET_TYPE_NAME = "BIOBANK";
+  private static final String BBMRI_PATIENT_REGISTRY_DATASET_TYPE_NAME = "REGISTRY";
 
   @Override
   public Query<Entity> buildCount() {
@@ -21,10 +25,20 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
     return getBaseQuery().pageSize(getPageSize()).offset(getOffset());
   }
 
+  private String transcodeResourceType(String resourceType) {
+    if (resourceType.equals(EJPRD_BIOBANK_DATASET_TYPE_NAME)) {
+      return BBMRI_BIOBANK_DATASET_TYPE_NAME;
+    } else if (resourceType.equals(EJPRD_PATIENT_REGISTRY_DATASET_TYPE_NAME)) {
+      return BBMRI_PATIENT_REGISTRY_DATASET_TYPE_NAME;
+    }
+    return null;
+  }
+
   private Query<Entity> getBaseQuery() {
     String diseaseCode = getDiseaseCode();
     String diseaseOntology = getDiseaseOntology();
     String diseaseName = getDiseaseName();
+    String resourceType = getResourceType();
 
     if (diseaseCode == null) {
       diseaseOntology = null;
@@ -39,6 +53,10 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
       q.eq("diagnosis_available.code", diseaseCode);
       q.and();
       q.eq("diagnosis_available.ontology", diseaseOntology);
+      if (resourceType != null) {
+        q.and();
+        q.eq("biobank.ressource_types", transcodeResourceType(resourceType));
+      }
       q.unnest();
     }
 
@@ -48,6 +66,7 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
       }
       q.like("diagnosis_available.label", diseaseName);
     }
+
     return q;
   }
 }

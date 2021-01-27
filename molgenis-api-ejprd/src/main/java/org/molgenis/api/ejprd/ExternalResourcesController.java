@@ -85,7 +85,7 @@ public class ExternalResourcesController {
 
     queryService.setServiceBaseURL(serviceBaseUrl);
 
-    DataResponse response = queryService.query(orphaCode, null, skip, limit);
+    DataResponse response = queryService.query(orphaCode, null, null, skip, limit);
 
     List<ResourceResponse> resourceResponses =
         response != null ? response.getResourceResponses() : Collections.emptyList();

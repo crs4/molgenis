@@ -16,7 +16,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.BeforeEach;
@@ -112,13 +111,13 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
     return entities;
   }
 
-  private HashMap<String,List<Entity>> getMockResourcesSplittedData(int size) {
+  private HashMap<String, List<Entity>> getMockResourcesSplittedData(int size) {
     HashMap entities = new HashMap();
     Entity country = mock(Entity.class);
     lenient().when(country.getString(eq("id"))).thenReturn("IT");
     lenient().when(country.getString(eq("name"))).thenReturn("Italy");
 
-    //lenient().when(ressourceType.getString(eq("id"))).thenReturn(BBMRI_BIOBANK_TYPE);
+    // lenient().when(ressourceType.getString(eq("id"))).thenReturn(BBMRI_BIOBANK_TYPE);
 
     List<Entity> collections_bb_type = new ArrayList<>();
     List<Entity> collections_reg_type = new ArrayList<>();
@@ -130,14 +129,11 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
       is_registry = false;
       Entity ressourceType = mock(Entity.class);
       Entity biobank = mock(Entity.class);
-      lenient()
-          .when(biobank.getString(eq("id")))
-          .thenReturn(String.format("Biobank_%s", i+1));
+      lenient().when(biobank.getString(eq("id"))).thenReturn(String.format("Biobank_%s", i + 1));
 
-      if (Arrays.asList(0,1,3,5,6,7).contains(i)){
+      if (Arrays.asList(0, 1, 3, 5, 6, 7).contains(i)) {
         lenient().when(ressourceType.getString(eq("id"))).thenReturn(BBMRI_BIOBANK_TYPE);
-      }
-      else{
+      } else {
         is_registry = true;
         lenient().when(ressourceType.getString(eq("id"))).thenReturn(BBMRI_REGISTRY_TYPE);
       }
@@ -162,12 +158,10 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
       if (is_registry) {
         biobanks_reg_type.add(biobank);
         collections_reg_type.add(collection);
-      }
-      else{
+      } else {
         biobanks_bb_type.add(biobank);
         collections_bb_type.add(collection);
       }
-
     }
 
     entities.put("biobanks_bb_type", biobanks_bb_type);
@@ -190,13 +184,15 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
       q.eq("diagnosis_available.code", String.format("ORPHA:%s", ORPHA_CODE));
       q.and();
       q.eq("diagnosis_available.ontology", "orphanet");
-      if(resourceType == BBMRI_BIOBANK_TYPE){
+      if (resourceType == BBMRI_BIOBANK_TYPE) {
         q.and();
-        q.in("biobank", Arrays.asList("Biobank_1", "Biobank_2","Biobank_4","Biobank_6","Biobank_7","Biobank_8"));
-      }
-      else if (resourceType == BBMRI_REGISTRY_TYPE){
+        q.in(
+            "biobank",
+            Arrays.asList(
+                "Biobank_1", "Biobank_2", "Biobank_4", "Biobank_6", "Biobank_7", "Biobank_8"));
+      } else if (resourceType == BBMRI_REGISTRY_TYPE) {
         q.and();
-        q.in("biobank", Arrays.asList("Biobank_3", "Biobank_5","Biobank_9","Biobank_10"));
+        q.in("biobank", Arrays.asList("Biobank_3", "Biobank_5", "Biobank_9", "Biobank_10"));
       }
       q.unnest();
     }
@@ -215,7 +211,7 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
     return q;
   }
 
-  private Query<Entity> getLookupResourceTypeQuery(String resourceTypeValue){
+  private Query<Entity> getLookupResourceTypeQuery(String resourceTypeValue) {
     Query<Entity> q = new QueryImpl<>();
     q.nest();
     q.eq("ressource_types", resourceTypeValue);
@@ -368,7 +364,7 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
     int resultSize = 1;
     List<Entity> entities = getMockData(1);
 
-    Query<Entity> findAllQuery = getQuery(true, false, null,  100, null);
+    Query<Entity> findAllQuery = getQuery(true, false, null, 100, null);
     Query<Entity> countQuery = getQuery(true, false, null, null, null);
     when(dataService.count(ENTITY_ID, countQuery)).thenReturn((long) resultSize);
     when(dataService.findAll(ENTITY_ID, findAllQuery)).thenReturn(entities.stream());
@@ -414,7 +410,7 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
     List<Entity> entities = getMockData(resultSize);
 
     Query<Entity> findAllQuery = getQuery(true, true, null, 100, null);
-    Query<Entity> countQuery = getQuery(true, true, null,  null, null);
+    Query<Entity> countQuery = getQuery(true, true, null, null, null);
 
     when(dataService.count(ENTITY_ID, countQuery)).thenReturn((long) resultSize);
     when(dataService.findAll(ENTITY_ID, findAllQuery)).thenReturn(entities.stream());
@@ -445,55 +441,59 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
   void testGetResourceByCodeAndResourceTypeBiobank() throws Exception {
     reset(dataService);
     int resultSize = 10;
-    HashMap<String, List<Entity> > entities = getMockResourcesSplittedData(resultSize);
+    HashMap<String, List<Entity>> entities = getMockResourcesSplittedData(resultSize);
     List<Entity> collectionEntities = entities.get("collections_bb_type");
     List<Entity> biobankEntities = entities.get("biobanks_bb_type");
 
-    Query<Entity> findAllQuery = getQuery(true, true, BBMRI_BIOBANK_TYPE,  100, null);
-    Query<Entity> countQuery = getQuery(true, true, BBMRI_BIOBANK_TYPE,  null, null);
+    Query<Entity> findAllQuery = getQuery(true, true, BBMRI_BIOBANK_TYPE, 100, null);
+    Query<Entity> countQuery = getQuery(true, true, BBMRI_BIOBANK_TYPE, null, null);
     Query<Entity> biobankTypeQuery = getLookupResourceTypeQuery("BIOBANK");
 
     lenient().when(dataService.count(ENTITY_ID, countQuery)).thenReturn((long) resultSize);
-    lenient().when(dataService.findAll(ENTITY_ID, findAllQuery)).thenReturn(collectionEntities.stream());
-    lenient().when(dataService.findAll("eu_bbmri_eric_biobanks", biobankTypeQuery)).thenReturn(biobankEntities.stream());
+    lenient()
+        .when(dataService.findAll(ENTITY_ID, findAllQuery))
+        .thenReturn(collectionEntities.stream());
+    lenient()
+        .when(dataService.findAll("eu_bbmri_eric_biobanks", biobankTypeQuery))
+        .thenReturn(biobankEntities.stream());
     ResultActions resultActions =
         this.mockMvc.perform(
             get(
                 URI.create(
                     String.format(
-                        "%s?name=%s&orphaCode=%s&type=%s", BASE_API_URL, DISEASE_NAME, ORPHA_CODE,"BiobankDataset"))));
+                        "%s?name=%s&orphaCode=%s&type=%s",
+                        BASE_API_URL, DISEASE_NAME, ORPHA_CODE, "BiobankDataset"))));
     resultActions.andExpect(status().isOk());
-    resultActions
-        .andExpect(jsonPath("$.resourceResponses", hasSize(6)));
-
+    resultActions.andExpect(jsonPath("$.resourceResponses", hasSize(6)));
   }
+
   @Test
   void testGetResourceByCodeAndResourceTypeRegistry() throws Exception {
     reset(dataService);
     int resultSize = 10;
-    HashMap<String, List<Entity> > entities = getMockResourcesSplittedData(resultSize);
+    HashMap<String, List<Entity>> entities = getMockResourcesSplittedData(resultSize);
     List<Entity> collectionEntities = entities.get("collections_reg_type");
     List<Entity> biobankEntities = entities.get("biobanks_reg_type");
 
-    Query<Entity> findAllQuery = getQuery(true, true, BBMRI_REGISTRY_TYPE,  100, null);
-    Query<Entity> countQuery = getQuery(true, true, BBMRI_REGISTRY_TYPE,  null, null);
+    Query<Entity> findAllQuery = getQuery(true, true, BBMRI_REGISTRY_TYPE, 100, null);
+    Query<Entity> countQuery = getQuery(true, true, BBMRI_REGISTRY_TYPE, null, null);
     Query<Entity> biobankTypeQuery = getLookupResourceTypeQuery("REGISTRY");
 
     lenient().when(dataService.count(ENTITY_ID, countQuery)).thenReturn((long) resultSize);
-    lenient().when(dataService.findAll(ENTITY_ID, findAllQuery)).thenReturn(collectionEntities.stream());
-    lenient().when(dataService.findAll("eu_bbmri_eric_biobanks", biobankTypeQuery)).thenReturn(biobankEntities.stream());
+    lenient()
+        .when(dataService.findAll(ENTITY_ID, findAllQuery))
+        .thenReturn(collectionEntities.stream());
+    lenient()
+        .when(dataService.findAll("eu_bbmri_eric_biobanks", biobankTypeQuery))
+        .thenReturn(biobankEntities.stream());
     ResultActions resultActions =
         this.mockMvc.perform(
             get(
                 URI.create(
                     String.format(
-                        "%s?name=%s&orphaCode=%s&type=%s", BASE_API_URL, DISEASE_NAME, ORPHA_CODE,"PatientRegistryDataset"))));
+                        "%s?name=%s&orphaCode=%s&type=%s",
+                        BASE_API_URL, DISEASE_NAME, ORPHA_CODE, "PatientRegistryDataset"))));
     resultActions.andExpect(status().isOk());
-    resultActions
-        .andExpect(jsonPath("$.resourceResponses", hasSize(4)));
-
-
-
-
+    resultActions.andExpect(jsonPath("$.resourceResponses", hasSize(4)));
   }
 }

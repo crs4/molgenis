@@ -35,14 +35,18 @@ public class InternalResourceQueryService implements ResourceQueryService {
   @Override
   public <T> T query(
       String orphaCode, String type, String diseaseName, Integer skip, Integer limit) {
+
     QueryBuilder queryBuilder =
         packageMappingServiceFactory
-            .getQueryBuilder()
+            .getQueryBuilder(dataService)
             .setDiseaseCode(orphaCode)
-            .setResourceType(type)
             .setDiseaseName(diseaseName)
+            .setResourceType(type)
             .setPageSize(limit)
             .setOffset(skip * limit);
+
+    // if type is not null, we have to perform a Lookup on the Biobanks entity and retrieve
+    // the list of all the entities matching that type
 
     int totalCount = getTotalCount(queryBuilder.buildCount());
     Stream<Entity> entities = query(queryBuilder.build());

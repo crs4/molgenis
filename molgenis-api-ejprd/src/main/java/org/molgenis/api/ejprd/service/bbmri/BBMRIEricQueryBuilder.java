@@ -3,7 +3,6 @@ package org.molgenis.api.ejprd.service.bbmri;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.stream.Stream;
 import org.molgenis.api.ejprd.service.QueryBuilder;
 import org.molgenis.data.DataService;
@@ -23,7 +22,7 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
   private static final String BBMRI_BIOBANK_DATASET_TYPE_NAME = "BIOBANK";
   private static final String BBMRI_PATIENT_REGISTRY_DATASET_TYPE_NAME = "REGISTRY";
 
-  private DataService dataService;
+  private final DataService dataService;
 
   private ArrayList<String> biobankResources;
 
@@ -60,13 +59,12 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
     q.eq("ressource_types", transcodeResourceType(resourceType));
     q.unnest();
     Stream<Entity> entities = dataService.findAll("eu_bbmri_eric_biobanks", q);
-    ArrayList<String> biobankResources = new ArrayList();
-    Iterator i = entities.iterator();
-    while (i.hasNext()) {
-      Entity e = (Entity) i.next();
-      String biobankId = e.getString("id");
-      biobankResources.add(biobankId);
-    }
+    ArrayList<String> biobankResources = new ArrayList<>();
+    entities.forEach(
+        entity -> {
+          String biobankId = entity.getString("id");
+          biobankResources.add(biobankId);
+        });
     return biobankResources;
   }
 

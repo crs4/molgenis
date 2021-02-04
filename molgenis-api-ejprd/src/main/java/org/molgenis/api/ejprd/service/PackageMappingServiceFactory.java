@@ -5,10 +5,6 @@ import org.molgenis.data.DataService;
 
 public abstract class PackageMappingServiceFactory {
 
-  public static PackageMappingServiceFactory getFactory(DataService dataService) {
-    return new BBMRIEricMappingServiceFactory();
-  }
-
   public static PackageMappingServiceFactory getFactory() {
     return new BBMRIEricMappingServiceFactory();
   }

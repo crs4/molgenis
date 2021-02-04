@@ -496,4 +496,16 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
     resultActions.andExpect(status().isOk());
     resultActions.andExpect(jsonPath("$.resourceResponses", hasSize(4)));
   }
+
+  @Test
+  void testGetResourceByCodeAndResourceTypeParamNotAllowed() throws Exception {
+    ResultActions resultActions =
+        this.mockMvc.perform(
+            get(
+                URI.create(
+                    String.format(
+                        "%s?name=%s&orphaCode=%s&type=fooType",
+                        BASE_API_URL, DISEASE_NAME, ORPHA_CODE))));
+    resultActions.andExpect(status().isBadRequest());
+  }
 }

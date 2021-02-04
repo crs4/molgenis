@@ -1,6 +1,7 @@
 package org.molgenis.api.ejprd.model;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +14,11 @@ public class InternalResourceRequest extends ResourceRequest {
   @NotBlank(message = "OrphaCode is mandatory")
   private String orphaCode;
 
-  // @Pattern(regexp="PatientRegistryDataset|BiobankDataset")
+  @Pattern(
+      regexp = "(PatientRegistryDataset|BiobankDataset)",
+      message =
+          "Resource Type value not "
+              + "allowed. Allowed values are BiobankDataset and  PatientRegistryDataset")
   private String type;
 
   public String getOrphaCode() {

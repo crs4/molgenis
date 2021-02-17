@@ -61,10 +61,10 @@ public class ExternalResourcesController {
   @RunAsSystem
   public CatalogResponse getExternalResource(
       @PathVariable("sourceId") String sourceId, @Valid ExternalResourceRequest request) {
-
-    // Todo: enable diagnosisAvailable filter in the future
+    LOG.debug(String.format("Received %s", request.toString()));
     String diagnosisAvailable = request.getDiagnosisAvailable();
     String orphaCode = diagnosisAvailable;
+    List<String> resourceType = request.getResourceType();
     Integer skip = request.getSkip();
     Integer limit = request.getLimit();
 
@@ -85,7 +85,7 @@ public class ExternalResourcesController {
 
     queryService.setServiceBaseURL(serviceBaseUrl);
 
-    DataResponse response = queryService.query(orphaCode, null, null, skip, limit);
+    DataResponse response = queryService.query(orphaCode, resourceType, null, skip, limit);
 
     List<ResourceResponse> resourceResponses =
         response != null ? response.getResourceResponses() : Collections.emptyList();

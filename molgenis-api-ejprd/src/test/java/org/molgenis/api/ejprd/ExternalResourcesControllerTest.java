@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -72,7 +73,9 @@ public class ExternalResourcesControllerTest extends AbstractMockitoSpringContex
     mockMvc
         .perform(
             MockMvcRequestBuilders.get(
-                String.format("%sEXT_1?diagnosisAvailable=ORPHA:63&skip=0&limit=5", BASE_API_URL)))
+                String.format(
+                    "%sEXT_1?diagnosisAvailable=ORPHA:63&resourceType=BiobankDataset,PatientRegistryDataset&skip=0&limit=5",
+                    BASE_API_URL)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.name", is("External source 1")))
         .andExpect(jsonPath("$.url", is("http://ext1.it/resource")))
@@ -96,6 +99,18 @@ public class ExternalResourcesControllerTest extends AbstractMockitoSpringContex
                 String.format(
                     "%sUNKNOWN?diagnosisAvailable=ORPHA:63&skip=0&limit=5", BASE_API_URL)))
         .andExpect(status().isNotFound());
+  }
+
+  @Test
+  void testRequestWrongResourceTypeValue() throws Exception {
+    controller = mock(ExternalResourcesController.class);
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.get(
+                String.format(
+                    "%sEXT_1?diagnosisAvailable=ORPHA:63&resourceType=UNK&skip=0&limit=5",
+                    BASE_API_URL)))
+        .andExpect(status().isBadRequest());
   }
 
   @Test
@@ -131,7 +146,6 @@ public class ExternalResourcesControllerTest extends AbstractMockitoSpringContex
       lenient()
           .when(externalSource.getString(eq("service_uri")))
           .thenReturn("http://ext1.it/resource");
-
       lenient()
           .when(dataService.findOneById("eu_bbmri_eric_external_sources", "EXT_1"))
           .thenReturn(externalSource);
@@ -155,8 +169,10 @@ public class ExternalResourcesControllerTest extends AbstractMockitoSpringContex
       ErrorResponse errorResponse = ErrorResponse.create(1, "Error");
       DataResponse dataResponse =
           DataResponse.create(apiVersion, resourceResponses, pageResponse, errorResponse);
-
-      lenient().when(queryService.query("63", null, null, 0, 5)).thenReturn(dataResponse);
+      List<String> resourceType = new ArrayList<>();
+      resourceType.add("BiobankDataset");
+      resourceType.add("PatientRegistryDataset");
+      lenient().when(queryService.query("63", resourceType, null, 0, 5)).thenReturn(dataResponse);
       return queryService;
     }
 

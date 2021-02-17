@@ -2,6 +2,8 @@ package org.molgenis.api.ejprd.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -51,12 +53,17 @@ public class ExternalSourceQueryServiceTest {
             + "}";
 
     Mockito.when(
-            restTemplate.getForEntity("http://mock.it/resource/search?orphaCode=63", String.class))
+            restTemplate.getForEntity(
+                "http://mock.it/resource/search?orphaCode=63&resourceType=BiobankDataset,PatientRegistryDataset",
+                String.class))
         .thenReturn(new ResponseEntity<>(expectedResponse, HttpStatus.OK));
     ExternalSourceQueryService service = new ExternalSourceQueryService();
     service.setServiceBaseURL("http://mock.it/resource/search");
     service.setRestTemplate(restTemplate);
-    DataResponse response = service.query("63", null, null, null, null);
+    List<String> resourceType = new ArrayList<>();
+    resourceType.add("BiobankDataset");
+    resourceType.add("PatientRegistryDataset");
+    DataResponse response = service.query("63", resourceType, null, null, null);
     assertEquals(response.getApiVersion(), "v2");
   }
 

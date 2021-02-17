@@ -1,5 +1,6 @@
 package org.molgenis.api.ejprd.service;
 
+import java.util.List;
 import org.molgenis.api.ejprd.model.DataResponse;
 import org.molgenis.api.ejprd.model.ErrorResponse;
 import org.slf4j.Logger;
@@ -30,15 +31,22 @@ public class ExternalSourceQueryService implements ResourceQueryService {
 
   @Override
   public <T> T query(
-      String orphaCode, String type, String diseaseName, Integer skip, Integer limit) {
+      String orphaCode,
+      List<String> resourceType,
+      String diseaseName,
+      Integer skip,
+      Integer limit) {
     String orphacCodeQp = String.format("orphaCode=%s", orphaCode);
+    String typeQp = "";
+    if (resourceType != null) {
+      typeQp = String.format("resourceType=%s", String.join(",", resourceType));
+    }
     String skipQp = skip != null ? String.format("skip=%d", skip) : "";
     String limitQp = limit != null ? String.format("limit=%d", limit) : "";
-    String queryParameters = String.join("&", orphacCodeQp, skipQp, limitQp);
-
+    String queryParameters = String.join("&", orphacCodeQp, typeQp, skipQp, limitQp);
     UriComponentsBuilder builder =
         UriComponentsBuilder.fromHttpUrl(String.format("%s?%s", serviceBaseURL, queryParameters));
-
+    LOG.debug(String.format("Querying external source: %s", builder.toUriString()));
     ResponseEntity<String> response;
     try {
       response = restTemplate.getForEntity(builder.toUriString(), String.class);

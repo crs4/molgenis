@@ -183,9 +183,11 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
     Query<Entity> q = new QueryImpl<>();
     if (includeCode) {
       q.nest();
-      q.eq("diagnosis_available.code", String.format("ORPHA:%s", ORPHA_CODE));
-      q.and();
-      q.eq("diagnosis_available.ontology", "orphanet");
+      q.in(
+          "diagnosis_available.code",
+          Collections.singletonList(String.format("ORPHA:%s", ORPHA_CODE)));
+      //      q.and();
+      //      q.eq("diagnosis_available.ontology", "orphanet");
       if (resourceType != null) {
         List<String> biobankIds = new ArrayList<>();
         if (resourceType.contains(BBMRI_BIOBANK_TYPE)) {

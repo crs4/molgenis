@@ -3,6 +3,7 @@ package org.molgenis.api.ejprd.model;
 import java.util.List;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +14,8 @@ public class InternalResourceRequest extends ResourceRequest {
 
   // At the moment ORPHA code is expected; TODO: implement lookup in case of IDC10 code
 
-  @NotBlank(message = "OrphaCode is mandatory")
-  private String orphaCode;
+  @NotEmpty(message = "OrphaCode is mandatory")
+  private List<String> orphaCode;
 
   @Nullable
   private List<
@@ -25,11 +26,11 @@ public class InternalResourceRequest extends ResourceRequest {
           String>
       resourceType;
 
-  public String getOrphaCode() {
+  public List<String> getOrphaCode() {
     return orphaCode;
   }
 
-  public void setOrphaCode(String orphaCode) {
+  public void setOrphaCode(@NotBlank List<String> orphaCode) {
     this.orphaCode = orphaCode;
   }
 
@@ -46,7 +47,7 @@ public class InternalResourceRequest extends ResourceRequest {
   public String toString() {
     return String.format(
         "InternalResourceRequest: orphaCode: %s, resourceType: %s, skip: %s, limit: %s",
-        getOrphaCode(),
+        getOrphaCode() != null ? String.join(",", getOrphaCode()) : "null",
         getResourceType() != null ? String.join(",", getResourceType()) : "null",
         getSkip(),
         getLimit());

@@ -3,23 +3,22 @@ package org.molgenis.api.ejprd.model;
 import java.util.List;
 import javax.annotation.Nullable;
 import javax.validation.constraints.AssertFalse;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 
 public class ExternalResourceRequest extends ResourceRequest {
 
   // At the moment ORPHA code is expected; TODO: implement lookup in case of IDC10 code
-  @NotNull @NotBlank private String diagnosisAvailable;
+  @NotEmpty private List<String> diagnosisAvailable;
 
   @Nullable
   private List<@Pattern(regexp = "(BiobankDataset|PatientRegistryDataset)") String> resourceType;
 
-  public String getDiagnosisAvailable() {
+  public List<String> getDiagnosisAvailable() {
     return diagnosisAvailable;
   }
 
-  public void setDiagnosisAvailable(String diagnosisAvailable) {
+  public void setDiagnosisAvailable(List<String> diagnosisAvailable) {
     this.diagnosisAvailable = diagnosisAvailable;
   }
 

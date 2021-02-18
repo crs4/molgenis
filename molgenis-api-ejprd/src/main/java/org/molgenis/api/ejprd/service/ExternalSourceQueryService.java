@@ -31,12 +31,12 @@ public class ExternalSourceQueryService implements ResourceQueryService {
 
   @Override
   public <T> T query(
-      String orphaCode,
+      List<String> orphaCode,
       List<String> resourceType,
       String diseaseName,
       Integer skip,
       Integer limit) {
-    String orphacCodeQp = String.format("orphaCode=%s", orphaCode);
+    String orphacCodeQp = String.format("orphaCode=%s", String.join(",", orphaCode));
     String typeQp = "";
     if (resourceType != null) {
       typeQp = String.format("resourceType=%s", String.join(",", resourceType));

@@ -65,7 +65,7 @@ public class ResourceApiController implements ResourceApi {
   @ResponseBody
   @RunAsSystem
   public DataResponse getResourceRequest(@Valid InternalResourceRequest resourceRequest) {
-    String orphaCode = resourceRequest.getOrphaCode();
+    List<String> orphaCode = resourceRequest.getOrphaCode();
     List<String> resourceType = resourceRequest.getResourceType();
     String name = resourceRequest.getName();
     Integer skip = resourceRequest.getSkip();

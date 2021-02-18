@@ -34,7 +34,7 @@ public class InternalResourceQueryService implements ResourceQueryService {
 
   @Override
   public <T> T query(
-      String orphaCode,
+      List<String> orphaCode,
       List<String> resourceType,
       String diseaseName,
       Integer skip,

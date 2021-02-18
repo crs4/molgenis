@@ -70,23 +70,22 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
   }
 
   private Query<Entity> getBaseQuery() {
-    String diseaseCode = getDiseaseCode();
-    String diseaseOntology = getDiseaseOntology();
+    List<String> diseaseCode = getDiseaseCode();
+    // String diseaseOntology = getDiseaseOntology();
     String diseaseName = getDiseaseName();
-
-    if (diseaseCode == null) {
-      diseaseOntology = null;
-    } else {
-      diseaseOntology = "orphanet";
-      diseaseCode = String.format("ORPHA:%s", diseaseCode);
-    }
 
     Query<Entity> q = new QueryImpl<>();
     if (diseaseCode != null) {
+      // diseaseOntology = "orphanet";
+      diseaseCode =
+          diseaseCode.stream()
+              .map(dc -> String.format("ORPHA:%s", dc))
+              .collect(Collectors.toList());
+      LOG.info("Querying for orphacodes: {}", String.join(",", diseaseCode));
       q.nest();
-      q.eq("diagnosis_available.code", diseaseCode);
-      q.and();
-      q.eq("diagnosis_available.ontology", diseaseOntology);
+      q.in("diagnosis_available.code", diseaseCode);
+      //      q.and();
+      //      q.eq("diagnosis_available.ontology", diseaseOntology);
       if (getResourceType() != null) {
         if (biobankResources == null) {
           biobankResources = getBiobankResources(dataService, getResourceType());

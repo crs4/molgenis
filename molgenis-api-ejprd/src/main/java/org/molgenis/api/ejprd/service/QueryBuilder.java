@@ -9,7 +9,7 @@ public abstract class QueryBuilder {
 
   // private String resourceType;
 
-  private String diseaseCode;
+  private List<String> diseaseCode;
 
   private String diseaseOntology;
 
@@ -36,11 +36,11 @@ public abstract class QueryBuilder {
   //  return this;
   // }
 
-  public String getDiseaseCode() {
+  public List<String> getDiseaseCode() {
     return diseaseCode;
   }
 
-  public QueryBuilder setDiseaseCode(String diseasesCode) {
+  public QueryBuilder setDiseaseCode(List<String> diseasesCode) {
     this.diseaseCode = diseasesCode;
     return this;
   }

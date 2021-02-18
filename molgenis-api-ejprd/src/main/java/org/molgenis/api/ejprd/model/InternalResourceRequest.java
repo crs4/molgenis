@@ -1,5 +1,7 @@
 package org.molgenis.api.ejprd.model;
 
+import java.util.List;
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import org.slf4j.Logger;
@@ -14,12 +16,14 @@ public class InternalResourceRequest extends ResourceRequest {
   @NotBlank(message = "OrphaCode is mandatory")
   private String orphaCode;
 
-  @Pattern(
-      regexp = "(PatientRegistryDataset|BiobankDataset)",
-      message =
-          "Resource Type value not "
-              + "allowed. Allowed values are BiobankDataset and  PatientRegistryDataset")
-  private String type;
+  @Nullable
+  private List<
+          @Pattern(
+              regexp = "(BiobankDataset|PatientRegistryDataset)",
+              message =
+                  "Resource Type value not allowed. Allowed values are BiobankDataset and  PatientRegistryDataset")
+          String>
+      resourceType;
 
   public String getOrphaCode() {
     return orphaCode;
@@ -29,16 +33,22 @@ public class InternalResourceRequest extends ResourceRequest {
     this.orphaCode = orphaCode;
   }
 
-  public String getType() {
-    return type;
+  @Nullable
+  public List<String> getResourceType() {
+    return resourceType;
   }
 
-  public void setType(String type) {
-    this.type = type;
+  public void setResourceType(@Nullable List<String> resourceType) {
+    this.resourceType = resourceType;
   }
 
-  //  @AssertFalse(message = "At least one search paramaters must be present")
-  //  private boolean isQueryEmpty() {
-  //    return getOrphaCode() == null && getName() == null;
-  //  }
+  @Override
+  public String toString() {
+    return String.format(
+        "InternalResourceRequest: orphaCode: %s, resourceType: %s, skip: %s, limit: %s",
+        getOrphaCode(),
+        getResourceType() != null ? String.join(",", getResourceType()) : "null",
+        getSkip(),
+        getLimit());
+  }
 }

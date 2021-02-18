@@ -3,6 +3,8 @@ package org.molgenis.api.ejprd.service.bbmri;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.molgenis.api.ejprd.service.QueryBuilder;
 import org.molgenis.data.DataService;
@@ -21,6 +23,7 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
   private static final String EJPRD_PATIENT_REGISTRY_DATASET_TYPE_NAME = "PatientRegistryDataset";
   private static final String BBMRI_BIOBANK_DATASET_TYPE_NAME = "BIOBANK";
   private static final String BBMRI_PATIENT_REGISTRY_DATASET_TYPE_NAME = "REGISTRY";
+  private static final String BIOBANK_ENTITY_ID = "eu_bbmri_eric_biobanks";
 
   private final DataService dataService;
 
@@ -40,10 +43,6 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
     return getBaseQuery().pageSize(getPageSize()).offset(getOffset());
   }
 
-  public Query<Entity> buildLookupQuery() {
-    return getLookupResourceTypeQuery();
-  }
-
   private String transcodeResourceType(String resourceType) {
     if (resourceType.equals(EJPRD_BIOBANK_DATASET_TYPE_NAME)) {
       return BBMRI_BIOBANK_DATASET_TYPE_NAME;
@@ -53,12 +52,14 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
     return null;
   }
 
-  private ArrayList<String> getBiobankResources(DataService dataService, String resourceType) {
+  private ArrayList<String> getBiobankResources(
+      DataService dataService, List<String> resourceType) {
+
     Query<Entity> q = new QueryImpl<>();
-    q.nest();
-    q.eq("ressource_types", transcodeResourceType(resourceType));
-    q.unnest();
-    Stream<Entity> entities = dataService.findAll("eu_bbmri_eric_biobanks", q);
+    resourceType =
+        resourceType.stream().map(this::transcodeResourceType).collect(Collectors.toList());
+    q.in("ressource_types", resourceType);
+    Stream<Entity> entities = dataService.findAll(BIOBANK_ENTITY_ID, q);
     ArrayList<String> biobankResources = new ArrayList<>();
     entities.forEach(
         entity -> {
@@ -66,14 +67,6 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
           biobankResources.add(biobankId);
         });
     return biobankResources;
-  }
-
-  private Query<Entity> getLookupResourceTypeQuery() {
-    Query<Entity> q = new QueryImpl<>();
-    q.nest();
-    q.eq("ressourceTypes", transcodeResourceType(getResourceType()));
-    q.unnest();
-    return q;
   }
 
   private Query<Entity> getBaseQuery() {

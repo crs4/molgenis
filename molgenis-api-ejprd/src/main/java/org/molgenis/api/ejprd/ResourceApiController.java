@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import javax.validation.Valid;
 import org.molgenis.api.ApiNamespace;
 import org.molgenis.api.ejprd.model.CatalogInfoResponse;
@@ -65,17 +66,19 @@ public class ResourceApiController implements ResourceApi {
   @RunAsSystem
   public DataResponse getResourceRequest(@Valid InternalResourceRequest resourceRequest) {
     String orphaCode = resourceRequest.getOrphaCode();
-    String type = resourceRequest.getType();
+    List<String> resourceType = resourceRequest.getResourceType();
     String name = resourceRequest.getName();
     Integer skip = resourceRequest.getSkip();
     Integer limit = resourceRequest.getLimit();
-    return resourceQueryService.query(orphaCode, type, name, skip, limit);
+    LOG.info("Received query request: {}", resourceRequest);
+    return resourceQueryService.query(orphaCode, resourceType, name, skip, limit);
   }
 
   @GetMapping("/resource/{resourceId}")
   @ResponseBody
   @RunAsSystem
   public DataResponse getResourceById(@PathVariable("resourceId") String resourceId) {
+    LOG.info("Received get request: for resource {}", resourceId);
     return resourceQueryService.getById(resourceId);
   }
 }

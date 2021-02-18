@@ -34,14 +34,18 @@ public class InternalResourceQueryService implements ResourceQueryService {
 
   @Override
   public <T> T query(
-      String orphaCode, String type, String diseaseName, Integer skip, Integer limit) {
+      String orphaCode,
+      List<String> resourceType,
+      String diseaseName,
+      Integer skip,
+      Integer limit) {
 
     QueryBuilder queryBuilder =
         packageMappingServiceFactory
             .getQueryBuilder(dataService)
             .setDiseaseCode(orphaCode)
             .setDiseaseName(diseaseName)
-            .setResourceType(type)
+            .setResourceType(resourceType)
             .setPageSize(limit)
             .setOffset(skip * limit);
 

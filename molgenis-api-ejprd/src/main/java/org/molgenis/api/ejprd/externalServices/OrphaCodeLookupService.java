@@ -29,9 +29,9 @@ public class OrphaCodeLookupService {
   private final String orphaLookupServiceEntity = "eu_bbmri_eric_lookup_service";
   private final String orphaLookupServiceURIField = "base_uri";
   // private String serviceURI = "https://api.orphacode.org/EN/ClinicalEntity/";
-  private String apiKey = "test";
-  private RestTemplate restTemplate = new RestTemplate();
-  private DataService dataService;
+  private final String apiKey = "test";
+  private final RestTemplate restTemplate = new RestTemplate();
+  private final DataService dataService;
 
   public OrphaCodeLookupService(DataService dataService) {
     this.dataService = requireNonNull(dataService);

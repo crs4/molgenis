@@ -1,6 +1,7 @@
 package org.molgenis.api.ejprd.service;
 
 import java.util.ArrayList;
+import java.util.List;
 import org.molgenis.data.Entity;
 import org.molgenis.data.Query;
 
@@ -14,7 +15,7 @@ public abstract class QueryBuilder {
 
   private String diseaseName;
 
-  private String resourceType;
+  private List<String> resourceType;
 
   private ArrayList<String> biobankResources;
 
@@ -62,11 +63,11 @@ public abstract class QueryBuilder {
     return this;
   }
 
-  public String getResourceType() {
+  public List<String> getResourceType() {
     return resourceType;
   }
 
-  public QueryBuilder setResourceType(String resourceType) {
+  public QueryBuilder setResourceType(List<String> resourceType) {
     this.resourceType = resourceType;
     return this;
   }

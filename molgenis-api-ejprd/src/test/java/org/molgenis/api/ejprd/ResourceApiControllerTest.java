@@ -175,40 +175,41 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
   }
 
   private Query<Entity> getQuery(
-      boolean includeCode,
-      boolean includeName,
       @Nullable List<String> resourceType,
+      @Nullable List<String> country,
       @Nullable Integer pageSize,
       @Nullable Integer offset) {
     Query<Entity> q = new QueryImpl<>();
-    if (includeCode) {
-      q.nest();
-      q.in(
-          "diagnosis_available.code",
-          Collections.singletonList(String.format("ORPHA:%s", ORPHA_CODE)));
-      //      q.and();
-      //      q.eq("diagnosis_available.ontology", "orphanet");
-      if (resourceType != null) {
-        List<String> biobankIds = new ArrayList<>();
-        if (resourceType.contains(BBMRI_BIOBANK_TYPE)) {
-          biobankIds.addAll(
-              Arrays.asList(
-                  "Biobank_1", "Biobank_2", "Biobank_3", "Biobank_4", "Biobank_5", "Biobank_6"));
-        }
-        if (resourceType.contains(BBMRI_REGISTRY_TYPE)) {
-          biobankIds.addAll(Arrays.asList("Biobank_7", "Biobank_8", "Biobank_9", "Biobank_10"));
-        }
-        q.and();
-        q.in("biobank", biobankIds);
+    q.nest();
+    q.in(
+        "diagnosis_available.code",
+        Collections.singletonList(String.format("ORPHA:%s", ORPHA_CODE)));
+
+    if (resourceType != null) {
+      List<String> biobankIds = new ArrayList<>();
+      if (resourceType.contains(BBMRI_BIOBANK_TYPE)) {
+        biobankIds.addAll(
+            Arrays.asList(
+                "Biobank_1", "Biobank_2", "Biobank_3", "Biobank_4", "Biobank_5", "Biobank_6"));
       }
-      q.unnest();
-    }
-    if (includeName) {
-      if (includeCode) {
-        q.or();
+      if (resourceType.contains(BBMRI_REGISTRY_TYPE)) {
+        biobankIds.addAll(Arrays.asList("Biobank_7", "Biobank_8", "Biobank_9", "Biobank_10"));
       }
-      q.like("diagnosis_available.label", DISEASE_NAME);
+      q.and();
+      q.in("biobank", biobankIds);
     }
+    if (country != null) {
+      q.and();
+      q.in("country", Collections.singletonList("IT"));
+    }
+    q.unnest();
+
+    //    if (includeName) {
+    //      if (includeCode) {
+    //        q.or();
+    //      }
+    //      q.like("diagnosis_available.label", DISEASE_NAME);
+    //    }
     if (pageSize != null) {
       q.pageSize(pageSize);
     }
@@ -222,10 +223,6 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
     Query<Entity> q = new QueryImpl<>();
     q.in("ressource_types", resourceType);
     return q;
-  }
-
-  private Query<Entity> getEmptyQuery() {
-    return getQuery(false, false, null, null, null);
   }
 
   private void checkContentType(ResultActions actions) throws Exception {
@@ -292,8 +289,8 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
   void testGetResourcesWithPaging() throws Exception {
     reset(dataService);
     int resultSize = 5;
-    Query<Entity> findalAllQuery = getQuery(true, false, null, 5, null);
-    Query<Entity> countQuery = getQuery(true, false, null, null, null);
+    Query<Entity> findalAllQuery = getQuery(null, null, 5, null);
+    Query<Entity> countQuery = getQuery(null, null, null, null);
     findalAllQuery.pageSize(5);
 
     List<Entity> entities = getMockData(5);
@@ -341,8 +338,8 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
   void testGetResourcesWithPagingSecondPage() throws Exception {
     reset(dataService);
     int resultSize = 5;
-    Query<Entity> findAllQuery = getQuery(true, false, null, 5, 5);
-    Query<Entity> countQuery = getQuery(true, false, null, null, null);
+    Query<Entity> findAllQuery = getQuery(null, null, 5, 5);
+    Query<Entity> countQuery = getQuery(null, null, null, null);
     findAllQuery.pageSize(5);
     findAllQuery.offset(5);
 
@@ -369,8 +366,8 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
     int resultSize = 1;
     List<Entity> entities = getMockData(1);
 
-    Query<Entity> findAllQuery = getQuery(true, false, null, 100, null);
-    Query<Entity> countQuery = getQuery(true, false, null, null, null);
+    Query<Entity> findAllQuery = getQuery(null, null, 100, null);
+    Query<Entity> countQuery = getQuery(null, null, null, null);
     when(dataService.count(COLLECTIONS_ENTITY_ID, countQuery)).thenReturn((long) resultSize);
     when(dataService.findAll(COLLECTIONS_ENTITY_ID, findAllQuery)).thenReturn(entities.stream());
 
@@ -408,31 +405,32 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
   //    checkPageData(resultActions, 100, resultSize, 1, 0);
   //  }
 
-  @Test
-  void testGetResourcesByCodeAndName() throws Exception {
-    reset(dataService);
-    int resultSize = 10;
-    List<Entity> entities = getMockData(resultSize);
-
-    Query<Entity> findAllQuery = getQuery(true, true, null, 100, null);
-    Query<Entity> countQuery = getQuery(true, true, null, null, null);
-
-    when(dataService.count(COLLECTIONS_ENTITY_ID, countQuery)).thenReturn((long) resultSize);
-    when(dataService.findAll(COLLECTIONS_ENTITY_ID, findAllQuery)).thenReturn(entities.stream());
-
-    ResultActions resultActions =
-        this.mockMvc.perform(
-            get(
-                URI.create(
-                    String.format(
-                        "%s?name=%s&orphaCode=%s", BASE_API_URL, DISEASE_NAME, ORPHA_CODE))));
-    resultActions.andExpect(status().isOk());
-
-    checkContentType(resultActions);
-    checkApiVersion(resultActions);
-    checkResultData(resultActions, resultSize);
-    checkPageData(resultActions, 100, resultSize, 1, 0);
-  }
+  //  @Test
+  //  void testGetResourcesByCodeAndName() throws Exception {
+  //    reset(dataService);
+  //    int resultSize = 10;
+  //    List<Entity> entities = getMockData(resultSize);
+  //
+  //    Query<Entity> findAllQuery = getQuery(true, true, null, null, 100, null);
+  //    Query<Entity> countQuery = getQuery(true, true, null, null, null, null);
+  //
+  //    when(dataService.count(COLLECTIONS_ENTITY_ID, countQuery)).thenReturn((long) resultSize);
+  //    when(dataService.findAll(COLLECTIONS_ENTITY_ID,
+  // findAllQuery)).thenReturn(entities.stream());
+  //
+  //    ResultActions resultActions =
+  //        this.mockMvc.perform(
+  //            get(
+  //                URI.create(
+  //                    String.format(
+  //                        "%s?name=%s&orphaCode=%s", BASE_API_URL, DISEASE_NAME, ORPHA_CODE))));
+  //    resultActions.andExpect(status().isOk());
+  //
+  //    checkContentType(resultActions);
+  //    checkApiVersion(resultActions);
+  //    checkResultData(resultActions, resultSize);
+  //    checkPageData(resultActions, 100, resultSize, 1, 0);
+  //  }
 
   @Test
   void testGetResourcesWithParamsWithoutValues() throws Exception {
@@ -451,9 +449,9 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
     List<Entity> biobankEntities = entities.get("biobanks_bb_type");
 
     Query<Entity> findAllQuery =
-        getQuery(true, true, Collections.singletonList(BBMRI_BIOBANK_TYPE), 100, null);
+        getQuery(Collections.singletonList(BBMRI_BIOBANK_TYPE), null, 100, null);
     Query<Entity> countQuery =
-        getQuery(true, true, Collections.singletonList(BBMRI_BIOBANK_TYPE), null, null);
+        getQuery(Collections.singletonList(BBMRI_BIOBANK_TYPE), null, null, null);
     Query<Entity> biobankTypeQuery =
         getBiobankLookupQuery(Collections.singletonList(BBMRI_BIOBANK_TYPE));
 
@@ -471,8 +469,8 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
             get(
                 URI.create(
                     String.format(
-                        "%s?name=%s&orphaCode=%s&resourceType=%s",
-                        BASE_API_URL, DISEASE_NAME, ORPHA_CODE, EJPRD_BIOBANK_TYPE))));
+                        "%s?orphaCode=%s&resourceType=%s",
+                        BASE_API_URL, ORPHA_CODE, EJPRD_BIOBANK_TYPE))));
     resultActions.andExpect(status().isOk());
     resultActions.andExpect(jsonPath("$.resourceResponses", hasSize(6)));
   }
@@ -492,8 +490,8 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
     resourceType.add(BBMRI_BIOBANK_TYPE);
     resourceType.add(BBMRI_REGISTRY_TYPE);
 
-    Query<Entity> findAllQuery = getQuery(true, true, resourceType, 100, null);
-    Query<Entity> countQuery = getQuery(true, true, resourceType, null, null);
+    Query<Entity> findAllQuery = getQuery(resourceType, null, 100, null);
+    Query<Entity> countQuery = getQuery(resourceType, null, null, null);
     Query<Entity> biobankLookupQuery = getBiobankLookupQuery(resourceType);
 
     lenient()
@@ -510,12 +508,8 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
             get(
                 URI.create(
                     String.format(
-                        "%s?name=%s&orphaCode=%s&resourceType=%s,%s",
-                        BASE_API_URL,
-                        DISEASE_NAME,
-                        ORPHA_CODE,
-                        EJPRD_BIOBANK_TYPE,
-                        EJPRD_REGISTRY_TYPE))));
+                        "%s?orphaCode=%s&resourceType=%s,%s",
+                        BASE_API_URL, ORPHA_CODE, EJPRD_BIOBANK_TYPE, EJPRD_REGISTRY_TYPE))));
     resultActions.andExpect(status().isOk());
     resultActions.andExpect(jsonPath("$.resourceResponses", hasSize(10)));
   }
@@ -529,9 +523,9 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
     List<Entity> biobankEntities = entities.get("biobanks_reg_type");
 
     Query<Entity> findAllQuery =
-        getQuery(true, true, Collections.singletonList(BBMRI_REGISTRY_TYPE), 100, null);
+        getQuery(Collections.singletonList(BBMRI_REGISTRY_TYPE), null, 100, null);
     Query<Entity> countQuery =
-        getQuery(true, true, Collections.singletonList(BBMRI_REGISTRY_TYPE), null, null);
+        getQuery(Collections.singletonList(BBMRI_REGISTRY_TYPE), null, null, null);
     Query<Entity> biobankTypeQuery =
         getBiobankLookupQuery(Collections.singletonList(BBMRI_REGISTRY_TYPE));
 
@@ -549,8 +543,8 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
             get(
                 URI.create(
                     String.format(
-                        "%s?name=%s&orphaCode=%s&resourceType=%s",
-                        BASE_API_URL, DISEASE_NAME, ORPHA_CODE, EJPRD_REGISTRY_TYPE))));
+                        "%s?orphaCode=%s&resourceType=%s",
+                        BASE_API_URL, ORPHA_CODE, EJPRD_REGISTRY_TYPE))));
     resultActions.andExpect(status().isOk());
     resultActions.andExpect(jsonPath("$.resourceResponses", hasSize(4)));
   }
@@ -565,5 +559,30 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
                         "%s?name=%s&orphaCode=%s&resourceType=fooType",
                         BASE_API_URL, DISEASE_NAME, ORPHA_CODE))));
     resultActions.andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void testGetResourceByCodeAndCountry() throws Exception {
+    reset(dataService);
+    int resultSize = 10;
+    HashMap<String, List<Entity>> entities = getMockResourcesSplittedData(resultSize);
+    List<Entity> collectionEntities = entities.get("collections_reg_type");
+
+    Query<Entity> findAllQuery = getQuery(null, Collections.singletonList("IT"), 100, null);
+    Query<Entity> countQuery = getQuery(Collections.singletonList("IT"), null, null, null);
+    Query<Entity> biobankTypeQuery =
+        getBiobankLookupQuery(Collections.singletonList(BBMRI_REGISTRY_TYPE));
+
+    lenient()
+        .when(dataService.count(COLLECTIONS_ENTITY_ID, countQuery))
+        .thenReturn((long) resultSize);
+    lenient()
+        .when(dataService.findAll(COLLECTIONS_ENTITY_ID, findAllQuery))
+        .thenReturn(collectionEntities.stream());
+    ResultActions resultActions =
+        this.mockMvc.perform(
+            get(URI.create(String.format("%s?orphaCode=%s&country=IT", BASE_API_URL, ORPHA_CODE))));
+    resultActions.andExpect(status().isOk());
+    resultActions.andExpect(jsonPath("$.resourceResponses", hasSize(4)));
   }
 }

@@ -27,7 +27,7 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
 
   private final DataService dataService;
 
-  private ArrayList<String> biobankResources;
+  private List<String> biobankResources;
 
   public BBMRIEricQueryBuilder(DataService dataService) {
     this.dataService = requireNonNull(dataService);
@@ -52,15 +52,14 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
     return null;
   }
 
-  private ArrayList<String> getBiobankResources(
-      DataService dataService, List<String> resourceType) {
+  private List<String> getBiobankResources(DataService dataService, List<String> resourceType) {
 
     Query<Entity> q = new QueryImpl<>();
     resourceType =
         resourceType.stream().map(this::transcodeResourceType).collect(Collectors.toList());
     q.in("ressource_types", resourceType);
     Stream<Entity> entities = dataService.findAll(BIOBANK_ENTITY_ID, q);
-    ArrayList<String> biobankResources = new ArrayList<>();
+    List<String> biobankResources = new ArrayList<>();
     entities.forEach(
         entity -> {
           String biobankId = entity.getString("id");
@@ -71,21 +70,15 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
 
   private Query<Entity> getBaseQuery() {
     List<String> diseaseCode = getDiseaseCode();
-    // String diseaseOntology = getDiseaseOntology();
-    String diseaseName = getDiseaseName();
+    //    String diseaseName = getDiseaseName();
 
     Query<Entity> q = new QueryImpl<>();
-    if (diseaseCode != null) {
-      // diseaseOntology = "orphanet";
-      diseaseCode =
-          diseaseCode.stream()
-              .map(dc -> String.format("ORPHA:%s", dc))
-              .collect(Collectors.toList());
-      LOG.info("Querying for orphacodes: {}", String.join(",", diseaseCode));
-      q.nest();
-      q.in("diagnosis_available.code", diseaseCode);
-      //      q.and();
-      //      q.eq("diagnosis_available.ontology", diseaseOntology);
+    diseaseCode =
+        diseaseCode.stream().map(dc -> String.format("ORPHA:%s", dc)).collect(Collectors.toList());
+    LOG.info("Querying for orphacodes: {}", String.join(",", diseaseCode));
+    q.nest();
+    q.in("diagnosis_available.code", diseaseCode);
+    if (anyOptionalParameter()) {
       if (getResourceType() != null) {
         if (biobankResources == null) {
           biobankResources = getBiobankResources(dataService, getResourceType());
@@ -93,16 +86,24 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
         q.and();
         q.in("biobank", biobankResources);
       }
-      q.unnest();
-    }
-
-    if (diseaseName != null) {
-      if (q.getRules().size() != 0) {
-        q.or();
+      if (getCountry() != null) {
+        q.and();
+        q.in("country", getCountry());
       }
-      q.like("diagnosis_available.label", diseaseName);
     }
+    q.unnest();
+
+    //    if (diseaseName != null) {
+    //      if (q.getRules().size() != 0) {
+    //        q.or();
+    //      }
+    //      q.like("diagnosis_available.label", diseaseName);
+    //    }
 
     return q;
+  }
+
+  private boolean anyOptionalParameter() {
+    return getResourceType() != null || getCountry() != null;
   }
 }

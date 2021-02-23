@@ -33,17 +33,19 @@ public class ExternalSourceQueryService implements ResourceQueryService {
   public <T> T query(
       List<String> orphaCode,
       List<String> resourceType,
+      List<String> country,
       String diseaseName,
       Integer skip,
       Integer limit) {
-    String orphacCodeQp = String.format("orphaCode=%s", String.join(",", orphaCode));
-    String typeQp = "";
-    if (resourceType != null) {
-      typeQp = String.format("resourceType=%s", String.join(",", resourceType));
-    }
-    String skipQp = skip != null ? String.format("skip=%d", skip) : "";
-    String limitQp = limit != null ? String.format("limit=%d", limit) : "";
-    String queryParameters = String.join("&", orphacCodeQp, typeQp, skipQp, limitQp);
+    String orphacCodeParameter = String.format("orphaCode=%s", String.join(",", orphaCode));
+    String typeParameter =
+        resourceType != null
+            ? String.format("resourceType=%s", String.join(",", resourceType))
+            : "";
+    String skipParameter = skip != null ? String.format("skip=%d", skip) : "";
+    String limitParameter = limit != null ? String.format("limit=%d", limit) : "";
+    String queryParameters =
+        String.join("&", orphacCodeParameter, typeParameter, skipParameter, limitParameter);
     UriComponentsBuilder builder =
         UriComponentsBuilder.fromHttpUrl(String.format("%s?%s", serviceBaseURL, queryParameters));
     LOG.debug(String.format("Querying external source: %s", builder.toUriString()));

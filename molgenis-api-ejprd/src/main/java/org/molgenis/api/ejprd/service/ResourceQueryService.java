@@ -8,6 +8,7 @@ public interface ResourceQueryService {
   <T> T query(
       List<String> orphaCode,
       List<String> resourceType,
+      List<String> country,
       String diseaseName,
       Integer skip,
       Integer limit);

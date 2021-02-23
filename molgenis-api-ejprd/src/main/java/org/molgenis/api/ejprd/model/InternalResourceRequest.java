@@ -13,7 +13,6 @@ public class InternalResourceRequest extends ResourceRequest {
   private static final Logger LOG = LoggerFactory.getLogger(InternalResourceRequest.class);
 
   // At the moment ORPHA code is expected; TODO: implement lookup in case of IDC10 code
-
   @NotEmpty(message = "OrphaCode is mandatory")
   private List<String> orphaCode;
 
@@ -25,6 +24,8 @@ public class InternalResourceRequest extends ResourceRequest {
                   "Resource Type value not allowed. Allowed values are BiobankDataset and  PatientRegistryDataset")
           String>
       resourceType;
+
+  @Nullable private List<String> country;
 
   public List<String> getOrphaCode() {
     return orphaCode;
@@ -43,12 +44,26 @@ public class InternalResourceRequest extends ResourceRequest {
     this.resourceType = resourceType;
   }
 
+  @Nullable
+  public List<String> getCountry() {
+    return country;
+  }
+
+  public void setCountry(@Nullable List<String> country) {
+    this.country = country;
+  }
+
+  private String listToString(@Nullable List<String> toConvert) {
+    return toConvert != null ? String.join(",", toConvert) : "null";
+  }
+
   @Override
   public String toString() {
     return String.format(
-        "InternalResourceRequest: orphaCode: %s, resourceType: %s, skip: %s, limit: %s",
-        getOrphaCode() != null ? String.join(",", getOrphaCode()) : "null",
-        getResourceType() != null ? String.join(",", getResourceType()) : "null",
+        "InternalResourceRequest: orphaCode: %s, resourceType: %s, country: %s, skip: %s, limit: %s",
+        listToString(getOrphaCode()),
+        listToString(getResourceType()),
+        listToString(getCountry()),
         getSkip(),
         getLimit());
   }

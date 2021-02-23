@@ -65,7 +65,7 @@ public class ExternalSourceQueryServiceTest {
     resourceType.add("BiobankDataset");
     resourceType.add("PatientRegistryDataset");
     DataResponse response =
-        service.query(Collections.singletonList("63"), resourceType, null, null, null);
+        service.query(Collections.singletonList("63"), resourceType, null, null, null, null);
     assertEquals(response.getApiVersion(), "v2");
   }
 
@@ -83,7 +83,7 @@ public class ExternalSourceQueryServiceTest {
     service.setServiceBaseURL("http://mock.it/resource/search");
     service.setRestTemplate(restTemplate);
     ErrorResponse errorResponse =
-        service.query(Collections.singletonList(""), null, null, null, null);
+        service.query(Collections.singletonList(""), null, null, null, null, null);
     assertEquals(errorResponse.getCode(), 400);
     assertEquals(errorResponse.getMessage(), "Bad Request: missing orphaCode parameter");
   }
@@ -100,7 +100,7 @@ public class ExternalSourceQueryServiceTest {
     service.setServiceBaseURL("http://mock.it/search");
     service.setRestTemplate(restTemplate);
     ErrorResponse errorResponse =
-        service.query(Collections.singletonList("63"), null, null, null, null);
+        service.query(Collections.singletonList("63"), null, null, null, null, null);
     assertEquals(errorResponse.getCode(), 404);
     assertEquals(errorResponse.getMessage(), "The requested resource cannot be found");
   }

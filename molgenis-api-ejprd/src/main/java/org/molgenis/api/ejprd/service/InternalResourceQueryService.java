@@ -36,6 +36,7 @@ public class InternalResourceQueryService implements ResourceQueryService {
   public <T> T query(
       List<String> orphaCode,
       List<String> resourceType,
+      List<String> country,
       String diseaseName,
       Integer skip,
       Integer limit) {
@@ -46,6 +47,7 @@ public class InternalResourceQueryService implements ResourceQueryService {
             .setDiseaseCode(orphaCode)
             .setDiseaseName(diseaseName)
             .setResourceType(resourceType)
+            .setCountry(country)
             .setPageSize(limit)
             .setOffset(skip * limit);
 

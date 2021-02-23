@@ -173,7 +173,7 @@ public class ExternalResourcesControllerTest extends AbstractMockitoSpringContex
       resourceType.add("BiobankDataset");
       resourceType.add("PatientRegistryDataset");
       lenient()
-          .when(queryService.query(Collections.singletonList("63"), resourceType, null, 0, 5))
+          .when(queryService.query(Collections.singletonList("63"), resourceType, null, null, 0, 5))
           .thenReturn(dataResponse);
       return queryService;
     }

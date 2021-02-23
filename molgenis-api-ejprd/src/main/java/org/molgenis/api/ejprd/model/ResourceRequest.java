@@ -1,14 +1,11 @@
 package org.molgenis.api.ejprd.model;
 
-import java.util.List;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Min;
 
 public class ResourceRequest {
 
   private String name;
-
-  private List<String> medAreas;
 
   @Min(value = 0, message = "Skip should be at least 0")
   private Integer skip = 0;
@@ -26,14 +23,6 @@ public class ResourceRequest {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public List<String> getMedAreas() {
-    return medAreas;
-  }
-
-  public void setMedAreas(List<String> medAreas) {
-    this.medAreas = medAreas;
   }
 
   public Integer getSkip() {

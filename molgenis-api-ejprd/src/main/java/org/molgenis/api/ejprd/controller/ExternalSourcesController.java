@@ -1,4 +1,4 @@
-package org.molgenis.api.ejprd;
+package org.molgenis.api.ejprd.controller;
 
 import static java.util.Objects.requireNonNull;
 
@@ -29,19 +29,20 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Controller
-@RequestMapping(ExternalResourcesController.BASE_URI)
-public class ExternalResourcesController {
+@RequestMapping(ExternalSourcesController.BASE_URI)
+public class ExternalSourcesController {
   static final String BASE_URI = ApiNamespace.API_PATH + "/ejprd";
   private static final String NAME_COLUMN = "name";
   private static final String BASE_URI_COLUMN = "base_uri";
   private static final String SERVICE_URI_COLUMN = "service_uri";
 
-  private static final Logger LOG = LoggerFactory.getLogger(ExternalResourcesController.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ExternalSourcesController.class);
   private final DataService dataService;
   private final PackageMappingServiceFactory packageMappingServiceFactory;
   private final ExternalResourceQueryService queryService;
 
-  ExternalResourcesController(DataService dataService, ExternalResourceQueryService queryService) {
+  public ExternalSourcesController(
+      DataService dataService, ExternalResourceQueryService queryService) {
     this.dataService = requireNonNull(dataService);
     this.packageMappingServiceFactory = PackageMappingServiceFactory.getFactory();
     this.queryService = requireNonNull(queryService);

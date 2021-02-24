@@ -1,4 +1,4 @@
-package org.molgenis.api.ejprd;
+package org.molgenis.api.ejprd.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Api(value = "resource")
-public interface ResourceApi {
+public interface ResourceController {
 
   @ApiOperation(
       value = "",

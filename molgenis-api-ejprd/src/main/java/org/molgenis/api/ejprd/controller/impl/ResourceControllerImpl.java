@@ -1,4 +1,4 @@
-package org.molgenis.api.ejprd;
+package org.molgenis.api.ejprd.controller.impl;
 
 import static java.util.Objects.requireNonNull;
 
@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import javax.validation.Valid;
 import org.molgenis.api.ApiNamespace;
+import org.molgenis.api.ejprd.controller.ResourceController;
 import org.molgenis.api.ejprd.model.CatalogInfoResponse;
 import org.molgenis.api.ejprd.model.DataResponse;
 import org.molgenis.api.ejprd.model.Organisation;
@@ -21,15 +22,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping(ResourceApiController.BASE_URI)
-public class ResourceApiController implements ResourceApi {
+@RequestMapping(ResourceControllerImpl.BASE_URI)
+public class ResourceControllerImpl implements ResourceController {
 
   static final String BASE_URI = ApiNamespace.API_PATH + "/ejprd";
-  private static final Logger LOG = LoggerFactory.getLogger(ResourceApiController.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ResourceControllerImpl.class);
   private static final String apiVersion = "v0.2";
   private final InternalResourceQueryService resourceQueryService;
 
-  ResourceApiController(InternalResourceQueryService resourceQueryService) {
+  public ResourceControllerImpl(InternalResourceQueryService resourceQueryService) {
     this.resourceQueryService = requireNonNull(resourceQueryService);
   }
 

@@ -21,6 +21,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.molgenis.api.ejprd.controller.impl.ResourceControllerImpl;
 import org.molgenis.api.ejprd.service.InternalResourceQueryService;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
@@ -38,7 +39,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @WebAppConfiguration
 @ContextConfiguration(classes = {GsonConfig.class})
-class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
+class ResourceControllerControllerTest extends AbstractMockitoSpringContextTests {
 
   private static final String EJPRD_BIOBANK_TYPE = "BiobankDataset";
   private static final String EJPRD_REGISTRY_TYPE = "PatientRegistryDataset";
@@ -69,7 +70,7 @@ class ResourceApiControllerTest extends AbstractMockitoSpringContextTests {
     dataService = mock(DataService.class);
     InternalResourceQueryService resourceQueryService =
         new InternalResourceQueryService(dataService);
-    ResourceApiController controller = new ResourceApiController(resourceQueryService);
+    ResourceControllerImpl controller = new ResourceControllerImpl(resourceQueryService);
 
     mockMvc =
         MockMvcBuilders.standaloneSetup(controller)

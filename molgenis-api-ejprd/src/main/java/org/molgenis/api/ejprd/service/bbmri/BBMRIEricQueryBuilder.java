@@ -70,7 +70,6 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
 
   private Query<Entity> getBaseQuery() {
     List<String> diseaseCode = getDiseaseCode();
-    //    String diseaseName = getDiseaseName();
 
     Query<Entity> q = new QueryImpl<>();
     diseaseCode =
@@ -92,13 +91,6 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
       }
     }
     q.unnest();
-
-    //    if (diseaseName != null) {
-    //      if (q.getRules().size() != 0) {
-    //        q.or();
-    //      }
-    //      q.like("diagnosis_available.label", diseaseName);
-    //    }
 
     return q;
   }

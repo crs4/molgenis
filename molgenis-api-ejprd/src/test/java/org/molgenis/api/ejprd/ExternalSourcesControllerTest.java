@@ -12,7 +12,8 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.molgenis.api.ejprd.ExternalResourcesControllerTest.Config;
+import org.molgenis.api.ejprd.ExternalSourcesControllerTest.Config;
+import org.molgenis.api.ejprd.controller.ExternalSourcesController;
 import org.molgenis.api.ejprd.model.DataResponse;
 import org.molgenis.api.ejprd.model.ErrorResponse;
 import org.molgenis.api.ejprd.model.ExternalResourceRequest;
@@ -37,9 +38,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @WebAppConfiguration
 @ContextConfiguration(classes = {Config.class, GsonConfig.class})
-public class ExternalResourcesControllerTest extends AbstractMockitoSpringContextTests {
+public class ExternalSourcesControllerTest extends AbstractMockitoSpringContextTests {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ExternalResourcesControllerTest.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ExternalSourcesControllerTest.class);
   private static final String BASE_URL = "http://molgenis01.gcc.rug.nl:8080";
   private static final String BASE_API_URL =
       String.format("%s/api/ejprd/external_sources/", BASE_URL);
@@ -53,8 +54,8 @@ public class ExternalResourcesControllerTest extends AbstractMockitoSpringContex
 
   @BeforeEach
   void beforeMethod() {
-    ExternalResourcesController controller =
-        new ExternalResourcesController(dataService, queryService);
+    ExternalSourcesController controller =
+        new ExternalSourcesController(dataService, queryService);
 
     mockMvc =
         MockMvcBuilders.standaloneSetup(controller)

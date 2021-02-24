@@ -53,8 +53,10 @@ public class ExternalResourceQueryService implements ResourceQueryService {
             countryParameter,
             skipParameter,
             limitParameter);
+
     UriComponentsBuilder builder =
         UriComponentsBuilder.fromHttpUrl(String.format("%s?%s", serviceBaseURL, queryParameters));
+
     LOG.debug(String.format("Querying external source: %s", builder.toUriString()));
     ResponseEntity<String> response;
     LOG.debug(String.format(builder.toUriString(), String.class));

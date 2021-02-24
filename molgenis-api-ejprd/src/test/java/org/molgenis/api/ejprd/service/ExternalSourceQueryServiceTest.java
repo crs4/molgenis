@@ -12,6 +12,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.molgenis.api.ejprd.model.DataResponse;
 import org.molgenis.api.ejprd.model.ErrorResponse;
+import org.molgenis.api.ejprd.model.ExternalResourceRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -55,7 +56,7 @@ public class ExternalSourceQueryServiceTest {
 
     Mockito.when(
             restTemplate.getForEntity(
-                "http://mock.it/resource/search?orphaCode=63&resourceType=BiobankDataset,PatientRegistryDataset",
+                "http://mock.it/resource/search?orphaCode=63&resourceType=BiobankDataset,PatientRegistryDataset&skip=0&limit=100",
                 String.class))
         .thenReturn(new ResponseEntity<>(expectedResponse, HttpStatus.OK));
     ExternalSourceQueryService service = new ExternalSourceQueryService();
@@ -64,8 +65,12 @@ public class ExternalSourceQueryServiceTest {
     List<String> resourceType = new ArrayList<>();
     resourceType.add("BiobankDataset");
     resourceType.add("PatientRegistryDataset");
-    DataResponse response =
-        service.query(Collections.singletonList("63"), resourceType, null, null, null, null);
+
+    ExternalResourceRequest request = new ExternalResourceRequest();
+    request.setOrphaCode(Collections.singletonList("63"));
+    request.setResourceType(resourceType);
+
+    DataResponse response = service.query(request);
     assertEquals(response.getApiVersion(), "v2");
   }
 
@@ -76,14 +81,16 @@ public class ExternalSourceQueryServiceTest {
         "{" + "\"code\": 400 ," + "\"message\": \"Bad Request: missing orphaCode parameter\"" + "}";
 
     Mockito.when(
-            restTemplate.getForEntity("http://mock.it/resource/search?orphaCode=", String.class))
+            restTemplate.getForEntity(
+                "http://mock.it/resource/search?orphaCode=&skip=0&limit=100", String.class))
         .thenReturn(new ResponseEntity<>(errorResponseJson, HttpStatus.BAD_REQUEST));
 
     ExternalSourceQueryService service = new ExternalSourceQueryService();
     service.setServiceBaseURL("http://mock.it/resource/search");
     service.setRestTemplate(restTemplate);
-    ErrorResponse errorResponse =
-        service.query(Collections.singletonList(""), null, null, null, null, null);
+    ExternalResourceRequest request = new ExternalResourceRequest();
+    request.setOrphaCode(Collections.singletonList(""));
+    ErrorResponse errorResponse = service.query(request);
     assertEquals(errorResponse.getCode(), 400);
     assertEquals(errorResponse.getMessage(), "Bad Request: missing orphaCode parameter");
   }
@@ -93,14 +100,19 @@ public class ExternalSourceQueryServiceTest {
     String errorResponseJson =
         "{" + "\"code\": 404 ," + "\"message\": \"The requested resource cannot be found\"" + "}";
 
-    Mockito.when(restTemplate.getForEntity("http://mock.it/search?orphaCode=63", String.class))
+    Mockito.when(
+            restTemplate.getForEntity(
+                "http://mock.it/search?orphaCode=63&skip=0&limit=100", String.class))
         .thenReturn(new ResponseEntity<>(errorResponseJson, HttpStatus.NOT_FOUND));
 
     ExternalSourceQueryService service = new ExternalSourceQueryService();
     service.setServiceBaseURL("http://mock.it/search");
     service.setRestTemplate(restTemplate);
-    ErrorResponse errorResponse =
-        service.query(Collections.singletonList("63"), null, null, null, null, null);
+
+    ExternalResourceRequest request = new ExternalResourceRequest();
+    request.setOrphaCode(Collections.singletonList("63"));
+
+    ErrorResponse errorResponse = service.query(request);
     assertEquals(errorResponse.getCode(), 404);
     assertEquals(errorResponse.getMessage(), "The requested resource cannot be found");
   }

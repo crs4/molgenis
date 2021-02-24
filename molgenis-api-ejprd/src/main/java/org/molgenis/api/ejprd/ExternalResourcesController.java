@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.molgenis.api.ApiNamespace;
 import org.molgenis.api.ejprd.exceptions.ExternalSourceNotFoundException;
@@ -64,21 +63,6 @@ public class ExternalResourcesController {
       @PathVariable("sourceId") String sourceId, @Valid ExternalResourceRequest request) {
     LOG.debug(String.format("Received %s", request.toString()));
 
-    List<String> orphaCode =
-        request.getDiagnosisAvailable().stream()
-            .map(
-                oc -> {
-                  if (oc.contains("ORPHA:")) {
-                    return oc.split(":")[1];
-                  }
-                  return oc;
-                })
-            .collect(Collectors.toList());
-
-    List<String> resourceType = request.getResourceType();
-    Integer skip = request.getSkip();
-    Integer limit = request.getLimit();
-
     Entity source = findExternalSourceById(sourceId);
 
     if (source == null) {
@@ -92,7 +76,7 @@ public class ExternalResourcesController {
 
     queryService.setServiceBaseURL(serviceBaseUrl);
 
-    DataResponse response = queryService.query(orphaCode, resourceType, null, null, skip, limit);
+    DataResponse response = queryService.query(request);
 
     List<ResourceResponse> resourceResponses =
         response != null ? response.getResourceResponses() : Collections.emptyList();

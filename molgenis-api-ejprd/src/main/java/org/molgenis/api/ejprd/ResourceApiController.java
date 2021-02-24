@@ -4,13 +4,12 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import javax.validation.Valid;
 import org.molgenis.api.ApiNamespace;
 import org.molgenis.api.ejprd.model.CatalogInfoResponse;
 import org.molgenis.api.ejprd.model.DataResponse;
-import org.molgenis.api.ejprd.model.InternalResourceRequest;
 import org.molgenis.api.ejprd.model.Organisation;
+import org.molgenis.api.ejprd.model.ResourceRequest;
 import org.molgenis.api.ejprd.service.InternalResourceQueryService;
 import org.molgenis.security.core.runas.RunAsSystem;
 import org.slf4j.Logger;
@@ -64,15 +63,9 @@ public class ResourceApiController implements ResourceApi {
   @GetMapping("/resource/search")
   @ResponseBody
   @RunAsSystem
-  public DataResponse getResourceRequest(@Valid InternalResourceRequest resourceRequest) {
-    List<String> orphaCode = resourceRequest.getOrphaCode();
-    List<String> resourceType = resourceRequest.getResourceType();
-    List<String> country = resourceRequest.getCountry();
-    String name = resourceRequest.getName();
-    Integer skip = resourceRequest.getSkip();
-    Integer limit = resourceRequest.getLimit();
+  public DataResponse getResourceRequest(@Valid ResourceRequest resourceRequest) {
     LOG.info("Received query request: {}", resourceRequest);
-    return resourceQueryService.query(orphaCode, resourceType, country, name, skip, limit);
+    return resourceQueryService.query(resourceRequest);
   }
 
   @GetMapping("/resource/{resourceId}")

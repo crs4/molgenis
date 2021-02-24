@@ -17,7 +17,7 @@ import org.molgenis.api.ejprd.model.DataResponse;
 import org.molgenis.api.ejprd.model.ErrorResponse;
 import org.molgenis.api.ejprd.model.ExternalResourceRequest;
 import org.molgenis.api.ejprd.model.ResourceResponse;
-import org.molgenis.api.ejprd.service.ExternalSourceQueryService;
+import org.molgenis.api.ejprd.service.ExternalResourceQueryService;
 import org.molgenis.api.model.response.PageResponse;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
@@ -46,7 +46,7 @@ public class ExternalResourcesControllerTest extends AbstractMockitoSpringContex
 
   @Autowired private DataService dataService;
   @Autowired private Entity source;
-  @Autowired private ExternalSourceQueryService queryService;
+  @Autowired private ExternalResourceQueryService queryService;
   @Autowired private GsonHttpMessageConverter gsonHttpMessageConverter;
 
   private MockMvc mockMvc;
@@ -143,8 +143,8 @@ public class ExternalResourcesControllerTest extends AbstractMockitoSpringContex
     }
 
     @Bean
-    ExternalSourceQueryService queryService() {
-      ExternalSourceQueryService queryService = mock(ExternalSourceQueryService.class);
+    ExternalResourceQueryService queryService() {
+      ExternalResourceQueryService queryService = mock(ExternalResourceQueryService.class);
       String apiVersion = "v1";
       ResourceResponse resourceResponse =
           ResourceResponse.create(

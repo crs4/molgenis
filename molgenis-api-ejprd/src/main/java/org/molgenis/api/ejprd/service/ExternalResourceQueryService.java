@@ -13,13 +13,13 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
-public class ExternalSourceQueryService implements ResourceQueryService {
+public class ExternalResourceQueryService implements ResourceQueryService {
   private static final Logger LOG = LoggerFactory.getLogger(InternalResourceQueryService.class);
 
   private String serviceBaseURL;
   private RestTemplate restTemplate = new RestTemplate();
 
-  public ExternalSourceQueryService() {}
+  public ExternalResourceQueryService() {}
 
   public void setServiceBaseURL(String serviceBaseURL) {
     this.serviceBaseURL = serviceBaseURL;
@@ -37,12 +37,22 @@ public class ExternalSourceQueryService implements ResourceQueryService {
         queryParam.getResourceType() != null
             ? String.format("resourceType=%s", String.join(",", queryParam.getResourceType()))
             : "";
+    String countryParameter =
+        queryParam.getCountry() != null
+            ? String.format("country=%s", String.join(",", queryParam.getCountry()))
+            : "";
     String skipParameter =
         queryParam.getSkip() != null ? String.format("skip=%d", queryParam.getSkip()) : "";
     String limitParameter =
         queryParam.getLimit() != null ? String.format("limit=%d", queryParam.getLimit()) : "";
     String queryParameters =
-        String.join("&", orphacCodeParameter, typeParameter, skipParameter, limitParameter);
+        String.join(
+            "&",
+            orphacCodeParameter,
+            typeParameter,
+            countryParameter,
+            skipParameter,
+            limitParameter);
     UriComponentsBuilder builder =
         UriComponentsBuilder.fromHttpUrl(String.format("%s?%s", serviceBaseURL, queryParameters));
     LOG.debug(String.format("Querying external source: %s", builder.toUriString()));

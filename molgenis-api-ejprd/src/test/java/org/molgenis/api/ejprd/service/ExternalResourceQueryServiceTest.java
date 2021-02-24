@@ -18,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ExternalSourceQueryServiceTest {
+public class ExternalResourceQueryServiceTest {
 
   @Mock private RestTemplate restTemplate;
 
@@ -56,18 +56,24 @@ public class ExternalSourceQueryServiceTest {
 
     Mockito.when(
             restTemplate.getForEntity(
-                "http://mock.it/resource/search?orphaCode=63&resourceType=BiobankDataset,PatientRegistryDataset&skip=0&limit=100",
+                "http://mock.it/resource/search"
+                    + "?orphaCode=63"
+                    + "&resourceType=BiobankDataset,PatientRegistryDataset"
+                    + "&country=IT"
+                    + "&skip=0&limit=100",
                 String.class))
         .thenReturn(new ResponseEntity<>(expectedResponse, HttpStatus.OK));
-    ExternalSourceQueryService service = new ExternalSourceQueryService();
+    ExternalResourceQueryService service = new ExternalResourceQueryService();
     service.setServiceBaseURL("http://mock.it/resource/search");
     service.setRestTemplate(restTemplate);
+
     List<String> resourceType = new ArrayList<>();
     resourceType.add("BiobankDataset");
     resourceType.add("PatientRegistryDataset");
 
     ExternalResourceRequest request = new ExternalResourceRequest();
     request.setOrphaCode(Collections.singletonList("63"));
+    request.setCountry(Collections.singletonList("IT"));
     request.setResourceType(resourceType);
 
     DataResponse response = service.query(request);
@@ -85,7 +91,7 @@ public class ExternalSourceQueryServiceTest {
                 "http://mock.it/resource/search?orphaCode=&skip=0&limit=100", String.class))
         .thenReturn(new ResponseEntity<>(errorResponseJson, HttpStatus.BAD_REQUEST));
 
-    ExternalSourceQueryService service = new ExternalSourceQueryService();
+    ExternalResourceQueryService service = new ExternalResourceQueryService();
     service.setServiceBaseURL("http://mock.it/resource/search");
     service.setRestTemplate(restTemplate);
     ExternalResourceRequest request = new ExternalResourceRequest();
@@ -105,7 +111,7 @@ public class ExternalSourceQueryServiceTest {
                 "http://mock.it/search?orphaCode=63&skip=0&limit=100", String.class))
         .thenReturn(new ResponseEntity<>(errorResponseJson, HttpStatus.NOT_FOUND));
 
-    ExternalSourceQueryService service = new ExternalSourceQueryService();
+    ExternalResourceQueryService service = new ExternalResourceQueryService();
     service.setServiceBaseURL("http://mock.it/search");
     service.setRestTemplate(restTemplate);
 

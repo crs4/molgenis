@@ -11,7 +11,7 @@ import org.molgenis.api.ejprd.model.CatalogResponse;
 import org.molgenis.api.ejprd.model.DataResponse;
 import org.molgenis.api.ejprd.model.ExternalResourceRequest;
 import org.molgenis.api.ejprd.model.ResourceResponse;
-import org.molgenis.api.ejprd.service.ExternalSourceQueryService;
+import org.molgenis.api.ejprd.service.ExternalResourceQueryService;
 import org.molgenis.api.ejprd.service.PackageMappingServiceFactory;
 import org.molgenis.api.model.response.PageResponse;
 import org.molgenis.data.DataService;
@@ -39,9 +39,9 @@ public class ExternalResourcesController {
   private static final Logger LOG = LoggerFactory.getLogger(ExternalResourcesController.class);
   private final DataService dataService;
   private final PackageMappingServiceFactory packageMappingServiceFactory;
-  private final ExternalSourceQueryService queryService;
+  private final ExternalResourceQueryService queryService;
 
-  ExternalResourcesController(DataService dataService, ExternalSourceQueryService queryService) {
+  ExternalResourcesController(DataService dataService, ExternalResourceQueryService queryService) {
     this.dataService = requireNonNull(dataService);
     this.packageMappingServiceFactory = PackageMappingServiceFactory.getFactory();
     this.queryService = requireNonNull(queryService);

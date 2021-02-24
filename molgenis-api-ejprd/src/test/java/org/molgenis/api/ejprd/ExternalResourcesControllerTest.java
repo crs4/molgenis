@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.molgenis.api.ejprd.ExternalResourcesControllerTest.Config;
 import org.molgenis.api.ejprd.model.DataResponse;
 import org.molgenis.api.ejprd.model.ErrorResponse;
+import org.molgenis.api.ejprd.model.ExternalResourceRequest;
 import org.molgenis.api.ejprd.model.ResourceResponse;
 import org.molgenis.api.ejprd.service.ExternalSourceQueryService;
 import org.molgenis.api.model.response.PageResponse;
@@ -43,7 +44,6 @@ public class ExternalResourcesControllerTest extends AbstractMockitoSpringContex
   private static final String BASE_API_URL =
       String.format("%s/api/ejprd/external_sources/", BASE_URL);
 
-  @Autowired private ExternalResourcesController controller;
   @Autowired private DataService dataService;
   @Autowired private Entity source;
   @Autowired private ExternalSourceQueryService queryService;
@@ -51,15 +51,11 @@ public class ExternalResourcesControllerTest extends AbstractMockitoSpringContex
 
   private MockMvc mockMvc;
 
-  // @Before
-  // public void setup() {
-
-  // this.mockMvc = standaloneSetup(new ExternalResourcesController(dataService)).build();
-  // this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-  // }
-
   @BeforeEach
   void beforeMethod() {
+    ExternalResourcesController controller =
+        new ExternalResourcesController(dataService, queryService);
+
     mockMvc =
         MockMvcBuilders.standaloneSetup(controller)
             .setMessageConverters(gsonHttpMessageConverter)
@@ -68,8 +64,6 @@ public class ExternalResourcesControllerTest extends AbstractMockitoSpringContex
 
   @Test
   void testRequestOK() throws Exception {
-    controller = mock(ExternalResourcesController.class);
-
     mockMvc
         .perform(
             MockMvcRequestBuilders.get(
@@ -92,7 +86,6 @@ public class ExternalResourcesControllerTest extends AbstractMockitoSpringContex
 
   @Test
   void testRequestUnknownExternalSource() throws Exception {
-    controller = mock(ExternalResourcesController.class);
     mockMvc
         .perform(
             MockMvcRequestBuilders.get(
@@ -103,7 +96,6 @@ public class ExternalResourcesControllerTest extends AbstractMockitoSpringContex
 
   @Test
   void testRequestWrongResourceTypeValue() throws Exception {
-    controller = mock(ExternalResourcesController.class);
     mockMvc
         .perform(
             MockMvcRequestBuilders.get(
@@ -115,7 +107,6 @@ public class ExternalResourcesControllerTest extends AbstractMockitoSpringContex
 
   @Test
   void testRequestMandatoryParamNotProvided() throws Exception {
-    controller = mock(ExternalResourcesController.class);
     mockMvc
         .perform(MockMvcRequestBuilders.get(String.format("%sEXT_1?skip=0&limit=5", BASE_API_URL)))
         .andExpect(status().is4xxClientError());
@@ -123,7 +114,6 @@ public class ExternalResourcesControllerTest extends AbstractMockitoSpringContex
 
   @Test
   void testRequestMandatoryParameterProvidedNull() throws Exception {
-    controller = mock(ExternalResourcesController.class);
     mockMvc
         .perform(
             MockMvcRequestBuilders.get(
@@ -167,20 +157,23 @@ public class ExternalResourcesControllerTest extends AbstractMockitoSpringContex
       List<ResourceResponse> resourceResponses = Collections.singletonList(resourceResponse);
       PageResponse pageResponse = PageResponse.create(5, 1, 0);
       ErrorResponse errorResponse = ErrorResponse.create(1, "Error");
+
       DataResponse dataResponse =
           DataResponse.create(apiVersion, resourceResponses, pageResponse, errorResponse);
+
       List<String> resourceType = new ArrayList<>();
       resourceType.add("BiobankDataset");
       resourceType.add("PatientRegistryDataset");
-      lenient()
-          .when(queryService.query(Collections.singletonList("63"), resourceType, null, null, 0, 5))
-          .thenReturn(dataResponse);
-      return queryService;
-    }
 
-    @Bean
-    ExternalResourcesController controller() {
-      return new ExternalResourcesController(dataService(), queryService());
+      ExternalResourceRequest request = new ExternalResourceRequest();
+      request.setDiagnosisAvailable(Collections.singletonList("ORPHA:63"));
+      request.setResourceType(resourceType);
+      request.setLimit(5);
+      request.setSkip(0);
+
+      lenient().when(queryService.query(request)).thenReturn(dataResponse);
+
+      return queryService;
     }
 
     @Bean

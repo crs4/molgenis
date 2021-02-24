@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.molgenis.api.ejprd.model.DataResponse;
+import org.molgenis.api.ejprd.model.ResourceRequest;
 import org.molgenis.api.ejprd.model.ResourceResponse;
 import org.molgenis.api.support.PageUtils;
 import org.molgenis.data.DataService;
@@ -33,23 +34,16 @@ public class InternalResourceQueryService implements ResourceQueryService {
   }
 
   @Override
-  public <T> T query(
-      List<String> orphaCode,
-      List<String> resourceType,
-      List<String> country,
-      String diseaseName,
-      Integer skip,
-      Integer limit) {
+  public <T> T query(ResourceRequest queryParam) {
 
     QueryBuilder queryBuilder =
         packageMappingServiceFactory
             .getQueryBuilder(dataService)
-            .setDiseaseCode(orphaCode)
-            .setDiseaseName(diseaseName)
-            .setResourceType(resourceType)
-            .setCountry(country)
-            .setPageSize(limit)
-            .setOffset(skip * limit);
+            .setDiseaseCode(queryParam.getOrphaCode())
+            .setResourceType(queryParam.getResourceType())
+            .setCountry(queryParam.getCountry())
+            .setPageSize(queryParam.getLimit())
+            .setOffset(queryParam.getSkip() * queryParam.getLimit());
 
     // if type is not null, we have to perform a Lookup on the Biobanks entity and retrieve
     // the list of all the entities matching that type
@@ -62,7 +56,11 @@ public class InternalResourceQueryService implements ResourceQueryService {
     return (T)
         DataResponse.builder()
             .setApiVersion(apiVersion)
-            .setPage(PageUtils.getPageResponse(limit, limit * skip, totalCount))
+            .setPage(
+                PageUtils.getPageResponse(
+                    queryParam.getLimit(),
+                    queryParam.getLimit() * queryParam.getSkip(),
+                    totalCount))
             .setResourceResponses(resources)
             .build();
   }

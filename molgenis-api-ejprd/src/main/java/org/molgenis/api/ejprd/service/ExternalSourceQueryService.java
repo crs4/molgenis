@@ -1,8 +1,8 @@
 package org.molgenis.api.ejprd.service;
 
-import java.util.List;
 import org.molgenis.api.ejprd.model.DataResponse;
 import org.molgenis.api.ejprd.model.ErrorResponse;
+import org.molgenis.api.ejprd.model.ResourceRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -30,26 +30,25 @@ public class ExternalSourceQueryService implements ResourceQueryService {
   }
 
   @Override
-  public <T> T query(
-      List<String> orphaCode,
-      List<String> resourceType,
-      List<String> country,
-      String diseaseName,
-      Integer skip,
-      Integer limit) {
-    String orphacCodeParameter = String.format("orphaCode=%s", String.join(",", orphaCode));
+  public <T> T query(ResourceRequest queryParam) {
+    String orphacCodeParameter =
+        String.format("orphaCode=%s", String.join(",", queryParam.getOrphaCode()));
     String typeParameter =
-        resourceType != null
-            ? String.format("resourceType=%s", String.join(",", resourceType))
+        queryParam.getResourceType() != null
+            ? String.format("resourceType=%s", String.join(",", queryParam.getResourceType()))
             : "";
-    String skipParameter = skip != null ? String.format("skip=%d", skip) : "";
-    String limitParameter = limit != null ? String.format("limit=%d", limit) : "";
+    String skipParameter =
+        queryParam.getSkip() != null ? String.format("skip=%d", queryParam.getSkip()) : "";
+    String limitParameter =
+        queryParam.getLimit() != null ? String.format("limit=%d", queryParam.getLimit()) : "";
     String queryParameters =
         String.join("&", orphacCodeParameter, typeParameter, skipParameter, limitParameter);
     UriComponentsBuilder builder =
         UriComponentsBuilder.fromHttpUrl(String.format("%s?%s", serviceBaseURL, queryParameters));
     LOG.debug(String.format("Querying external source: %s", builder.toUriString()));
     ResponseEntity<String> response;
+    LOG.debug(String.format(builder.toUriString(), String.class));
+    String s = builder.toUriString();
     try {
       response = restTemplate.getForEntity(builder.toUriString(), String.class);
     } catch (ResourceAccessException ex) {

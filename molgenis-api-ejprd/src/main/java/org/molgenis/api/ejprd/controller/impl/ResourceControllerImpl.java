@@ -9,8 +9,8 @@ import org.molgenis.api.ApiNamespace;
 import org.molgenis.api.ejprd.controller.ResourceController;
 import org.molgenis.api.ejprd.model.CatalogInfoResponse;
 import org.molgenis.api.ejprd.model.DataResponse;
+import org.molgenis.api.ejprd.model.InternalResourceRequest;
 import org.molgenis.api.ejprd.model.Organisation;
-import org.molgenis.api.ejprd.model.ResourceRequest;
 import org.molgenis.api.ejprd.service.InternalResourceQueryService;
 import org.molgenis.security.core.runas.RunAsSystem;
 import org.slf4j.Logger;
@@ -64,7 +64,7 @@ public class ResourceControllerImpl implements ResourceController {
   @GetMapping("/resource/search")
   @ResponseBody
   @RunAsSystem
-  public DataResponse getResourceRequest(@Valid ResourceRequest resourceRequest) {
+  public DataResponse getResourceRequest(@Valid InternalResourceRequest resourceRequest) {
     LOG.info("Received query request: {}", resourceRequest);
     return resourceQueryService.query(resourceRequest);
   }

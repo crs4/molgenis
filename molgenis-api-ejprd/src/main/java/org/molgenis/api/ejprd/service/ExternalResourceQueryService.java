@@ -1,7 +1,11 @@
 package org.molgenis.api.ejprd.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.molgenis.api.ejprd.model.DataResponse;
 import org.molgenis.api.ejprd.model.ErrorResponse;
+import org.molgenis.api.ejprd.model.ExternalResourceRequest;
 import org.molgenis.api.ejprd.model.ResourceRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,36 +35,39 @@ public class ExternalResourceQueryService implements ResourceQueryService {
 
   @Override
   public <T> T query(ResourceRequest queryParam) {
-    String orphacCodeParameter =
-        String.format("orphaCode=%s", String.join(",", queryParam.getOrphaCode()));
-    String typeParameter =
-        queryParam.getResourceType() != null
-            ? String.format("resourceType=%s", String.join(",", queryParam.getResourceType()))
-            : "";
-    String countryParameter =
-        queryParam.getCountry() != null
-            ? String.format("country=%s", String.join(",", queryParam.getCountry()))
-            : "";
-    String skipParameter =
-        queryParam.getSkip() != null ? String.format("skip=%d", queryParam.getSkip()) : "";
-    String limitParameter =
-        queryParam.getLimit() != null ? String.format("limit=%d", queryParam.getLimit()) : "";
-    String queryParameters =
-        String.join(
-            "&",
-            orphacCodeParameter,
-            typeParameter,
-            countryParameter,
-            skipParameter,
-            limitParameter);
+    ExternalResourceRequest externalQueryParam = (ExternalResourceRequest) queryParam;
+    List<String> orphaCode =
+        externalQueryParam.getDiagnosisAvailable().stream()
+            .filter(da -> da.contains("ORPHA:"))
+            .map(da -> da.replace("ORPHA:", ""))
+            .collect(Collectors.toList());
+
+    List<String> httpQueryParameters = new ArrayList<>();
+    httpQueryParameters.add(String.format("orphaCode=%s", String.join(",", orphaCode)));
+
+    if (queryParam.getResourceType() != null) {
+      httpQueryParameters.add(
+          String.format("resourceType=%s", String.join(",", queryParam.getResourceType())));
+    }
+    if (queryParam.getCountry() != null) {
+      httpQueryParameters.add(
+          String.format("country=%s", String.join(",", queryParam.getCountry())));
+    }
+    if (queryParam.getSkip() != null) {
+      httpQueryParameters.add(String.format("skip=%d", queryParam.getSkip()));
+    }
+    if (queryParam.getLimit() != null) {
+      httpQueryParameters.add(String.format("limit=%d", queryParam.getLimit()));
+    }
+
+    String queryParameters = String.join("&", httpQueryParameters);
 
     UriComponentsBuilder builder =
         UriComponentsBuilder.fromHttpUrl(String.format("%s?%s", serviceBaseURL, queryParameters));
 
     LOG.debug(String.format("Querying external source: %s", builder.toUriString()));
     ResponseEntity<String> response;
-    LOG.debug(String.format(builder.toUriString(), String.class));
-    String s = builder.toUriString();
+
     try {
       response = restTemplate.getForEntity(builder.toUriString(), String.class);
     } catch (ResourceAccessException ex) {

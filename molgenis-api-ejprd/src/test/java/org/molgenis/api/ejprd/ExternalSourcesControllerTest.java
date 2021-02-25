@@ -54,8 +54,7 @@ public class ExternalSourcesControllerTest extends AbstractMockitoSpringContextT
 
   @BeforeEach
   void beforeMethod() {
-    ExternalSourcesController controller =
-        new ExternalSourcesController(dataService, queryService);
+    ExternalSourcesController controller = new ExternalSourcesController(dataService, queryService);
 
     mockMvc =
         MockMvcBuilders.standaloneSetup(controller)
@@ -69,7 +68,10 @@ public class ExternalSourcesControllerTest extends AbstractMockitoSpringContextT
         .perform(
             MockMvcRequestBuilders.get(
                 String.format(
-                    "%sEXT_1?diagnosisAvailable=ORPHA:63&resourceType=BiobankDataset,PatientRegistryDataset&skip=0&limit=5",
+                    "%sEXT_1?diagnosisAvailable=ORPHA:63&"
+                        + "resourceType=BiobankDataset,PatientRegistryDataset"
+                        + "&country=IT"
+                        + "&skip=0&limit=5",
                     BASE_API_URL)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.name", is("External source 1")))
@@ -169,6 +171,7 @@ public class ExternalSourcesControllerTest extends AbstractMockitoSpringContextT
       ExternalResourceRequest request = new ExternalResourceRequest();
       request.setDiagnosisAvailable(Collections.singletonList("ORPHA:63"));
       request.setResourceType(resourceType);
+      request.setCountry(Collections.singletonList("IT"));
       request.setLimit(5);
       request.setSkip(0);
 

@@ -5,15 +5,9 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 
 public class ResourceRequest {
-
-  // At the moment ORPHA code is expected; TODO: implement lookup in case of IDC10 code
-  @NotEmpty(message = "OrphaCode is mandatory")
-  private List<String> orphaCode;
 
   private String name;
 
@@ -33,17 +27,7 @@ public class ResourceRequest {
   @Min(value = 1, message = "Limit should be at least 1")
   private Integer limit = 100;
 
-  private boolean queryEmpty;
-
   private boolean validOffset;
-
-  public List<String> getOrphaCode() {
-    return orphaCode;
-  }
-
-  public void setOrphaCode(@NotBlank List<String> orphaCode) {
-    this.orphaCode = orphaCode;
-  }
 
   public String getName() {
     return name;
@@ -105,10 +89,7 @@ public class ResourceRequest {
       return false;
     }
     ResourceRequest that = (ResourceRequest) o;
-    return queryEmpty == that.queryEmpty
-        && isValidOffset() == that.isValidOffset()
-        && Objects.equals(getOrphaCode(), that.getOrphaCode())
-        && Objects.equals(getName(), that.getName())
+    return Objects.equals(getName(), that.getName())
         && Objects.equals(getResourceType(), that.getResourceType())
         && Objects.equals(getCountry(), that.getCountry())
         && Objects.equals(getSkip(), that.getSkip())
@@ -118,13 +99,6 @@ public class ResourceRequest {
   @Override
   public int hashCode() {
     return Objects.hash(
-        getOrphaCode(),
-        getName(),
-        getResourceType(),
-        getCountry(),
-        getSkip(),
-        getLimit(),
-        queryEmpty,
-        isValidOffset());
+        getName(), getResourceType(), getCountry(), getSkip(), getLimit(), isValidOffset());
   }
 }

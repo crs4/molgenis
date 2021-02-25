@@ -72,7 +72,7 @@ public class ExternalResourceQueryServiceTest {
     resourceType.add("PatientRegistryDataset");
 
     ExternalResourceRequest request = new ExternalResourceRequest();
-    request.setOrphaCode(Collections.singletonList("63"));
+    request.setDiagnosisAvailable(Collections.singletonList("ORPHA:63"));
     request.setCountry(Collections.singletonList("IT"));
     request.setResourceType(resourceType);
 
@@ -95,7 +95,7 @@ public class ExternalResourceQueryServiceTest {
     service.setServiceBaseURL("http://mock.it/resource/search");
     service.setRestTemplate(restTemplate);
     ExternalResourceRequest request = new ExternalResourceRequest();
-    request.setOrphaCode(Collections.singletonList(""));
+    request.setDiagnosisAvailable(Collections.singletonList(""));
     ErrorResponse errorResponse = service.query(request);
     assertEquals(errorResponse.getCode(), 400);
     assertEquals(errorResponse.getMessage(), "Bad Request: missing orphaCode parameter");
@@ -116,7 +116,7 @@ public class ExternalResourceQueryServiceTest {
     service.setRestTemplate(restTemplate);
 
     ExternalResourceRequest request = new ExternalResourceRequest();
-    request.setOrphaCode(Collections.singletonList("63"));
+    request.setDiagnosisAvailable(Collections.singletonList("ORPHA:63"));
 
     ErrorResponse errorResponse = service.query(request);
     assertEquals(errorResponse.getCode(), 404);

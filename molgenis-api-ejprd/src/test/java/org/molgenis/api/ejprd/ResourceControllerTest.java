@@ -39,7 +39,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @WebAppConfiguration
 @ContextConfiguration(classes = {GsonConfig.class})
-class ResourceControllerControllerTest extends AbstractMockitoSpringContextTests {
+class ResourceControllerTest extends AbstractMockitoSpringContextTests {
 
   private static final String EJPRD_BIOBANK_TYPE = "BiobankDataset";
   private static final String EJPRD_REGISTRY_TYPE = "PatientRegistryDataset";

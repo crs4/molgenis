@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.molgenis.api.ejprd.model.DataResponse;
+import org.molgenis.api.ejprd.model.InternalResourceRequest;
 import org.molgenis.api.ejprd.model.ResourceRequest;
 import org.molgenis.api.ejprd.model.ResourceResponse;
 import org.molgenis.api.support.PageUtils;
@@ -35,15 +36,15 @@ public class InternalResourceQueryService implements ResourceQueryService {
 
   @Override
   public <T> T query(ResourceRequest queryParam) {
-
+    InternalResourceRequest internalQueryParam = (InternalResourceRequest) queryParam;
     QueryBuilder queryBuilder =
         packageMappingServiceFactory
             .getQueryBuilder(dataService)
-            .setDiseaseCode(queryParam.getOrphaCode())
-            .setResourceType(queryParam.getResourceType())
-            .setCountry(queryParam.getCountry())
-            .setPageSize(queryParam.getLimit())
-            .setOffset(queryParam.getSkip() * queryParam.getLimit());
+            .setDiseaseCode(internalQueryParam.getOrphaCode())
+            .setResourceType(internalQueryParam.getResourceType())
+            .setCountry(internalQueryParam.getCountry())
+            .setPageSize(internalQueryParam.getLimit())
+            .setOffset(internalQueryParam.getSkip() * internalQueryParam.getLimit());
 
     // if type is not null, we have to perform a Lookup on the Biobanks entity and retrieve
     // the list of all the entities matching that type

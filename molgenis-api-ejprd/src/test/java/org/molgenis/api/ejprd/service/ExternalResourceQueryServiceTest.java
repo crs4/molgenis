@@ -1,6 +1,7 @@
 package org.molgenis.api.ejprd.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,7 +12,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.molgenis.api.ejprd.model.DataResponse;
-import org.molgenis.api.ejprd.model.ErrorResponse;
 import org.molgenis.api.ejprd.model.ExternalResourceRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -94,11 +94,11 @@ public class ExternalResourceQueryServiceTest {
     ExternalResourceQueryService service = new ExternalResourceQueryService();
     service.setServiceBaseURL("http://mock.it/resource/search");
     service.setRestTemplate(restTemplate);
+
     ExternalResourceRequest request = new ExternalResourceRequest();
     request.setDiagnosisAvailable(Collections.singletonList(""));
-    ErrorResponse errorResponse = service.query(request);
-    assertEquals(errorResponse.getCode(), 400);
-    assertEquals(errorResponse.getMessage(), "Bad Request: missing orphaCode parameter");
+
+    assertNull(service.query(request));
   }
 
   @Test
@@ -118,8 +118,6 @@ public class ExternalResourceQueryServiceTest {
     ExternalResourceRequest request = new ExternalResourceRequest();
     request.setDiagnosisAvailable(Collections.singletonList("ORPHA:63"));
 
-    ErrorResponse errorResponse = service.query(request);
-    assertEquals(errorResponse.getCode(), 404);
-    assertEquals(errorResponse.getMessage(), "The requested resource cannot be found");
+    assertNull(service.query(request));
   }
 }

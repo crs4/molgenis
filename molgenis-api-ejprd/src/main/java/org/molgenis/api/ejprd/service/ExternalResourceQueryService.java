@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.molgenis.api.ejprd.model.DataResponse;
-import org.molgenis.api.ejprd.model.ErrorResponse;
 import org.molgenis.api.ejprd.model.ExternalResourceRequest;
 import org.molgenis.api.ejprd.model.ResourceRequest;
 import org.slf4j.Logger;
@@ -34,7 +33,7 @@ public class ExternalResourceQueryService implements ResourceQueryService {
   }
 
   @Override
-  public <T> T query(ResourceRequest queryParam) {
+  public DataResponse query(ResourceRequest queryParam) {
     ExternalResourceRequest externalQueryParam = (ExternalResourceRequest) queryParam;
     List<String> orphaCode =
         externalQueryParam.getDiagnosisAvailable().stream()
@@ -76,9 +75,9 @@ public class ExternalResourceQueryService implements ResourceQueryService {
 
     // TODO: handle NullPointerException in case response.getBody() is malformed
     if (response.getStatusCode().equals(HttpStatus.OK)) {
-      return (T) DataResponse.fromJson(response.getBody());
+      return DataResponse.fromJson(response.getBody());
     }
-    return (T) ErrorResponse.fromJson(response.getBody());
+    return null;
   }
 
   @Override

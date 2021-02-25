@@ -35,7 +35,7 @@ public class InternalResourceQueryService implements ResourceQueryService {
   }
 
   @Override
-  public <T> T query(ResourceRequest queryParam) {
+  public DataResponse query(ResourceRequest queryParam) {
     InternalResourceRequest internalQueryParam = (InternalResourceRequest) queryParam;
     QueryBuilder queryBuilder =
         packageMappingServiceFactory
@@ -54,16 +54,13 @@ public class InternalResourceQueryService implements ResourceQueryService {
 
     List<ResourceResponse> resources = mapEntity(entities);
 
-    return (T)
-        DataResponse.builder()
-            .setApiVersion(apiVersion)
-            .setPage(
-                PageUtils.getPageResponse(
-                    queryParam.getLimit(),
-                    queryParam.getLimit() * queryParam.getSkip(),
-                    totalCount))
-            .setResourceResponses(resources)
-            .build();
+    return DataResponse.builder()
+        .setApiVersion(apiVersion)
+        .setPage(
+            PageUtils.getPageResponse(
+                queryParam.getLimit(), queryParam.getLimit() * queryParam.getSkip(), totalCount))
+        .setResourceResponses(resources)
+        .build();
   }
 
   @Override

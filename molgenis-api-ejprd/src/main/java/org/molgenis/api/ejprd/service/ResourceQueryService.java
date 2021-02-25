@@ -5,7 +5,7 @@ import org.molgenis.api.ejprd.model.ResourceRequest;
 
 public interface ResourceQueryService {
 
-  <T> T query(ResourceRequest queryParam);
+  DataResponse query(ResourceRequest queryParam);
 
   DataResponse getById(String resourceId);
 }

@@ -13,7 +13,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.molgenis.api.ejprd.ExternalSourcesControllerTest.Config;
-import org.molgenis.api.ejprd.controller.ExternalSourcesController;
+import org.molgenis.api.ejprd.controller.impl.ExternalSourcesControllerImpl;
 import org.molgenis.api.ejprd.model.DataResponse;
 import org.molgenis.api.ejprd.model.ErrorResponse;
 import org.molgenis.api.ejprd.model.ExternalResourceRequest;
@@ -54,7 +54,8 @@ public class ExternalSourcesControllerTest extends AbstractMockitoSpringContextT
 
   @BeforeEach
   void beforeMethod() {
-    ExternalSourcesController controller = new ExternalSourcesController(dataService, queryService);
+    ExternalSourcesControllerImpl controller =
+        new ExternalSourcesControllerImpl(dataService, queryService);
 
     mockMvc =
         MockMvcBuilders.standaloneSetup(controller)

@@ -2,6 +2,7 @@ package org.molgenis.api.ejprd.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,10 +12,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.molgenis.api.ejprd.exceptions.ExternalSourceErrorException;
 import org.molgenis.api.ejprd.model.DataResponse;
 import org.molgenis.api.ejprd.model.ExternalResourceRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -82,14 +85,10 @@ public class ExternalResourceQueryServiceTest {
 
   @Test
   public void testExternalQueryServiceMissingMandatoryParam() {
-
-    String errorResponseJson =
-        "{" + "\"code\": 400 ," + "\"message\": \"Bad Request: missing orphaCode parameter\"" + "}";
-
     Mockito.when(
             restTemplate.getForEntity(
                 "http://mock.it/resource/search?orphaCode=&skip=0&limit=100", String.class))
-        .thenReturn(new ResponseEntity<>(errorResponseJson, HttpStatus.BAD_REQUEST));
+        .thenThrow(HttpClientErrorException.class);
 
     ExternalResourceQueryService service = new ExternalResourceQueryService();
     service.setServiceBaseURL("http://mock.it/resource/search");
@@ -98,7 +97,7 @@ public class ExternalResourceQueryServiceTest {
     ExternalResourceRequest request = new ExternalResourceRequest();
     request.setDiagnosisAvailable(Collections.singletonList(""));
 
-    assertNull(service.query(request));
+    assertThrows(ExternalSourceErrorException.class, () -> service.query(request));
   }
 
   @Test

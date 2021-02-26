@@ -1,7 +1,6 @@
 package org.molgenis.api.ejprd.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
@@ -117,6 +116,6 @@ public class ExternalResourceQueryServiceTest {
     ExternalResourceRequest request = new ExternalResourceRequest();
     request.setDiagnosisAvailable(Collections.singletonList("ORPHA:63"));
 
-    assertNull(service.query(request));
+    assertThrows(ExternalSourceErrorException.class, () -> service.query(request));
   }
 }

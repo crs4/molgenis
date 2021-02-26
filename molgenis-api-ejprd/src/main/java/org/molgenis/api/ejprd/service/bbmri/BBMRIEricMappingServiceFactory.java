@@ -13,22 +13,8 @@ public class BBMRIEricMappingServiceFactory extends PackageMappingServiceFactory
   }
 
   @Override
-  public QueryBuilder getQueryBuilder() {
-    return null;
-  }
-
-  @Override
   public ResourceMapper getResourceMapper() {
     return new BBMRIEricResourceMapper();
-  }
-
-  @Override
-  public String getEntityTypeId() {
-    return "eu_bbmri_eric_collections";
-  }
-
-  public String getBiobankEntity() {
-    return "eu_bbmri_eric_biobanks";
   }
 
   @Override

@@ -7,5 +7,5 @@ public interface ResourceQueryService {
 
   DataResponse query(ResourceRequest queryParam);
 
-  DataResponse getById(String resourceId);
+  //  DataResponse getById(String resourceId);
 }

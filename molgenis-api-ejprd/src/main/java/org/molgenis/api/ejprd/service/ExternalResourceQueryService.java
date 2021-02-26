@@ -3,6 +3,7 @@ package org.molgenis.api.ejprd.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.molgenis.api.ejprd.exceptions.ExternalSourceErrorException;
 import org.molgenis.api.ejprd.model.DataResponse;
 import org.molgenis.api.ejprd.model.ExternalResourceRequest;
 import org.molgenis.api.ejprd.model.ResourceRequest;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -69,15 +71,17 @@ public class ExternalResourceQueryService implements ResourceQueryService {
 
     try {
       response = restTemplate.getForEntity(builder.toUriString(), String.class);
-    } catch (ResourceAccessException ex) {
-      return null;
+    } catch (ResourceAccessException | HttpClientErrorException ex) {
+      throw new ExternalSourceErrorException();
     }
 
     // TODO: handle NullPointerException in case response.getBody() is malformed
+    LOG.debug("Resource returned code {}", response.getStatusCode());
     if (response.getStatusCode().equals(HttpStatus.OK)) {
       return DataResponse.fromJson(response.getBody());
+    } else {
+      throw new ExternalSourceErrorException();
     }
-    return null;
   }
 
   @Override

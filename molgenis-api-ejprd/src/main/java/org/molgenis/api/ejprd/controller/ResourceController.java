@@ -43,7 +43,6 @@ public interface ResourceController {
                 "Forbidden (e.g. the resource is protected for all users or the user is authenticated but s/he is not granted for this resource)",
             response = ErrorResponse.class),
         @ApiResponse(code = 404, message = "not found", response = ErrorResponse.class),
-        @ApiResponse(code = 200, message = "unexpected error", response = ErrorResponse.class)
       })
   @RequestMapping(
       value = "/resource",

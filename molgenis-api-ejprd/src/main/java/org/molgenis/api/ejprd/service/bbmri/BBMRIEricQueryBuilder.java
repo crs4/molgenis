@@ -23,6 +23,8 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
   private static final String EJPRD_PATIENT_REGISTRY_DATASET_TYPE_NAME = "PatientRegistryDataset";
   private static final String BBMRI_BIOBANK_DATASET_TYPE_NAME = "BIOBANK";
   private static final String BBMRI_PATIENT_REGISTRY_DATASET_TYPE_NAME = "REGISTRY";
+
+  private static final String COLLECTION_ENTITY_ID = "eu_bbmri_eric_collections";
   private static final String BIOBANK_ENTITY_ID = "eu_bbmri_eric_biobanks";
 
   private final DataService dataService;
@@ -52,13 +54,13 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
     return null;
   }
 
-  private List<String> getBiobankResources(DataService dataService, List<String> resourceType) {
+  private List<String> getBiobankResources(List<String> resourceType) {
 
-    Query<Entity> q = new QueryImpl<>();
+    Query<Entity> q = new QueryImpl<>(dataService, BIOBANK_ENTITY_ID);
     resourceType =
         resourceType.stream().map(this::transcodeResourceType).collect(Collectors.toList());
     q.in("ressource_types", resourceType);
-    Stream<Entity> entities = dataService.findAll(BIOBANK_ENTITY_ID, q);
+    Stream<Entity> entities = q.findAll();
     List<String> biobankResources = new ArrayList<>();
     entities.forEach(
         entity -> {
@@ -71,7 +73,7 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
   private Query<Entity> getBaseQuery() {
     List<String> diseaseCode = getDiseaseCode();
 
-    Query<Entity> q = new QueryImpl<>();
+    Query<Entity> q = new QueryImpl<>(dataService, COLLECTION_ENTITY_ID);
     diseaseCode =
         diseaseCode.stream().map(dc -> String.format("ORPHA:%s", dc)).collect(Collectors.toList());
     LOG.info("Querying for orphacodes: {}", String.join(",", diseaseCode));
@@ -80,7 +82,7 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
     if (anyOptionalParameter()) {
       if (getResourceType() != null) {
         if (biobankResources == null) {
-          biobankResources = getBiobankResources(dataService, getResourceType());
+          biobankResources = getBiobankResources(getResourceType());
         }
         q.and();
         q.in("biobank", biobankResources);

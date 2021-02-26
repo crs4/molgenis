@@ -20,6 +20,12 @@
       <scope>compile</scope>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <artifactId>molgenis-api-data</artifactId>
+      <groupId>org.molgenis</groupId>
+      <scope>compile</scope>
+      <version>${project.version}</version>
+    </dependency>
     <!-- test dependencies -->
     <dependency>
       <artifactId>molgenis-data</artifactId>

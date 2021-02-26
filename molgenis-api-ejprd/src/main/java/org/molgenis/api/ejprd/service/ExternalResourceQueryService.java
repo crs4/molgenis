@@ -84,8 +84,8 @@ public class ExternalResourceQueryService implements ResourceQueryService {
     }
   }
 
-  @Override
-  public DataResponse getById(String resourceId) {
-    return null;
-  }
+  //  @Override
+  //  public DataResponse getById(String resourceId) {
+  //    return null;
+  //  }
 }

@@ -9,13 +9,9 @@ public abstract class PackageMappingServiceFactory {
     return new BBMRIEricMappingServiceFactory();
   }
 
-  public abstract QueryBuilder getQueryBuilder();
-
   public abstract QueryBuilder getQueryBuilder(DataService dataService);
 
   public abstract ResourceMapper getResourceMapper();
-
-  public abstract String getEntityTypeId();
 
   public abstract String getExternalSourcesEntityTypeId();
 }

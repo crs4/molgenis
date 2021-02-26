@@ -50,11 +50,8 @@ public class ExternalSourcesControllerImpl implements ExternalSourcesController 
     this.queryService = requireNonNull(queryService);
   }
 
-  private static UriComponentsBuilder getBaseUri() {
-    return ServletUriComponentsBuilder.fromCurrentContextPath().path(BASE_URI);
-  }
-
   private Entity findExternalSourceById(String sourceId) {
+    // TODO: consider moving external sources in a EJPRD package
     return dataService.findOneById(
         packageMappingServiceFactory.getExternalSourcesEntityTypeId(), sourceId);
   }

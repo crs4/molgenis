@@ -9,16 +9,27 @@ import org.molgenis.api.ApiNamespace;
 import org.molgenis.api.ejprd.controller.ResourceController;
 import org.molgenis.api.ejprd.model.CatalogInfoResponse;
 import org.molgenis.api.ejprd.model.DataResponse;
+import org.molgenis.api.ejprd.model.ErrorResponse;
 import org.molgenis.api.ejprd.model.InternalResourceRequest;
 import org.molgenis.api.ejprd.model.Organisation;
 import org.molgenis.api.ejprd.service.InternalResourceQueryService;
 import org.molgenis.security.core.runas.RunAsSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.TypeMismatchException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.ServletRequestBindingException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 @Controller
 @RequestMapping(ResourceControllerImpl.BASE_URI)
@@ -75,4 +86,18 @@ public class ResourceControllerImpl implements ResourceController {
   //    LOG.info("Received get request: for resource {}", resourceId);
   //    return resourceQueryService.getById(resourceId);
   //  }
+
+  @ExceptionHandler({
+    MissingServletRequestParameterException.class,
+    ServletRequestBindingException.class,
+    TypeMismatchException.class,
+    HttpMessageNotReadableException.class,
+    MethodArgumentNotValidException.class,
+    MissingServletRequestPartException.class,
+    BindException.class
+  })
+  public ResponseEntity<ErrorResponse> exceptionHandler() {
+    ErrorResponse errorResponse = ErrorResponse.create(400, "Invalid request parameter(s)");
+    return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+  }
 }

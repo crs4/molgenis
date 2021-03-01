@@ -25,17 +25,17 @@ public class EJPRDResponseExceptionHandler extends ResponseEntityExceptionHandle
     return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
-  //  @Override
-  //  protected ResponseEntity<Object> handleExceptionInternal(
-  //      Exception ex,
-  //      @Nullable Object body,
-  //      HttpHeaders headers,
-  //      HttpStatus status,
-  //      WebRequest request) {
-  //    if (HttpStatus.BAD_REQUEST.equals(status)) {
-  //      ErrorResponse errorResponse = ErrorResponse.create(400, "Invalid request parameter(s)");
-  //      return new ResponseEntity<>(errorResponse, headers, HttpStatus.BAD_REQUEST);
+  //    @Override
+  //    protected ResponseEntity<Object> handleExceptionInternal(
+  //        Exception ex,
+  //        @Nullable Object body,
+  //        HttpHeaders headers,
+  //        HttpStatus status,
+  //        WebRequest request) {
+  //      if (HttpStatus.BAD_REQUEST.equals(status)) {
+  //        ErrorResponse errorResponse = ErrorResponse.create(400, "Invalid request parameter(s)");
+  //        return new ResponseEntity<>(errorResponse, headers, HttpStatus.BAD_REQUEST);
+  //      }
+  //      return super.handleExceptionInternal(ex, body, headers, status, request);
   //    }
-  //    return super.handleExceptionInternal(ex, body, headers, status, request);
-  //  }
 }

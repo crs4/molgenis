@@ -88,6 +88,10 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
           query.and();
           query.in("country", getCountry());
         }
+        if (getName() != null) {
+          query.and();
+          query.search("name", getName());
+        }
       }
       query.unnest();
     }
@@ -95,6 +99,6 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
   }
 
   private boolean anyOptionalParameter() {
-    return getResourceType() != null || getCountry() != null;
+    return getResourceType() != null || getCountry() != null || getName() != null;
   }
 }

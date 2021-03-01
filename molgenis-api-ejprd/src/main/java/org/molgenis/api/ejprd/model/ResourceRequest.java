@@ -9,7 +9,7 @@ import javax.validation.constraints.Pattern;
 
 public class ResourceRequest {
 
-  private String name;
+  @Nullable private String name;
 
   @Nullable
   private List<
@@ -29,11 +29,12 @@ public class ResourceRequest {
 
   private boolean validOffset;
 
+  @Nullable
   public String getName() {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(@Nullable String name) {
     this.name = name;
   }
 

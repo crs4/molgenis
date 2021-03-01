@@ -180,6 +180,7 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
   private Query<Entity> getQuery(
       @Nullable List<String> resourceType,
       @Nullable List<String> country,
+      @Nullable String name,
       @Nullable Integer pageSize,
       @Nullable Integer offset) {
     Query<Entity> q = new QueryImpl<>();
@@ -211,14 +212,12 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
       q.and();
       q.in("country", Collections.singletonList("IT"));
     }
+    if (name != null) {
+      q.and();
+      q.search("name", name);
+    }
     q.unnest();
 
-    //    if (includeName) {
-    //      if (includeCode) {
-    //        q.or();
-    //      }
-    //      q.like("diagnosis_available.label", DISEASE_NAME);
-    //    }
     if (pageSize != null) {
       q.pageSize(pageSize);
     }
@@ -298,8 +297,8 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
   void testGetResourcesWithPaging() throws Exception {
     reset(dataService);
     int resultSize = 5;
-    Query<Entity> findalAllQuery = getQuery(null, null, 5, null);
-    Query<Entity> countQuery = getQuery(null, null, null, null);
+    Query<Entity> findalAllQuery = getQuery(null, null, null, 5, null);
+    Query<Entity> countQuery = getQuery(null, null, null, null, null);
     findalAllQuery.pageSize(5);
 
     List<Entity> entities = getMockData(5);
@@ -347,8 +346,8 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
   void testGetResourcesWithPagingSecondPage() throws Exception {
     reset(dataService);
     int resultSize = 5;
-    Query<Entity> findAllQuery = getQuery(null, null, 5, 5);
-    Query<Entity> countQuery = getQuery(null, null, null, null);
+    Query<Entity> findAllQuery = getQuery(null, null, null, 5, 5);
+    Query<Entity> countQuery = getQuery(null, null, null, null, null);
     findAllQuery.pageSize(5);
     findAllQuery.offset(5);
 
@@ -375,8 +374,8 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
     int resultSize = 1;
     List<Entity> entities = getMockData(1);
 
-    Query<Entity> findAllQuery = getQuery(null, null, 100, null);
-    Query<Entity> countQuery = getQuery(null, null, null, null);
+    Query<Entity> findAllQuery = getQuery(null, null, null, 100, null);
+    Query<Entity> countQuery = getQuery(null, null, null, null, null);
     when(dataService.count(COLLECTIONS_ENTITY_ID, countQuery)).thenReturn((long) resultSize);
     when(dataService.findAll(COLLECTIONS_ENTITY_ID, findAllQuery)).thenReturn(entities.stream());
 
@@ -391,55 +390,28 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
     checkPageData(resultActions, 100, resultSize, 1, 0);
   }
 
-  //  @Test
-  //  void testGetResourcesByName() throws Exception {
-  //    reset(dataService);
-  //    int resultSize = 10;
-  //    List<Entity> entities = getMockData(resultSize);
-  //
-  //    Query<Entity> findAllQuery = getQuery(false, true, 100, null);
-  //    Query<Entity> countQuery = getQuery(false, true, null, null);
-  //
-  //    when(dataService.count(ENTITY_ID, countQuery)).thenReturn((long) resultSize);
-  //    when(dataService.findAll(ENTITY_ID, findAllQuery)).thenReturn(entities.stream());
-  //
-  //    ResultActions resultActions =
-  //        this.mockMvc.perform(
-  //            get(URI.create(String.format("%s?name=%s", BASE_API_URL, DISEASE_NAME))));
-  //    resultActions.andExpect(status().isOk());
-  //
-  //    checkContentType(resultActions);
-  //    checkApiVersion(resultActions);
-  //    checkResultData(resultActions, resultSize);
-  //    checkPageData(resultActions, 100, resultSize, 1, 0);
-  //  }
+  @Test
+  void testGetResourcesByCodeAndName() throws Exception {
+    reset(dataService);
+    int resultSize = 10;
+    List<Entity> entities = getMockData(resultSize);
 
-  //  @Test
-  //  void testGetResourcesByCodeAndName() throws Exception {
-  //    reset(dataService);
-  //    int resultSize = 10;
-  //    List<Entity> entities = getMockData(resultSize);
-  //
-  //    Query<Entity> findAllQuery = getQuery(true, true, null, null, 100, null);
-  //    Query<Entity> countQuery = getQuery(true, true, null, null, null, null);
-  //
-  //    when(dataService.count(COLLECTIONS_ENTITY_ID, countQuery)).thenReturn((long) resultSize);
-  //    when(dataService.findAll(COLLECTIONS_ENTITY_ID,
-  // findAllQuery)).thenReturn(entities.stream());
-  //
-  //    ResultActions resultActions =
-  //        this.mockMvc.perform(
-  //            get(
-  //                URI.create(
-  //                    String.format(
-  //                        "%s?name=%s&orphaCode=%s", BASE_API_URL, DISEASE_NAME, ORPHA_CODE))));
-  //    resultActions.andExpect(status().isOk());
-  //
-  //    checkContentType(resultActions);
-  //    checkApiVersion(resultActions);
-  //    checkResultData(resultActions, resultSize);
-  //    checkPageData(resultActions, 100, resultSize, 1, 0);
-  //  }
+    Query<Entity> findAllQuery = getQuery(null, null, "Cell", 100, null);
+    Query<Entity> countQuery = getQuery(null, null, "Cell", null, null);
+
+    when(dataService.count(COLLECTIONS_ENTITY_ID, countQuery)).thenReturn((long) resultSize);
+    when(dataService.findAll(COLLECTIONS_ENTITY_ID, findAllQuery)).thenReturn(entities.stream());
+
+    ResultActions resultActions =
+        this.mockMvc.perform(
+            get(URI.create(String.format("%s?orphaCode=%s&name=Cell", BASE_API_URL, ORPHA_CODE))));
+    resultActions.andExpect(status().isOk());
+
+    checkContentType(resultActions);
+    checkApiVersion(resultActions);
+    checkResultData(resultActions, resultSize);
+    checkPageData(resultActions, 100, resultSize, 1, 0);
+  }
 
   @Test
   void testGetResourcesWithParamsWithoutValues() throws Exception {
@@ -458,9 +430,9 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
     List<Entity> biobankEntities = entities.get("biobanks_bb_type");
 
     Query<Entity> findAllQuery =
-        getQuery(Collections.singletonList(BBMRI_BIOBANK_TYPE), null, 100, null);
+        getQuery(Collections.singletonList(BBMRI_BIOBANK_TYPE), null, null, 100, null);
     Query<Entity> countQuery =
-        getQuery(Collections.singletonList(BBMRI_BIOBANK_TYPE), null, null, null);
+        getQuery(Collections.singletonList(BBMRI_BIOBANK_TYPE), null, null, null, null);
     Query<Entity> biobankTypeQuery =
         getBiobankLookupQuery(Collections.singletonList(BBMRI_BIOBANK_TYPE));
 
@@ -493,8 +465,8 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
     List<Entity> collectionEntities = entities.get("collections_bb_type");
     collectionEntities.addAll(entities.get("collections_reg_type"));
 
-    Query<Entity> findAllQuery = getQuery(null, null, 100, null);
-    Query<Entity> countQuery = getQuery(null, null, null, null);
+    Query<Entity> findAllQuery = getQuery(null, null, null, 100, null);
+    Query<Entity> countQuery = getQuery(null, null, null, null, null);
 
     lenient()
         .when(dataService.count(COLLECTIONS_ENTITY_ID, countQuery))
@@ -523,9 +495,9 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
     List<Entity> biobankEntities = entities.get("biobanks_reg_type");
 
     Query<Entity> findAllQuery =
-        getQuery(Collections.singletonList(BBMRI_REGISTRY_TYPE), null, 100, null);
+        getQuery(Collections.singletonList(BBMRI_REGISTRY_TYPE), null, null, 100, null);
     Query<Entity> countQuery =
-        getQuery(Collections.singletonList(BBMRI_REGISTRY_TYPE), null, null, null);
+        getQuery(Collections.singletonList(BBMRI_REGISTRY_TYPE), null, null, null, null);
     Query<Entity> biobankTypeQuery =
         getBiobankLookupQuery(Collections.singletonList(BBMRI_REGISTRY_TYPE));
 
@@ -569,8 +541,8 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
     HashMap<String, List<Entity>> entities = getMockResourcesSplittedData(resultSize);
     List<Entity> collectionEntities = entities.get("collections_reg_type");
 
-    Query<Entity> findAllQuery = getQuery(null, Collections.singletonList("IT"), 100, null);
-    Query<Entity> countQuery = getQuery(Collections.singletonList("IT"), null, null, null);
+    Query<Entity> findAllQuery = getQuery(null, Collections.singletonList("IT"), null, 100, null);
+    Query<Entity> countQuery = getQuery(Collections.singletonList("IT"), null, null, null, null);
 
     lenient()
         .when(dataService.count(COLLECTIONS_ENTITY_ID, countQuery))

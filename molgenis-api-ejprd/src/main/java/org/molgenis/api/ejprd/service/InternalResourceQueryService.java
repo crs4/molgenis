@@ -38,6 +38,7 @@ public class InternalResourceQueryService implements ResourceQueryService {
         packageMappingServiceFactory
             .getQueryBuilder(dataService)
             .setDiseaseCode(internalQueryParam.getOrphaCode())
+            .setName(internalQueryParam.getName())
             .setResourceType(internalQueryParam.getResourceType())
             .setCountry(internalQueryParam.getCountry())
             .setPageSize(internalQueryParam.getLimit())

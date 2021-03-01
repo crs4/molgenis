@@ -2,10 +2,9 @@ package org.molgenis.api.ejprd.service.bbmri;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.molgenis.api.ejprd.service.QueryBuilder;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
@@ -26,10 +25,11 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
 
   private static final String COLLECTION_ENTITY_ID = "eu_bbmri_eric_collections";
   private static final String BIOBANK_ENTITY_ID = "eu_bbmri_eric_biobanks";
+  private static final String[] RESOURCE_TYPES = {"BiobankDataset", "PatientRegistryDataset"};
 
   private final DataService dataService;
 
-  private List<String> biobankResources;
+  private Query<Entity> query;
 
   public BBMRIEricQueryBuilder(DataService dataService) {
     this.dataService = requireNonNull(dataService);
@@ -54,47 +54,44 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
     return null;
   }
 
-  private List<String> getBiobankResources(List<String> resourceType) {
+  private List<Entity> getBiobankResources(List<String> resourceType) {
+    List<String> transcodedResourceType =
+        resourceType.stream().map(this::transcodeResourceType).collect(Collectors.toList());
 
     Query<Entity> q = new QueryImpl<>(dataService, BIOBANK_ENTITY_ID);
-    resourceType =
-        resourceType.stream().map(this::transcodeResourceType).collect(Collectors.toList());
-    q.in("ressource_types", resourceType);
-    Stream<Entity> entities = q.findAll();
-    List<String> biobankResources = new ArrayList<>();
-    entities.forEach(
-        entity -> {
-          String biobankId = entity.getString("id");
-          biobankResources.add(biobankId);
-        });
-    return biobankResources;
+    q.in("ressource_types", transcodedResourceType);
+    return q.findAll().collect(Collectors.toList());
   }
 
   private Query<Entity> getBaseQuery() {
-    List<String> diseaseCode = getDiseaseCode();
+    if (this.query == null) {
 
-    Query<Entity> q = new QueryImpl<>(dataService, COLLECTION_ENTITY_ID);
-    diseaseCode =
-        diseaseCode.stream().map(dc -> String.format("ORPHA:%s", dc)).collect(Collectors.toList());
-    LOG.info("Querying for orphacodes: {}", String.join(",", diseaseCode));
-    q.nest();
-    q.in("diagnosis_available.code", diseaseCode);
-    if (anyOptionalParameter()) {
-      if (getResourceType() != null) {
-        if (biobankResources == null) {
-          biobankResources = getBiobankResources(getResourceType());
+      List<String> diseaseCode = getDiseaseCode();
+
+      query = new QueryImpl<>(dataService, COLLECTION_ENTITY_ID);
+      diseaseCode =
+          diseaseCode.stream()
+              .map(dc -> String.format("ORPHA:%s", dc))
+              .collect(Collectors.toList());
+      LOG.info("Querying for orphacodes: {}", String.join(",", diseaseCode));
+      query.nest();
+      query.in("diagnosis_available.code", diseaseCode);
+      if (anyOptionalParameter()) {
+        if (getResourceType() != null
+            && !getResourceType()
+                .containsAll(Arrays.stream(RESOURCE_TYPES).collect(Collectors.toList()))) {
+          List<Entity> biobankResources = getBiobankResources(getResourceType());
+          query.and();
+          query.in("biobank", biobankResources);
         }
-        q.and();
-        q.in("biobank", biobankResources);
+        if (getCountry() != null) {
+          query.and();
+          query.in("country", getCountry());
+        }
       }
-      if (getCountry() != null) {
-        q.and();
-        q.in("country", getCountry());
-      }
+      query.unnest();
     }
-    q.unnest();
-
-    return q;
+    return query;
   }
 
   private boolean anyOptionalParameter() {

@@ -1,9 +1,10 @@
 package org.molgenis.api.ejprd.service.bbmri;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import org.molgenis.api.ejprd.model.Location;
 import org.molgenis.api.ejprd.model.Organisation;
 import org.molgenis.api.ejprd.model.ResourceResponse;
-import org.molgenis.api.ejprd.service.InternalResourceQueryService;
 import org.molgenis.api.ejprd.service.ResourceMapper;
 import org.molgenis.data.Entity;
 import org.slf4j.Logger;
@@ -12,7 +13,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public class BBMRIEricResourceMapper implements ResourceMapper {
-  private static final Logger LOG = LoggerFactory.getLogger(InternalResourceQueryService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BBMRIEricResourceMapper.class);
 
   private static final String EJPRD_BIOBANK_TYPE = "BiobankDataset";
   private static final String EJPRD_REGISTRY_TYPE = "PatientRegistryDataset";
@@ -29,14 +30,14 @@ public class BBMRIEricResourceMapper implements ResourceMapper {
     String homepage =
         String.format( // TODO: the path should be dynamic
             "%s/menu/main/app-molgenis-app-biobank-explorer/collection/%s",
-            baseURL, entity.getString("id"));
+            baseURL, URLEncoder.encode(entity.getString("id"), StandardCharsets.UTF_8));
 
     String uuid = entity.getString("id");
     Entity biobank = (Entity) entity.get("biobank");
     Entity country = (Entity) entity.get("country");
     String name = String.format("%s - %s", biobank.getString("name"), entity.getString("name"));
     Entity ressourceType = (Entity) biobank.get("ressource_types");
-    LOG.debug(ressourceType.toString());
+
     String type =
         ressourceType.getString("id").equals(BBMRI_BIOBANK_TYPE)
             ? EJPRD_BIOBANK_TYPE

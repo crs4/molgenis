@@ -49,13 +49,13 @@ public class BBMRIEricResourceMapper implements ResourceMapper {
         uuid, type, name, description, homepage, mapOrganisation(biobank, mapLocation(country)));
   }
 
-  public Location mapLocation(Entity country) {
+  private Location mapLocation(Entity country) {
     String id = country.getString("id");
     String name = country.getString("name");
     return Location.create(id, name, null, null);
   }
 
-  public Organisation mapOrganisation(Entity biobank, Location location) {
+  private Organisation mapOrganisation(Entity biobank, Location location) {
     return Organisation.create(
         biobank.getString("juridical_person"),
         biobank.getString("juridical_person"),

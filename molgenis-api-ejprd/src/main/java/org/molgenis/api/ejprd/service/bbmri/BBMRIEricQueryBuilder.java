@@ -27,6 +27,9 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
   private static final String BIOBANK_ENTITY_ID = "eu_bbmri_eric_biobanks";
   private static final String[] RESOURCE_TYPES = {"BiobankDataset", "PatientRegistryDataset"};
 
+  private static final String ORPHA_CODE_EXACT_MATCHING_COLUMN = "orphanet_exact_matching";
+  private static final String ORPHA_CODE_LOOKUP_ENTITY = "eu_bbmri_eric_disease_types";
+
   private final DataService dataService;
 
   private Query<Entity> query;
@@ -42,7 +45,10 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
 
   @Override
   public Query<Entity> build() {
-    return getBaseQuery().pageSize(getPageSize()).offset(getOffset());
+    if (getBaseQuery() != null) {
+      return getBaseQuery().pageSize(getPageSize()).offset(getOffset());
+    }
+    return null;
   }
 
   private String transcodeResourceType(String resourceType) {
@@ -63,7 +69,15 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
     return q.findAll().collect(Collectors.toList());
   }
 
+  public List<Entity> getICD10ExactMatchByOrphaCode(List<String> orphaCodes) {
+    Query<Entity> q = new QueryImpl<>(dataService, ORPHA_CODE_LOOKUP_ENTITY);
+    q.in(ORPHA_CODE_EXACT_MATCHING_COLUMN, orphaCodes);
+    // Stream<Entity> entities = q.findAll();
+    return q.findAll().collect(Collectors.toList());
+  }
+
   private Query<Entity> getBaseQuery() {
+
     if (this.query == null) {
 
       List<String> diseaseCode = getDiseaseCode();
@@ -74,8 +88,13 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
               .map(dc -> String.format("ORPHA:%s", dc))
               .collect(Collectors.toList());
       LOG.info("Querying for orphacodes: {}", String.join(",", diseaseCode));
+      // Obtain matching ICD-10 codes from the service
+      List<Entity> matchingICD10Codes = getICD10ExactMatchByOrphaCode(diseaseCode);
+      if (matchingICD10Codes.isEmpty()) {
+        return query;
+      }
       query.nest();
-      query.in("diagnosis_available.code", diseaseCode);
+      query.in("diagnosis_available.id", matchingICD10Codes);
       if (anyOptionalParameter()) {
         if (getResourceType() != null
             && !getResourceType()
@@ -93,6 +112,7 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
           query.search("name", getName());
         }
       }
+
       query.unnest();
     }
     return query;

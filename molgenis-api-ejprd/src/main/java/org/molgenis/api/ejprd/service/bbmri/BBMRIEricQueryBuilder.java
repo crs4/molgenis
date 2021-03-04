@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.molgenis.api.ejprd.externalServices.OrphaCodeLookupService;
 import org.molgenis.api.ejprd.service.QueryBuilder;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
@@ -42,7 +43,10 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
 
   @Override
   public Query<Entity> build() {
-    return getBaseQuery().pageSize(getPageSize()).offset(getOffset());
+    if (getBaseQuery() != null) {
+      return getBaseQuery().pageSize(getPageSize()).offset(getOffset());
+    }
+    return null;
   }
 
   private String transcodeResourceType(String resourceType) {
@@ -64,6 +68,7 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
   }
 
   private Query<Entity> getBaseQuery() {
+
     if (this.query == null) {
 
       List<String> diseaseCode = getDiseaseCode();
@@ -74,8 +79,14 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
               .map(dc -> String.format("ORPHA:%s", dc))
               .collect(Collectors.toList());
       LOG.info("Querying for orphacodes: {}", String.join(",", diseaseCode));
+      // Obtain matching ICD-10 codes from the service
+      OrphaCodeLookupService s = new OrphaCodeLookupService(dataService);
+      List<Entity> matchingICD10Codes = s.getICD10ExactMatchByOrphaCode(diseaseCode);
+      if (matchingICD10Codes.isEmpty()) {
+        return query;
+      }
       query.nest();
-      query.in("diagnosis_available.code", diseaseCode);
+      query.in("diagnosis_available.id", matchingICD10Codes);
       if (anyOptionalParameter()) {
         if (getResourceType() != null
             && !getResourceType()
@@ -93,6 +104,7 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
           query.search("name", getName());
         }
       }
+
       query.unnest();
     }
     return query;

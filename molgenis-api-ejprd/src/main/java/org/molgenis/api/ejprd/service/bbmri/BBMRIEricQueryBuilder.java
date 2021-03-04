@@ -5,7 +5,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.molgenis.api.ejprd.externalServices.OrphaCodeLookupService;
 import org.molgenis.api.ejprd.service.QueryBuilder;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
@@ -27,6 +26,9 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
   private static final String COLLECTION_ENTITY_ID = "eu_bbmri_eric_collections";
   private static final String BIOBANK_ENTITY_ID = "eu_bbmri_eric_biobanks";
   private static final String[] RESOURCE_TYPES = {"BiobankDataset", "PatientRegistryDataset"};
+
+  private static final String ORPHA_CODE_EXACT_MATCHING_COLUMN = "orphanet_exact_matching";
+  private static final String ORPHA_CODE_LOOKUP_ENTITY = "eu_bbmri_eric_disease_types";
 
   private final DataService dataService;
 
@@ -67,6 +69,13 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
     return q.findAll().collect(Collectors.toList());
   }
 
+  public List<Entity> getICD10ExactMatchByOrphaCode(List<String> orphaCodes) {
+    Query<Entity> q = new QueryImpl<>(dataService, ORPHA_CODE_LOOKUP_ENTITY);
+    q.in(ORPHA_CODE_EXACT_MATCHING_COLUMN, orphaCodes);
+    // Stream<Entity> entities = q.findAll();
+    return q.findAll().collect(Collectors.toList());
+  }
+
   private Query<Entity> getBaseQuery() {
 
     if (this.query == null) {
@@ -80,8 +89,7 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
               .collect(Collectors.toList());
       LOG.info("Querying for orphacodes: {}", String.join(",", diseaseCode));
       // Obtain matching ICD-10 codes from the service
-      OrphaCodeLookupService s = new OrphaCodeLookupService(dataService);
-      List<Entity> matchingICD10Codes = s.getICD10ExactMatchByOrphaCode(diseaseCode);
+      List<Entity> matchingICD10Codes = getICD10ExactMatchByOrphaCode(diseaseCode);
       if (matchingICD10Codes.isEmpty()) {
         return query;
       }

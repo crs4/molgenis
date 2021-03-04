@@ -6,12 +6,9 @@ import org.molgenis.data.Query;
 
 public abstract class QueryBuilder {
 
-  private List<String> diseaseCode;
-
-  private String diseaseOntology;
-
   public String name;
-
+  private List<String> diseaseCode;
+  private String diseaseOntology;
   private List<String> resourceType;
 
   private List<String> country;

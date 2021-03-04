@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +41,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 @ContextConfiguration(classes = {GsonConfig.class})
 class ResourceControllerTest extends AbstractMockitoSpringContextTests {
 
+  public static final String RESOURCE_TYPES_ENTITY = "eu_bbmri_eric_disease_types";
+  public static final String ORPHANET_MATCHING_COLUMN = "orphanet_exact_matching";
   private static final String EJPRD_BIOBANK_TYPE = "BiobankDataset";
   private static final String EJPRD_REGISTRY_TYPE = "PatientRegistryDataset";
   private static final String BBMRI_BIOBANK_TYPE = "BIOBANK";
@@ -57,7 +60,6 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
   private static final String BIOBANK_ENTITY_ID = "eu_bbmri_eric_biobanks";
   private static final String ORPHA_CODE = "145";
   private static final String DISEASE_NAME = "COVID";
-
   private DataService dataService;
 
   private MockMvc mockMvc;
@@ -108,6 +110,15 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
 
       entities.add(collection);
     }
+    return entities;
+  }
+
+  private List<Entity> getOrphanetLookupEntities() {
+    List<Entity> entities = new ArrayList<>();
+    Entity disease = mock(Entity.class);
+    lenient().when(disease.getString(eq(ORPHANET_MATCHING_COLUMN))).thenReturn("ORPHA:145");
+    lenient().when(disease.getString(eq("id"))).thenReturn("ORPHA:145");
+    entities.add(disease);
     return entities;
   }
 
@@ -186,8 +197,12 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
     Query<Entity> q = new QueryImpl<>();
     q.nest();
     q.in(
-        "diagnosis_available.code",
-        Collections.singletonList(String.format("ORPHA:%s", ORPHA_CODE)));
+        "diagnosis_available.id", Collections.singletonList(String.format("ORPHA:%s", ORPHA_CODE)));
+
+    // q.in(
+    //    "diagnosis_available.id",
+    //    Arrays.asList("44"));
+    // Arrays.asList("ORPHA:"+ORPHA_CODE));
 
     if (resourceType != null) {
       List<Entity> biobanks = new ArrayList<>();
@@ -224,6 +239,15 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
     if (offset != null) {
       q.offset(offset);
     }
+    return q;
+  }
+
+  private Query<Entity> getOrphanetServiceQuery(List<String> orphacodes) {
+    Query<Entity> q = new QueryImpl<>(dataService, "eu_bbmri_eric_disease_types");
+    q.nest();
+    q.in("orphanet_exact_matching", orphacodes);
+    q.unnest();
+
     return q;
   }
 
@@ -297,11 +321,24 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
   void testGetResourcesWithPaging() throws Exception {
     reset(dataService);
     int resultSize = 5;
+
     Query<Entity> findalAllQuery = getQuery(null, null, null, 5, null);
     Query<Entity> countQuery = getQuery(null, null, null, null, null);
+    Query<Entity> orphanetLookupQuery =
+        getOrphanetServiceQuery(Arrays.asList("ORPHA:" + ORPHA_CODE));
+
     findalAllQuery.pageSize(5);
 
     List<Entity> entities = getMockData(5);
+    List<Entity> lookupFirstCallEntities = getOrphanetLookupEntities();
+    List<Entity> lookupSecondCallEntities = getOrphanetLookupEntities();
+    List<Entity> lookupThirdCallEntities = getOrphanetLookupEntities();
+    lenient()
+        .when(dataService.findAll(RESOURCE_TYPES_ENTITY, orphanetLookupQuery))
+        .thenReturn(
+            lookupFirstCallEntities.stream(),
+            lookupSecondCallEntities.stream(),
+            lookupThirdCallEntities.stream());
     when(dataService.count(COLLECTIONS_ENTITY_ID, countQuery)).thenReturn((long) resultSize * 2);
     when(dataService.findAll(COLLECTIONS_ENTITY_ID, findalAllQuery)).thenReturn(entities.stream());
 
@@ -346,14 +383,32 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
   void testGetResourcesWithPagingSecondPage() throws Exception {
     reset(dataService);
     int resultSize = 5;
+
     Query<Entity> findAllQuery = getQuery(null, null, null, 5, 5);
     Query<Entity> countQuery = getQuery(null, null, null, null, null);
+
+    Query<Entity> orphanetLookupQuery =
+        getOrphanetServiceQuery(Arrays.asList("ORPHA:" + ORPHA_CODE));
+
     findAllQuery.pageSize(5);
     findAllQuery.offset(5);
-
     List<Entity> entities = getMockData(resultSize);
-    when(dataService.count(COLLECTIONS_ENTITY_ID, countQuery)).thenReturn((long) resultSize * 2);
-    when(dataService.findAll(COLLECTIONS_ENTITY_ID, findAllQuery)).thenReturn(entities.stream());
+
+    List<Entity> lookupFirstCallEntities = getOrphanetLookupEntities();
+    List<Entity> lookupSecondCallEntities = getOrphanetLookupEntities();
+    List<Entity> lookupThirdCallEntities = getOrphanetLookupEntities();
+    lenient()
+        .when(dataService.findAll(RESOURCE_TYPES_ENTITY, orphanetLookupQuery))
+        .thenReturn(
+            lookupFirstCallEntities.stream(),
+            lookupSecondCallEntities.stream(),
+            lookupThirdCallEntities.stream());
+    lenient()
+        .when(dataService.count(COLLECTIONS_ENTITY_ID, countQuery))
+        .thenReturn((long) resultSize * 2);
+    lenient()
+        .when(dataService.findAll(COLLECTIONS_ENTITY_ID, findAllQuery))
+        .thenReturn(entities.stream());
 
     ResultActions resultActions =
         this.mockMvc.perform(
@@ -374,8 +429,24 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
     int resultSize = 1;
     List<Entity> entities = getMockData(1);
 
+
     Query<Entity> findAllQuery = getQuery(null, null, null, 100, null);
     Query<Entity> countQuery = getQuery(null, null, null, null, null);
+
+    Query<Entity> orphanetLookupQuery =
+        getOrphanetServiceQuery(Arrays.asList("ORPHA:" + ORPHA_CODE));
+
+    List<Entity> lookupFirstCallEntities = getOrphanetLookupEntities();
+    List<Entity> lookupSecondCallEntities = getOrphanetLookupEntities();
+    List<Entity> lookupThirdCallEntities = getOrphanetLookupEntities();
+    lenient()
+        .when(dataService.findAll(RESOURCE_TYPES_ENTITY, orphanetLookupQuery))
+        .thenReturn(
+            lookupFirstCallEntities.stream(),
+            lookupSecondCallEntities.stream(),
+            lookupThirdCallEntities.stream());
+
+
     when(dataService.count(COLLECTIONS_ENTITY_ID, countQuery)).thenReturn((long) resultSize);
     when(dataService.findAll(COLLECTIONS_ENTITY_ID, findAllQuery)).thenReturn(entities.stream());
 
@@ -398,6 +469,18 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
 
     Query<Entity> findAllQuery = getQuery(null, null, "Cell", 100, null);
     Query<Entity> countQuery = getQuery(null, null, "Cell", null, null);
+    Query<Entity> orphanetLookupQuery =
+        getOrphanetServiceQuery(Arrays.asList("ORPHA:" + ORPHA_CODE));
+
+    List<Entity> lookupFirstCallEntities = getOrphanetLookupEntities();
+    List<Entity> lookupSecondCallEntities = getOrphanetLookupEntities();
+    List<Entity> lookupThirdCallEntities = getOrphanetLookupEntities();
+    lenient()
+        .when(dataService.findAll(RESOURCE_TYPES_ENTITY, orphanetLookupQuery))
+        .thenReturn(
+            lookupFirstCallEntities.stream(),
+            lookupSecondCallEntities.stream(),
+            lookupThirdCallEntities.stream());
 
     when(dataService.count(COLLECTIONS_ENTITY_ID, countQuery)).thenReturn((long) resultSize);
     when(dataService.findAll(COLLECTIONS_ENTITY_ID, findAllQuery)).thenReturn(entities.stream());
@@ -427,7 +510,9 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
     int resultSize = 10;
     HashMap<String, List<Entity>> entities = getMockResourcesSplittedData(resultSize);
     List<Entity> collectionEntities = entities.get("collections_bb_type");
-    List<Entity> biobankEntities = entities.get("biobanks_bb_type");
+    List<Entity> biobankEntitiesFirstCall = entities.get("biobanks_bb_type");
+    List<Entity> biobankEntitiesSecondCallCall = entities.get("biobanks_bb_type");
+    List<Entity> biobankEntitiesThirdCall = entities.get("biobanks_bb_type");
 
     Query<Entity> findAllQuery =
         getQuery(Collections.singletonList(BBMRI_BIOBANK_TYPE), null, null, 100, null);
@@ -435,6 +520,18 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
         getQuery(Collections.singletonList(BBMRI_BIOBANK_TYPE), null, null, null, null);
     Query<Entity> biobankTypeQuery =
         getBiobankLookupQuery(Collections.singletonList(BBMRI_BIOBANK_TYPE));
+    Query<Entity> orphanetLookupQuery =
+        getOrphanetServiceQuery(Arrays.asList("ORPHA:" + ORPHA_CODE));
+
+    List<Entity> lookupFirstCallEntities = getOrphanetLookupEntities();
+    List<Entity> lookupSecondCallEntities = getOrphanetLookupEntities();
+    List<Entity> lookupThirdCallEntities = getOrphanetLookupEntities();
+    lenient()
+        .when(dataService.findAll(RESOURCE_TYPES_ENTITY, orphanetLookupQuery))
+        .thenReturn(
+            lookupFirstCallEntities.stream(),
+            lookupSecondCallEntities.stream(),
+            lookupThirdCallEntities.stream());
 
     lenient()
         .when(dataService.count(COLLECTIONS_ENTITY_ID, countQuery))
@@ -444,7 +541,10 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
         .thenReturn(collectionEntities.stream());
     lenient()
         .when(dataService.findAll(BIOBANK_ENTITY_ID, biobankTypeQuery))
-        .thenReturn(biobankEntities.stream());
+        .thenReturn(
+            biobankEntitiesFirstCall.stream(),
+            biobankEntitiesSecondCallCall.stream(),
+            biobankEntitiesThirdCall.stream());
 
     ResultActions resultActions =
         this.mockMvc.perform(
@@ -465,8 +565,22 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
     List<Entity> collectionEntities = entities.get("collections_bb_type");
     collectionEntities.addAll(entities.get("collections_reg_type"));
 
+
     Query<Entity> findAllQuery = getQuery(null, null, null, 100, null);
     Query<Entity> countQuery = getQuery(null, null, null, null, null);
+    Query<Entity> orphanetLookupQuery =
+        getOrphanetServiceQuery(Arrays.asList("ORPHA:" + ORPHA_CODE));
+
+    List<Entity> lookupFirstCallEntities = getOrphanetLookupEntities();
+    List<Entity> lookupSecondCallEntities = getOrphanetLookupEntities();
+    List<Entity> lookupThirdCallEntities = getOrphanetLookupEntities();
+    lenient()
+        .when(dataService.findAll(RESOURCE_TYPES_ENTITY, orphanetLookupQuery))
+        .thenReturn(
+            lookupFirstCallEntities.stream(),
+            lookupSecondCallEntities.stream(),
+            lookupThirdCallEntities.stream());
+
 
     lenient()
         .when(dataService.count(COLLECTIONS_ENTITY_ID, countQuery))
@@ -491,8 +605,11 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
     reset(dataService);
     int resultSize = 10;
     HashMap<String, List<Entity>> entities = getMockResourcesSplittedData(resultSize);
-    List<Entity> collectionEntities = entities.get("collections_reg_type");
-    List<Entity> biobankEntities = entities.get("biobanks_reg_type");
+    List<Entity> collectionEntitiesFirstCall = entities.get("collections_reg_type");
+    List<Entity> collectionEntitiesSecondCall = entities.get("collections_reg_type");
+    List<Entity> biobankEntitiesFirstCall = entities.get("biobanks_reg_type");
+    List<Entity> biobankEntitiesSecondCall = entities.get("biobanks_reg_type");
+    List<Entity> biobankEntitiesThirdCall = entities.get("biobanks_reg_type");
 
     Query<Entity> findAllQuery =
         getQuery(Collections.singletonList(BBMRI_REGISTRY_TYPE), null, null, 100, null);
@@ -500,16 +617,32 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
         getQuery(Collections.singletonList(BBMRI_REGISTRY_TYPE), null, null, null, null);
     Query<Entity> biobankTypeQuery =
         getBiobankLookupQuery(Collections.singletonList(BBMRI_REGISTRY_TYPE));
+    Query<Entity> orphanetLookupQuery =
+        getOrphanetServiceQuery(Arrays.asList("ORPHA:" + ORPHA_CODE));
+
+    List<Entity> lookupFirstCallEntities = getOrphanetLookupEntities();
+    List<Entity> lookupSecondCallEntities = getOrphanetLookupEntities();
+    List<Entity> lookupThirdCallEntities = getOrphanetLookupEntities();
+
+    lenient()
+        .when(dataService.findAll(RESOURCE_TYPES_ENTITY, orphanetLookupQuery))
+        .thenReturn(
+            lookupFirstCallEntities.stream(),
+            lookupSecondCallEntities.stream(),
+            lookupThirdCallEntities.stream());
 
     lenient()
         .when(dataService.count(COLLECTIONS_ENTITY_ID, countQuery))
         .thenReturn((long) resultSize);
     lenient()
         .when(dataService.findAll(COLLECTIONS_ENTITY_ID, findAllQuery))
-        .thenReturn(collectionEntities.stream());
+        .thenReturn(collectionEntitiesFirstCall.stream(), collectionEntitiesSecondCall.stream());
     lenient()
         .when(dataService.findAll(BIOBANK_ENTITY_ID, biobankTypeQuery))
-        .thenReturn(biobankEntities.stream());
+        .thenReturn(
+            biobankEntitiesFirstCall.stream(),
+            biobankEntitiesSecondCall.stream(),
+            biobankEntitiesThirdCall.stream());
 
     ResultActions resultActions =
         this.mockMvc.perform(
@@ -541,8 +674,24 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
     HashMap<String, List<Entity>> entities = getMockResourcesSplittedData(resultSize);
     List<Entity> collectionEntities = entities.get("collections_reg_type");
 
+
     Query<Entity> findAllQuery = getQuery(null, Collections.singletonList("IT"), null, 100, null);
     Query<Entity> countQuery = getQuery(Collections.singletonList("IT"), null, null, null, null);
+
+
+    Query<Entity> orphanetLookupQuery =
+        getOrphanetServiceQuery(Arrays.asList("ORPHA:" + ORPHA_CODE));
+
+    List<Entity> lookupFirstCallEntities = getOrphanetLookupEntities();
+    List<Entity> lookupSecondCallEntities = getOrphanetLookupEntities();
+    List<Entity> lookupThirdCallEntities = getOrphanetLookupEntities();
+    lenient()
+        .when(dataService.findAll(RESOURCE_TYPES_ENTITY, orphanetLookupQuery))
+        .thenReturn(
+            lookupFirstCallEntities.stream(),
+            lookupSecondCallEntities.stream(),
+            lookupThirdCallEntities.stream());
+
 
     lenient()
         .when(dataService.count(COLLECTIONS_ENTITY_ID, countQuery))

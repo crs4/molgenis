@@ -78,10 +78,16 @@ public class InternalResourceQueryService implements ResourceQueryService {
   //  }
 
   private int getTotalCount(Query<Entity> query) {
+    if (query.getRules().isEmpty()) {
+      return 0;
+    }
     return Math.toIntExact(query.count());
   }
 
   private Stream<Entity> query(Query<Entity> query) {
+    if (query.getRules().isEmpty()) {
+      return Stream.empty();
+    }
     return query.findAll();
   }
 

@@ -223,7 +223,7 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
     }
     if (name != null) {
       q.and();
-      q.search("name", name);
+      q.like("name", name);
     }
     q.unnest();
 

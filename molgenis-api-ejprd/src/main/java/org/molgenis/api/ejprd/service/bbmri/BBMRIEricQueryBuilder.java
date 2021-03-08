@@ -109,7 +109,7 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
         }
         if (getName() != null) {
           query.and();
-          query.search("name", getName());
+          query.like("name", getName());
         }
       }
 

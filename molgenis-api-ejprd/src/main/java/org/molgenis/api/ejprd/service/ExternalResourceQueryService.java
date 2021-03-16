@@ -1,6 +1,5 @@
 package org.molgenis.api.ejprd.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.molgenis.api.ejprd.exceptions.ExternalSourceErrorException;
@@ -43,40 +42,34 @@ public class ExternalResourceQueryService implements ResourceQueryService {
             .map(da -> da.replace("ORPHA:", ""))
             .collect(Collectors.toList());
 
-    List<String> httpQueryParameters = new ArrayList<>();
-    httpQueryParameters.add(String.format("orphaCode=%s", String.join(",", orphaCode)));
+    UriComponentsBuilder builder =
+        UriComponentsBuilder.fromHttpUrl(serviceBaseURL).queryParam("orphaCode", orphaCode);
 
     if (queryParam.getResourceType() != null) {
-      httpQueryParameters.add(
-          String.format("resourceType=%s", String.join(",", queryParam.getResourceType())));
+      builder.queryParam("resourceType", queryParam.getResourceType());
     }
     if (queryParam.getCountry() != null) {
-      httpQueryParameters.add(
-          String.format("country=%s", String.join(",", queryParam.getCountry())));
+      builder.queryParam("country", queryParam.getCountry());
+    }
+    if (queryParam.getName() != null) {
+      builder.queryParam("name", queryParam.getName());
     }
     if (queryParam.getSkip() != null) {
-      httpQueryParameters.add(String.format("skip=%d", queryParam.getSkip()));
+      builder.queryParam("skip", queryParam.getSkip());
     }
     if (queryParam.getLimit() != null) {
-      httpQueryParameters.add(String.format("limit=%d", queryParam.getLimit()));
+      builder.queryParam("limit", queryParam.getLimit());
     }
 
-    String queryParameters = String.join("&", httpQueryParameters);
-
-    UriComponentsBuilder builder =
-        UriComponentsBuilder.fromHttpUrl(String.format("%s?%s", serviceBaseURL, queryParameters));
-
-    LOG.debug(String.format("Querying external source: %s", builder.toUriString()));
     ResponseEntity<String> response;
-
     try {
-      response = restTemplate.getForEntity(builder.toUriString(), String.class);
+      response = restTemplate.getForEntity(builder.buildAndExpand().encode().toUri(), String.class);
     } catch (ResourceAccessException | HttpClientErrorException ex) {
       throw new ExternalSourceErrorException();
     }
 
     // TODO: handle NullPointerException in case response.getBody() is malformed
-    LOG.debug("Resource returned code {}", response.getStatusCode());
+    LOG.info("Resource returned code {}", response.getStatusCode());
     if (response.getStatusCode().equals(HttpStatus.OK)) {
       return DataResponse.fromJson(response.getBody());
     } else {

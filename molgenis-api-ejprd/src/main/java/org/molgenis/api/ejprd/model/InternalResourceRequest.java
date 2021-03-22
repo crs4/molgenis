@@ -3,11 +3,14 @@ package org.molgenis.api.ejprd.model;
 import java.util.List;
 import java.util.Objects;
 import javax.validation.constraints.NotEmpty;
+import org.molgenis.api.ejprd.validators.OrphaCodeOrNameNotNull;
 
+@OrphaCodeOrNameNotNull
 public class InternalResourceRequest extends ResourceRequest {
 
   // At the moment ORPHA code is expected; TODO: implement lookup in case of IDC10 code
-  @NotEmpty(message = "OrphaCode is mandatory")
+  // @NotEmpty(message = "OrphaCode is mandatory")
+
   private List<String> orphaCode;
 
   public List<String> getOrphaCode() {

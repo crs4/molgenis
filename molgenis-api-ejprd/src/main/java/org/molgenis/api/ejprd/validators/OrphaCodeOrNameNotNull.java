@@ -24,18 +24,5 @@ public @interface OrphaCodeOrNameNotNull {
   Class<? extends Payload>[] payload() default {};
 }
 
-class OrphaCodeOrNameNotNullValidator
-    implements ConstraintValidator<OrphaCodeOrNameNotNull, InternalResourceRequest> {
 
-  @Override
-  public void initialize(OrphaCodeOrNameNotNull orphaCodeOrNameNotNullValid) {}
 
-  @Override
-  public boolean isValid(InternalResourceRequest request, ConstraintValidatorContext context) {
-
-    List<String> orphaCode = request.getOrphaCode();
-    String name = request.getName();
-
-    return orphaCode != null || name != null;
-  }
-}

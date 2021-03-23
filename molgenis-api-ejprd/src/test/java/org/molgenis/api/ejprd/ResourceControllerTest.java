@@ -59,6 +59,8 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
   private static final String BIOBANK_ENTITY_ID = "eu_bbmri_eric_biobanks";
   private static final String ORPHA_CODE = "145";
   private static final String DISEASE_NAME = "COVID";
+  private static final String COUNTRY_CODE = "IT";
+  private static final String RESOURCE_NAME = "Cell";
   private DataService dataService;
 
   private MockMvc mockMvc;
@@ -80,7 +82,7 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
 
   private List<Entity> getMockData(int size) {
     Entity country = mock(Entity.class);
-    lenient().when(country.getString(eq("id"))).thenReturn("IT");
+    lenient().when(country.getString(eq("id"))).thenReturn(COUNTRY_CODE);
     lenient().when(country.getString(eq("name"))).thenReturn("Italy");
 
     Entity resourceType = mock(Entity.class);
@@ -124,7 +126,7 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
   private HashMap<String, List<Entity>> getMockResourcesSplittedData(int size) {
     HashMap<String, List<Entity>> entities = new HashMap<>();
     Entity country = mock(Entity.class);
-    lenient().when(country.getString(eq("id"))).thenReturn("IT");
+    lenient().when(country.getString(eq("id"))).thenReturn(COUNTRY_CODE);
     lenient().when(country.getString(eq("name"))).thenReturn("Italy");
 
     // lenient().when(ressourceType.getString(eq("id"))).thenReturn(BBMRI_BIOBANK_TYPE);
@@ -228,7 +230,7 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
     }
     if (country != null) {
       q.and();
-      q.in("country", Collections.singletonList("IT"));
+      q.in("country", Collections.singletonList(COUNTRY_CODE));
     }
     q.unnest();
 
@@ -625,9 +627,9 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
     List<Entity> collectionEntities = entities.get("collections_reg_type");
 
     Query<Entity> findAllQuery =
-        getQuery(ORPHA_CODE, null, Collections.singletonList("IT"), null, 100, null);
+        getQuery(ORPHA_CODE, null, Collections.singletonList(COUNTRY_CODE), null, 100, null);
     Query<Entity> countQuery =
-        getQuery(ORPHA_CODE, Collections.singletonList("IT"), null, null, null, null);
+        getQuery(ORPHA_CODE, Collections.singletonList(COUNTRY_CODE), null, null, null, null);
 
     Query<Entity> orphanetLookupQuery =
         getOrphanetServiceQuery(Collections.singletonList("ORPHA:" + ORPHA_CODE));
@@ -656,8 +658,8 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
     int resultSize = 10;
     List<Entity> entities = getMockData(resultSize);
 
-    Query<Entity> findAllQuery = getQuery(null, null, null, "Cell", 100, null);
-    Query<Entity> countQuery = getQuery(null, null, null, "Cell", null, null);
+    Query<Entity> findAllQuery = getQuery(null, null, null, RESOURCE_NAME, 100, null);
+    Query<Entity> countQuery = getQuery(null, null, null, RESOURCE_NAME, null, null);
 
     when(dataService.count(COLLECTIONS_ENTITY_ID, countQuery)).thenReturn((long) resultSize);
     when(dataService.findAll(COLLECTIONS_ENTITY_ID, findAllQuery)).thenReturn(entities.stream());
@@ -679,9 +681,9 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
     List<Entity> entities = getMockData(resultSize);
 
     Query<Entity> findAllQuery =
-        getQuery(null, null, Collections.singletonList("IT"), "Cell", 100, null);
+        getQuery(null, null, Collections.singletonList(COUNTRY_CODE), RESOURCE_NAME, 100, null);
     Query<Entity> countQuery =
-        getQuery(null, null, Collections.singletonList("IT"), "Cell", null, null);
+        getQuery(null, null, Collections.singletonList(COUNTRY_CODE), RESOURCE_NAME, null, null);
 
     when(dataService.count(COLLECTIONS_ENTITY_ID, countQuery)).thenReturn((long) resultSize);
     when(dataService.findAll(COLLECTIONS_ENTITY_ID, findAllQuery)).thenReturn(entities.stream());
@@ -699,18 +701,44 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
 
   @Test
   void testGetResourcesByValidOrphacodeAndEmptyName() throws Exception {
+    reset(dataService);
+    int resultSize = 10;
+    List<Entity> entities = getMockData(resultSize);
+
+    Query<Entity> findAllQuery = getQuery(ORPHA_CODE, null, null, null, 100, null);
+    Query<Entity> countQuery = getQuery(ORPHA_CODE, null, null, null, null, null);
+    Query<Entity> orphanetLookupQuery =
+        getOrphanetServiceQuery(Collections.singletonList("ORPHA:" + ORPHA_CODE));
+
+    List<Entity> lookupEntities = getOrphanetLookupEntities();
+
+    lenient()
+        .when(dataService.findAll(DISEASE_TYPES_ENTITY, orphanetLookupQuery))
+        .thenReturn(lookupEntities.stream());
+
+    when(dataService.count(COLLECTIONS_ENTITY_ID, countQuery)).thenReturn((long) resultSize);
+    when(dataService.findAll(COLLECTIONS_ENTITY_ID, findAllQuery)).thenReturn(entities.stream());
     ResultActions resultActions =
         this.mockMvc.perform(
             get(URI.create(String.format("%s?orphaCode=%s&name=", BASE_API_URL, ORPHA_CODE))));
-    resultActions.andExpect(status().isBadRequest());
+    resultActions.andExpect(status().isOk());
     //      resultActions.andExpect(jsonPath("$.errors", is("")));
   }
 
   @Test
   void testGetResourcesByEmptyOrphacodeAndValidName() throws Exception {
+
     ResultActions resultActions =
         this.mockMvc.perform(
             get(URI.create(String.format("%s?name=Cell&orphaCode=", BASE_API_URL))));
+    resultActions.andExpect(status().isOk());
+    //      resultActions.andExpect(jsonPath("$.errors", is("")));
+  }
+
+  @Test
+  void testGetResourcesByOrphacodeAndNameBothEmpty() throws Exception {
+    ResultActions resultActions =
+        this.mockMvc.perform(get(URI.create(String.format("%s?name=&orphaCode=", BASE_API_URL))));
     resultActions.andExpect(status().isBadRequest());
     //      resultActions.andExpect(jsonPath("$.errors", is("")));
   }

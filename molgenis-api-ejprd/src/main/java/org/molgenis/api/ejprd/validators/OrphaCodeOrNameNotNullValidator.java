@@ -17,18 +17,6 @@ public class OrphaCodeOrNameNotNullValidator
     List<String> orphaCode = request.getOrphaCode();
     String name = request.getName();
 
-    if (orphaCode == null && name == null) {
-      return false;
-    } else if (orphaCode != null && name != null) {
-      if (!orphaCode.isEmpty()) {
-        return !name.isEmpty();
-      } else {
-        return false;
-      }
-    } else if (orphaCode != null) {
-      return !orphaCode.isEmpty();
-    } else {
-      return !name.isEmpty();
-    }
+    return (orphaCode != null && !orphaCode.isEmpty()) || (name != null && !name.isEmpty());
   }
 }

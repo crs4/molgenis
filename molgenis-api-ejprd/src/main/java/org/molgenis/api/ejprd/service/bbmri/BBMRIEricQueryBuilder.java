@@ -85,8 +85,9 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
 
       query = new QueryImpl<>(dataService, COLLECTION_ENTITY_ID);
       // Check if the orphaCode and name fields are both present, or only one of them
+      query.nest();
 
-      if (diseaseCode != null) {
+      if (diseaseCode != null && !diseaseCode.isEmpty()) {
         diseaseCode =
             diseaseCode.stream()
                 .map(dc -> String.format("ORPHA:%s", dc))
@@ -97,15 +98,12 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
         if (matchingICD10Codes.isEmpty()) {
           return query;
         }
-        query.nest();
         query.in("diagnosis_available.id", matchingICD10Codes);
-        if (name != null) {
+      }
+      if (name != null && !name.isEmpty()) {
+        if (diseaseCode != null && !diseaseCode.isEmpty()) {
           query.and();
-          query.like("name", getName());
         }
-      } else {
-        // name is for sure not null
-        query.nest();
         query.like("name", getName());
       }
 

@@ -81,20 +81,32 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
     if (this.query == null) {
 
       List<String> diseaseCode = getDiseaseCode();
+      String name = getName();
 
       query = new QueryImpl<>(dataService, COLLECTION_ENTITY_ID);
-      diseaseCode =
-          diseaseCode.stream()
-              .map(dc -> String.format("ORPHA:%s", dc))
-              .collect(Collectors.toList());
-      LOG.info("Querying for orphacodes: {}", String.join(",", diseaseCode));
-      // Obtain matching ICD-10 codes from the service
-      List<Entity> matchingICD10Codes = getICD10ExactMatchByOrphaCode(diseaseCode);
-      if (matchingICD10Codes.isEmpty()) {
-        return query;
-      }
+      // Check if the orphaCode and name fields are both present, or only one of them
       query.nest();
-      query.in("diagnosis_available.id", matchingICD10Codes);
+
+      if (diseaseCode != null && !diseaseCode.isEmpty()) {
+        diseaseCode =
+            diseaseCode.stream()
+                .map(dc -> String.format("ORPHA:%s", dc))
+                .collect(Collectors.toList());
+        LOG.info("Querying for orphacodes: {}", String.join(",", diseaseCode));
+        // Obtain matching ICD-10 codes from the service
+        List<Entity> matchingICD10Codes = getICD10ExactMatchByOrphaCode(diseaseCode);
+        if (matchingICD10Codes.isEmpty()) {
+          return query;
+        }
+        query.in("diagnosis_available.id", matchingICD10Codes);
+      }
+      if (name != null && !name.isEmpty()) {
+        if (diseaseCode != null && !diseaseCode.isEmpty()) {
+          query.and();
+        }
+        query.like("name", getName());
+      }
+
       if (anyOptionalParameter()) {
         if (getResourceType() != null
             && !getResourceType()
@@ -107,10 +119,6 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
           query.and();
           query.in("country", getCountry());
         }
-        if (getName() != null) {
-          query.and();
-          query.like("name", getName());
-        }
       }
 
       query.unnest();
@@ -119,6 +127,6 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
   }
 
   private boolean anyOptionalParameter() {
-    return getResourceType() != null || getCountry() != null || getName() != null;
+    return getResourceType() != null || getCountry() != null;
   }
 }

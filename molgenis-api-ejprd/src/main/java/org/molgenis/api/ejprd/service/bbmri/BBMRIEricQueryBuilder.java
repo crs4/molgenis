@@ -69,13 +69,6 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
     return q.findAll().collect(Collectors.toList());
   }
 
-  public List<Entity> getICD10ExactMatchByOrphaCode(List<String> orphaCodes) {
-    Query<Entity> q = new QueryImpl<>(dataService, ORPHA_CODE_LOOKUP_ENTITY);
-    q.in(ORPHA_CODE_EXACT_MATCHING_COLUMN, orphaCodes);
-    // Stream<Entity> entities = q.findAll();
-    return q.findAll().collect(Collectors.toList());
-  }
-
   private Query<Entity> getBaseQuery() {
 
     if (this.query == null) {
@@ -93,12 +86,7 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
                 .map(dc -> String.format("ORPHA:%s", dc))
                 .collect(Collectors.toList());
         LOG.info("Querying for orphacodes: {}", String.join(",", diseaseCode));
-        // Obtain matching ICD-10 codes from the service
-        List<Entity> matchingICD10Codes = getICD10ExactMatchByOrphaCode(diseaseCode);
-        if (matchingICD10Codes.isEmpty()) {
-          return query;
-        }
-        query.in("diagnosis_available.id", matchingICD10Codes);
+        query.in("diagnosis_available.id", diseaseCode);
       }
       if (name != null && !name.isEmpty()) {
         if (diseaseCode != null && !diseaseCode.isEmpty()) {

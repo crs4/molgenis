@@ -29,7 +29,7 @@ public class BBMRIEricResourceMapper implements ResourceMapper {
 
     String homepage =
         String.format( // TODO: the path should be dynamic
-            "%s/menu/main/app-molgenis-app-biobank-explorer/collection/%s",
+            "%s/menu/main/app-molgenis-app-biobank-explorer/#/collection/%s",
             baseURL, URLEncoder.encode(entity.getString("id"), StandardCharsets.UTF_8));
 
     String uuid = entity.getString("id");

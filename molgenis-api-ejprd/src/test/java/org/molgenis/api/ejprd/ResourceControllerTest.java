@@ -54,7 +54,7 @@ class ResourceControllerTest extends AbstractMockitoSpringContextTests {
   private static final String BASE_API_URL =
       String.format("%s/api/ejprd/resource/search", BASE_URL);
   private static final String COLLECTION_URL =
-      String.format("%s/menu/main/app-molgenis-app-biobank-explorer/collection", BASE_URL);
+      String.format("%s/menu/main/app-molgenis-app-biobank-explorer/#/collection", BASE_URL);
   private static final String COLLECTIONS_ENTITY_ID = "eu_bbmri_eric_collections";
   private static final String BIOBANK_ENTITY_ID = "eu_bbmri_eric_biobanks";
   private static final String ORPHA_CODE = "145";

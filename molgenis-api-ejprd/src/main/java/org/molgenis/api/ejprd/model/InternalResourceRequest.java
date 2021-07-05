@@ -20,6 +20,14 @@ public class InternalResourceRequest extends ResourceRequest {
     this.orphaCode = orphaCode;
   }
 
+  private String code;
+
+  public String getCode() { return code; }
+
+  public void setCode(@NotEmpty String code) {
+    this.code = code;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {

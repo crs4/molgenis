@@ -30,6 +30,8 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
   private static final String ORPHA_CODE_EXACT_MATCHING_COLUMN = "orphanet_exact_matching";
   private static final String ORPHA_CODE_LOOKUP_ENTITY = "eu_bbmri_eric_disease_types";
 
+  private static final String ORPHANET_URI_PREFIX = "http://www.orpha.net/ORDO/Orphanet_";
+
   private final DataService dataService;
 
   private Query<Entity> query;
@@ -107,6 +109,10 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
           query.and();
           query.in("country", getCountry());
         }
+        if (getCode() != null) {
+          query.and();
+          query.eq("diagnosis_available.id", getCode().replace(ORPHANET_URI_PREFIX, "ORPHA:"));
+        }
       }
 
       query.unnest();
@@ -115,6 +121,6 @@ public class BBMRIEricQueryBuilder extends QueryBuilder {
   }
 
   private boolean anyOptionalParameter() {
-    return getResourceType() != null || getCountry() != null;
+    return getResourceType() != null || getCountry() != null || getCode() != null;
   }
 }
